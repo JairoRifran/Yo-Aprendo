@@ -1395,31 +1395,31 @@ function applyDashboardModuleVisibility() {
 
   const activeModule = main.getAttribute("data-active-module") || "";
   const isOverview = activeModule.endsWith("-overview");
-  const directChildren = Array.from(main.children);
+  const contentRoot = main.querySelector(":scope > .dashboard-role-panel") || main;
+  const contentBlocks = Array.from(contentRoot.children);
 
-  directChildren.forEach((child) => {
+  contentRoot.querySelectorAll(".dashboard-module-hidden").forEach((child) => {
     child.classList.remove("dashboard-module-hidden");
-    child.querySelectorAll(".dashboard-module-hidden").forEach((nested) => nested.classList.remove("dashboard-module-hidden"));
   });
 
   if (isOverview) {
-    directChildren.forEach((child) => {
-      const identifiedCards = child.matches(".dashboard-card[id]")
-        ? [child]
-        : Array.from(child.querySelectorAll(":scope > .dashboard-card[id]"));
+    contentBlocks.forEach((block) => {
+      const moduleCards = block.matches(".dashboard-card[id]")
+        ? [block]
+        : Array.from(block.querySelectorAll(":scope > .dashboard-card[id]"));
 
-      identifiedCards.forEach((card) => card.classList.add("dashboard-module-hidden"));
-      if (identifiedCards.length && identifiedCards.length === child.children.length) {
-        child.classList.add("dashboard-module-hidden");
+      moduleCards.forEach((card) => card.classList.add("dashboard-module-hidden"));
+      if (moduleCards.length && moduleCards.length === block.children.length) {
+        block.classList.add("dashboard-module-hidden");
       }
     });
     return;
   }
 
   const target = document.getElementById(activeModule);
-  directChildren.forEach((child) => {
-    const containsTarget = child === target || child.contains(target);
-    child.classList.toggle("dashboard-module-hidden", !containsTarget);
+  contentBlocks.forEach((block) => {
+    const containsTarget = block === target || block.contains(target);
+    block.classList.toggle("dashboard-module-hidden", !containsTarget);
   });
 
   if (target) {
