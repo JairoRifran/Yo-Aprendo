@@ -13,6 +13,7 @@ import {
   playTurn,
   playBlocked
 } from "../utils/audio.js";
+import { uiIcon } from "../utils/icons.js";
 
 const DIRECTIONS = ["up", "right", "down", "left"];
 const DIRECTION_DELTAS = {
@@ -885,7 +886,7 @@ function renderPathGuidedMission(challenge, localState, mission) {
         <img class="mission-guided-boat" src="./img/barco.png" alt="" />
       </div>
       <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la mision">
-        <span class="mission-guided-map-icon" aria-hidden="true"></span>
+        <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("route")}</span>
         <span class="mission-guided-side-copy">
           <strong>Mision ${mission.number}</strong>
           <small>Ruta al faro</small>
@@ -898,7 +899,7 @@ function renderPathGuidedMission(challenge, localState, mission) {
           <span><i class="mission-guided-gem-icon" aria-hidden="true"></i>${appState.gems}</span>
         </span>
         <button id="guidedBackToSubmapBtn" type="button" aria-label="Volver a las islas de secuencias">
-          <span class="mission-guided-back-icon" aria-hidden="true"></span>
+          <span class="mission-guided-back-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span>
           <small>Volver</small>
         </button>
       </aside>
@@ -1164,7 +1165,7 @@ function renderChallengeBody(challenge, localState, mission) {
           <span class="fish-c"></span>
         </div>
         <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la mision">
-          <span class="mission-guided-map-icon" aria-hidden="true"></span>
+          <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("book")}</span>
           <span class="mission-guided-side-copy">
             <strong>Mision ${mission.number}</strong>
             <small>${mission.title}</small>
@@ -1177,7 +1178,7 @@ function renderChallengeBody(challenge, localState, mission) {
             <span><i class="mission-guided-gem-icon" aria-hidden="true"></i>${appState.gems}</span>
           </span>
           <button id="guidedBackToSubmapBtn" type="button" aria-label="Volver a las islas de secuencias">
-            <span class="mission-guided-back-icon" aria-hidden="true"></span>
+            <span class="mission-guided-back-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span>
             <small>Volver</small>
           </button>
         </aside>
@@ -1226,7 +1227,7 @@ function renderChallengeBody(challenge, localState, mission) {
             <span class="fish-c"></span>
           </div>
           <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la mision">
-            <span class="mission-guided-map-icon" aria-hidden="true"></span>
+            <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("book")}</span>
             <span class="mission-guided-side-copy">
               <strong>Mision ${mission.number}</strong>
               <small>${mission.title}</small>
@@ -1239,7 +1240,7 @@ function renderChallengeBody(challenge, localState, mission) {
               <span><i class="mission-guided-gem-icon" aria-hidden="true"></i>${appState.gems}</span>
             </span>
             <button id="guidedBackToSubmapBtn" type="button" aria-label="Volver a las islas de secuencias">
-              <span class="mission-guided-back-icon" aria-hidden="true"></span>
+              <span class="mission-guided-back-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span>
               <small>Volver</small>
             </button>
           </aside>
@@ -1612,20 +1613,20 @@ export function renderMission() {
       ${isFullScreenMission ? "" : `<header class="topbar">
         <div class="topbar-left">
           <div class="pill level-pill mission-header-pill">
-            <span class="mission-header-badge" aria-hidden="true">★</span>
+          <span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span>
             <span>Nivel 4</span>
           </div>
-          <div class="mission-header-chevron" aria-hidden="true">›</div>
-          <div class="pill title-pill mission-header-pill mission-header-pill-title"><span class="mission-header-icon" aria-hidden="true">&#9873;</span><span>${mission.title}</span></div>
+          <div class="mission-header-chevron" aria-hidden="true">${uiIcon("arrow-right")}</div>
+          <div class="pill title-pill mission-header-pill mission-header-pill-title"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("flag")}</span><span>${mission.title}</span></div>
         </div>
 
         <div class="topbar-right">
           <button class="pill nav-pill mission-header-pill" id="goHomeBtn" type="button">
-            <span class="mission-header-icon" aria-hidden="true">⌂</span>
+            <span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("home")}</span>
             <span>Inicio</span>
           </button>
           <button class="pill nav-pill mission-header-pill" id="openDashboardBtn" type="button">
-            <span class="mission-header-icon" aria-hidden="true">▦</span>
+            <span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span>
             <span>Paneles</span>
           </button>
           <div class="pill currency-pill">
@@ -1637,7 +1638,7 @@ export function renderMission() {
             <span>${appState.gems}</span>
           </div>
           <button class="pill nav-pill mission-header-pill mission-header-pill-icon" type="button" aria-label="Configuracion">
-            <span class="mission-header-icon" aria-hidden="true">&#9881;</span>
+            <span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("settings")}</span>
           </button>
         </div>
       </header>`}

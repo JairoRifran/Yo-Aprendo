@@ -2,6 +2,7 @@ import { grade4Data } from "../data/grade4.js";
 import { appState } from "../state/appState.js";
 import { goToDashboard, goToMission, goToStart, goToSubmap } from "../utils/navigation.js";
 import { unlockAudio, playUiClick, playSuccess, playError } from "../utils/audio.js";
+import { uiIcon } from "../utils/icons.js";
 
 const RESULT_ROBOT_ART = "./img/mission-robot-pirate.png";
 const RESULT_TOP_PANEL_ART = "./img/path-guided-top-panel.png";
@@ -152,7 +153,7 @@ export function renderResult() {
   appShell.innerHTML = `
     <main class="result-screen result-screen-celebration result-screen-guided ${result.success ? "result-screen-guided-success" : "result-screen-guided-fail"}">
       <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Resultado de la mision">
-        <span class="mission-guided-map-icon" aria-hidden="true"></span>
+        <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span>
         <span class="mission-guided-side-copy">
           <strong>Resultado</strong>
           <small>${result.success ? "Mision superada" : "Ajusta y prueba"}</small>
@@ -165,7 +166,7 @@ export function renderResult() {
           <span><i class="mission-guided-gem-icon" aria-hidden="true"></i>${appState.gems}</span>
         </span>
         <button id="resultHudBackBtn" type="button" aria-label="Volver a las islas de secuencias">
-          <span class="mission-guided-back-icon" aria-hidden="true"></span>
+          <span class="mission-guided-back-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span>
           <small>Volver</small>
         </button>
       </aside>

@@ -966,6 +966,51 @@ body::before {
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
+.ui-icon {
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mission-header-badge.ui-icon-wrap,
+.mission-header-icon.ui-icon-wrap {
+  color: #eaf8ff;
+  font-size: 18px;
+}
+
+.mission-header-badge.ui-icon-wrap::before,
+.mission-header-icon.ui-icon-wrap::before,
+.mission-header-icon.ui-icon-wrap::after,
+.start-art-role-icon.ui-icon-wrap::before,
+.start-art-role-icon.ui-icon-wrap::after,
+.mission-guided-map-icon.ui-icon-wrap::before,
+.mission-guided-gear-icon.ui-icon-wrap::before,
+.mission-guided-back-icon.ui-icon-wrap::before,
+.mission-guided-grid-icon.ui-icon-wrap::before {
+  content: none;
+}
+
+.mission-header-badge .ui-icon,
+.mission-header-icon .ui-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.start-art-role-icon.ui-icon-wrap {
+  color: #1b7fc7;
+  font-size: 22px;
+}
+
+.start-art-role-icon.ui-icon-wrap .ui-icon,
+.start-art-role-arrow .ui-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .mission-header-badge {
   background:
     radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.62), transparent 25%),
@@ -1116,6 +1161,17 @@ body::before {
   border-radius: 2px;
   transform: rotate(45deg);
   filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.22));
+}
+
+.mission-header-chevron:has(.ui-icon) {
+  display: inline-grid;
+  place-items: center;
+  color: rgba(239, 250, 255, 0.82);
+  font-size: 16px;
+}
+
+.mission-header-chevron:has(.ui-icon)::before {
+  content: none;
 }
 
 .currency-icon {
@@ -8138,9 +8194,16 @@ body::before {
 }
 
 .dashboard-svg-icon {
-  width: 100%;
-  height: 100%;
+  width: 24px;
+  height: 24px;
   display: block;
+  color: #277fc4;
+  margin: auto;
+}
+
+.owner-sidebar .dashboard-svg-icon,
+.owner-nav-icon .ui-icon {
+  color: currentColor;
 }
 
 .dashboard-list.compact {
@@ -14786,6 +14849,23 @@ body::before {
     0 4px 0 rgba(0, 24, 60, 0.42);
 }
 
+.mission-guided-map-icon.ui-icon-wrap,
+.mission-guided-gear-icon.ui-icon-wrap,
+.mission-guided-back-icon.ui-icon-wrap,
+.mission-guided-grid-icon.ui-icon-wrap {
+  display: inline-grid;
+  place-items: center;
+  color: #fff7d8;
+}
+
+.mission-guided-map-icon.ui-icon-wrap .ui-icon,
+.mission-guided-gear-icon.ui-icon-wrap .ui-icon,
+.mission-guided-back-icon.ui-icon-wrap .ui-icon,
+.mission-guided-grid-icon.ui-icon-wrap .ui-icon {
+  width: 22px;
+  height: 22px;
+}
+
 .mission-guided-map-icon::before,
 .mission-guided-gear-icon::before,
 .mission-guided-back-icon::before {
@@ -14840,6 +14920,18 @@ body::before {
   top: clamp(338px, 48vh, 358px) !important;
   z-index: 5 !important;
   overflow: visible !important;
+}
+
+.start-art-role-icon.ui-icon-wrap {
+  display: inline-grid;
+  place-items: center;
+  color: #1d78bd;
+}
+
+.start-art-role-icon.ui-icon-wrap .ui-icon,
+.start-art-role-arrow .ui-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .mission-screen-path-guided .mission-guided-route-shell .mission-guided-panel-img {

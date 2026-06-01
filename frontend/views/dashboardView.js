@@ -16,6 +16,7 @@ import {
   playSelect,
   setAmbientMode
 } from "../utils/audio.js";
+import { uiIcon } from "../utils/icons.js";
 
 const DEMO_SESSION_BY_ROLE = {
   student: {
@@ -137,25 +138,31 @@ async function ensureDashboardData() {
   }
 }
 
-function renderLoadingShell(backLabel) {
+function renderLoadingShell(backLabel, showCurrency = true) {
   return `
     <header class="topbar">
       <div class="topbar-left">
-        <div class="pill level-pill"><span class="mission-header-badge" aria-hidden="true">&#9733;</span><span>Nivel 4</span></div>
-        <div class="pill title-pill"><span class="mission-header-icon" aria-hidden="true">&#9638;</span><span>Paneles de seguimiento</span></div>
+        <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Nivel 4</span></div>
+        <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span><span>Paneles de seguimiento</span></div>
       </div>
 
       <div class="topbar-right">
-        <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon" aria-hidden="true">&#8592;</span><span>${backLabel}</span></button>
-        <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon" aria-hidden="true">&#8617;</span><span>Cerrar sesion</span></button>
-        <div class="pill currency-pill">
-          <span class="currency-icon gold"></span>
-          <span>${appState.coins}</span>
-        </div>
-        <div class="pill currency-pill">
-          <span class="currency-icon gems"></span>
-          <span>${appState.gems}</span>
-        </div>
+        <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span><span>${backLabel}</span></button>
+        <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesion</span></button>
+        ${
+          showCurrency
+            ? `
+              <div class="pill currency-pill">
+                <span class="currency-icon gold"></span>
+                <span>${appState.coins}</span>
+              </div>
+              <div class="pill currency-pill">
+                <span class="currency-icon gems"></span>
+                <span>${appState.gems}</span>
+              </div>
+            `
+            : ""
+        }
       </div>
     </header>
 
@@ -171,6 +178,8 @@ function renderLoadingShell(backLabel) {
 }
 
 function renderDashboardIcon(name) {
+  return uiIcon(name, "dashboard-svg-icon ui-icon");
+
   const icons = {
     student: `
       <svg viewBox="0 0 48 48" class="dashboard-svg-icon" aria-hidden="true">
@@ -1274,7 +1283,7 @@ export function renderDashboard() {
   const backLabel = role === "student" ? "Volver al mapa" : "Cambiar acceso";
   setAmbientMode("mission");
 
-  appShell.innerHTML = renderLoadingShell(backLabel);
+  appShell.innerHTML = renderLoadingShell(backLabel, role !== "owner");
   bindCommonEvents(role);
 
   ensureDashboardData()
@@ -1282,21 +1291,27 @@ export function renderDashboard() {
       appShell.innerHTML = `
         <header class="topbar">
           <div class="topbar-left">
-            <div class="pill level-pill"><span class="mission-header-badge" aria-hidden="true">&#9733;</span><span>Nivel 4</span></div>
-            <div class="pill title-pill"><span class="mission-header-icon" aria-hidden="true">&#9638;</span><span>Paneles de seguimiento</span></div>
+            <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Nivel 4</span></div>
+            <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span><span>Paneles de seguimiento</span></div>
           </div>
 
           <div class="topbar-right">
-            <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon" aria-hidden="true">&#8592;</span><span>${backLabel}</span></button>
-            <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon" aria-hidden="true">&#8617;</span><span>Cerrar sesion</span></button>
-            <div class="pill currency-pill">
-              <span class="currency-icon gold"></span>
-              <span>${appState.coins}</span>
-            </div>
-            <div class="pill currency-pill">
-              <span class="currency-icon gems"></span>
-              <span>${appState.gems}</span>
-            </div>
+            <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span><span>${backLabel}</span></button>
+            <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesion</span></button>
+            ${
+              role !== "owner"
+                ? `
+                  <div class="pill currency-pill">
+                    <span class="currency-icon gold"></span>
+                    <span>${appState.coins}</span>
+                  </div>
+                  <div class="pill currency-pill">
+                    <span class="currency-icon gems"></span>
+                    <span>${appState.gems}</span>
+                  </div>
+                `
+                : ""
+            }
           </div>
         </header>
 
@@ -1330,12 +1345,12 @@ export function renderDashboard() {
       appShell.innerHTML = `
         <header class="topbar">
           <div class="topbar-left">
-            <div class="pill level-pill"><span class="mission-header-badge" aria-hidden="true">&#9733;</span><span>Nivel 4</span></div>
-            <div class="pill title-pill"><span class="mission-header-icon" aria-hidden="true">&#9638;</span><span>Paneles de seguimiento</span></div>
+            <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Nivel 4</span></div>
+            <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span><span>Paneles de seguimiento</span></div>
           </div>
           <div class="topbar-right">
-            <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon" aria-hidden="true">&#8592;</span><span>${backLabel}</span></button>
-            <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon" aria-hidden="true">&#8617;</span><span>Cerrar sesion</span></button>
+            <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span><span>${backLabel}</span></button>
+            <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesion</span></button>
           </div>
         </header>
         <main class="dashboard-screen">

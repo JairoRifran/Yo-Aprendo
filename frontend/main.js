@@ -21,6 +21,7 @@ import {
   playAmbient,
   setAmbientMode
 } from "./utils/audio.js";
+import { uiIcon } from "./utils/icons.js";
 
 const worlds = grade4Data.worlds;
 let hasGlobalAudioUnlock = false;
@@ -288,13 +289,13 @@ function renderWorldMapShell() {
   appShell.innerHTML = `
     <header class="topbar world-map-hidden-topbar">
       <div class="topbar-left">
-        <div class="pill level-pill"><span class="mission-header-badge" aria-hidden="true">&#9733;</span><span>Nivel 4</span></div>
-        <div class="pill title-pill"><span class="mission-header-icon" aria-hidden="true">&#128506;</span><span>Mundos de 4.º</span></div>
+        <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Nivel 4</span></div>
+        <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span><span>Mundos de 4.º</span></div>
       </div>
 
       <div class="topbar-right">
-        <button class="pill nav-pill" id="goHomeBtn" type="button"><span class="mission-header-icon" aria-hidden="true">&#8962;</span><span>Inicio</span></button>
-        <button class="pill nav-pill" id="openDashboardBtn" type="button"><span class="mission-header-icon" aria-hidden="true">&#9638;</span><span>Paneles</span></button>
+        <button class="pill nav-pill" id="goHomeBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("home")}</span><span>Inicio</span></button>
+        <button class="pill nav-pill" id="openDashboardBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span><span>Paneles</span></button>
         <div class="pill currency-pill">
           <span class="currency-icon gold"></span>
           <span id="coinsValue">${appState.coins}</span>
@@ -311,7 +312,7 @@ function renderWorldMapShell() {
         <div id="sceneWrap">
           <img class="scene-backdrop" src="./img/worlds-ocean-story-bg.png" alt="" />
           <aside class="mission-guided-side-card mission-guided-side-card-left world-map-hud-card world-map-hud-card-left" aria-label="Nivel actual">
-            <span class="mission-guided-map-icon" aria-hidden="true"></span>
+            <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span>
             <span class="mission-guided-side-copy">
               <strong>Nivel 4</strong>
               <small>Mundos de 4.º</small>
@@ -323,11 +324,11 @@ function renderWorldMapShell() {
               <span><i class="mission-guided-gem-icon" aria-hidden="true"></i><span id="gemsValue">${appState.gems}</span></span>
             </span>
             <button id="goHomeBtn" type="button" aria-label="Inicio">
-              <span class="mission-guided-map-icon" aria-hidden="true"></span>
+              <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("home")}</span>
               <small>Inicio</small>
             </button>
             <button id="openDashboardBtn" type="button" aria-label="Paneles">
-              <span class="mission-guided-grid-icon" aria-hidden="true"></span>
+              <span class="mission-guided-grid-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span>
               <small>Paneles</small>
             </button>
           </aside>
@@ -462,7 +463,7 @@ function bootstrapWorldMap() {
   if (sceneLabel) sceneLabel.textContent = "Recupera el mapa del codigo: cada isla enseÃ±a una pieza de la aventura";
   if (titlePill) {
     titlePill.innerHTML =
-      '<span class="mission-header-icon" aria-hidden="true"></span><span>Mundos de 4.º</span>';
+      `<span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span><span>Mundos de 4.º</span>`;
   }
   if (sceneLabel) sceneLabel.textContent = "Explorá los mundos de 4.º y elegí tu próxima aventura ✨";
   if (tipsCard) {

@@ -9,6 +9,7 @@ import {
   playSelect,
   setAmbientMode
 } from "../utils/audio.js";
+import { uiIcon } from "../utils/icons.js";
 
 const ROLE_META = {
   student: {
@@ -77,14 +78,21 @@ const ROLE_META = {
 function roleCard(role, selectedRole) {
   const meta = ROLE_META[role];
   const active = selectedRole === role;
+  const iconByRole = {
+    student: "user",
+    parent: "heart",
+    teacher: "monitor",
+    institution: "school",
+    owner: "bar-chart"
+  };
 
   return `
     <button class="start-art-role-card${active ? " active" : ""}" type="button" data-role-card="${role}">
-      <span class="start-art-role-icon ${role}" aria-hidden="true"></span>
+      <span class="start-art-role-icon ${role} ui-icon-wrap" aria-hidden="true">${uiIcon(iconByRole[role] || "sparkles")}</span>
       <strong>${meta.title}</strong>
       <span>${meta.subtitle}</span>
       <em class="start-art-role-demo">${meta.demoName} &middot; ${meta.demoCode}</em>
-      <span class="start-art-role-arrow">&#8594;</span>
+      <span class="start-art-role-arrow" aria-hidden="true">${uiIcon("arrow-right")}</span>
     </button>
   `;
 }

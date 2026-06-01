@@ -3,6 +3,7 @@ import { appState } from "../state/appState.js";
 import { goToDashboard, goToMission, goToStart, goToWorldMap } from "../utils/navigation.js";
 import { getMissionState, getWorldProgress } from "../utils/progress.js";
 import { unlockAudio, playUiClick, playHoverTick, playSelect } from "../utils/audio.js";
+import { uiIcon } from "../utils/icons.js";
 
 const SUBMAP_VISUALS = [
   { x: 13, y: 65, size: 154, art: "./img/start-island-treasure.png", depth: 5 },
@@ -137,10 +138,10 @@ export function renderSubmap() {
     <header class="topbar submap-v2-topbar submap-v2-hidden-topbar">
       <div class="topbar-left submap-v2-topbar-left">
         <div class="pill level-pill submap-v2-level-pill">
-          <span class="mission-header-badge">★</span>
+          <span class="mission-header-badge ui-icon-wrap">${uiIcon("trophy")}</span>
           <span>Nivel 4</span>
         </div>
-        <span class="mission-header-chevron" aria-hidden="true">›</span>
+        <span class="mission-header-chevron" aria-hidden="true">${uiIcon("arrow-right")}</span>
         <div class="pill title-pill mission-header-pill mission-header-pill-title submap-v2-title-pill">
           <img class="submap-v2-pill-art" src="./img/start-island-treasure.png" alt="" />
           <span>${world.title}</span>
@@ -149,11 +150,11 @@ export function renderSubmap() {
 
       <div class="topbar-right submap-v2-topbar-right">
         <button class="pill nav-pill mission-header-pill" id="goHomeBtn" type="button">
-          <span class="mission-header-icon">⌂</span>
+          <span class="mission-header-icon ui-icon-wrap">${uiIcon("home")}</span>
           <span>Inicio</span>
         </button>
         <button class="pill nav-pill mission-header-pill" id="openDashboardBtn" type="button">
-          <span class="mission-header-icon">▦</span>
+          <span class="mission-header-icon ui-icon-wrap">${uiIcon("panels")}</span>
           <span>Paneles</span>
         </button>
         <div class="pill currency-pill mission-header-pill">
@@ -169,7 +170,7 @@ export function renderSubmap() {
 
     <main class="submap-v2-screen submap-v2-fullscreen">
       <aside class="mission-guided-side-card mission-guided-side-card-left submap-v2-hud-card submap-v2-hud-card-left" aria-label="Mundo actual">
-        <span class="mission-guided-map-icon" aria-hidden="true"></span>
+        <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span>
         <span class="mission-guided-side-copy">
           <strong>Nivel 4</strong>
           <small>${world.title}</small>
@@ -181,11 +182,11 @@ export function renderSubmap() {
           <span><i class="mission-guided-gem-icon" aria-hidden="true"></i><span>${appState.gems}</span></span>
         </span>
         <button id="submapHudHomeBtn" type="button" aria-label="Inicio">
-          <span class="mission-guided-map-icon" aria-hidden="true"></span>
+          <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("home")}</span>
           <small>Inicio</small>
         </button>
         <button id="submapHudDashboardBtn" type="button" aria-label="Paneles">
-          <span class="mission-guided-grid-icon" aria-hidden="true"></span>
+          <span class="mission-guided-grid-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span>
           <small>Paneles</small>
         </button>
       </aside>
