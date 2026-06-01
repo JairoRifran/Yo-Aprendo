@@ -417,6 +417,7 @@ function roleModules(role) {
     ],
     institution: [
       { id: "institution-overview", icon: "school", label: "Resumen institucional", hint: "Centro, plan y uso" },
+      { id: "institution-plan", icon: "badge", label: "Mi plan", hint: "Planes y upgrade" },
       { id: "institution-groups", icon: "users", label: "Grupos", hint: "Estructura escolar" },
       { id: "institution-student-register", icon: "user", label: "Alumnos", hint: "Registro y accesos" },
       { id: "institution-guardian-access", icon: "heart", label: "Familias", hint: "Invitaciones" },
@@ -438,6 +439,10 @@ function roleSidebarMeta(role, data) {
 
 function renderRoleSidebar(role, data) {
   const meta = roleSidebarMeta(role, data);
+  const modules = roleModules(role);
+  const activeModule = modules.some((item) => item.id === appState.selectedDashboardModule)
+    ? appState.selectedDashboardModule
+    : `${role}-overview`;
   return `
     <aside class="owner-sidebar role-sidebar" aria-label="Modulos del dashboard">
       <div class="owner-sidebar-brand">
@@ -448,10 +453,10 @@ function renderRoleSidebar(role, data) {
         </div>
       </div>
       <nav class="owner-nav">
-        ${roleModules(role)
+        ${modules
           .map(
             (item, index) => `
-              <button class="owner-nav-item${index === 0 ? " active" : ""}" type="button" data-scroll-target="${item.id}">
+              <button class="owner-nav-item${activeModule === item.id || (!appState.selectedDashboardModule && index === 0) ? " active" : ""}" type="button" data-scroll-target="${item.id}">
                 <span class="owner-nav-icon ${item.icon}" aria-hidden="true">${uiIcon(item.icon, "dashboard-svg-icon ui-icon")}</span>
                 <span>
                   <strong>${item.label}</strong>
@@ -467,10 +472,14 @@ function renderRoleSidebar(role, data) {
 }
 
 function renderRoleWorkspace(role, data, content) {
+  const modules = roleModules(role);
+  const activeModule = modules.some((item) => item.id === appState.selectedDashboardModule)
+    ? appState.selectedDashboardModule
+    : `${role}-overview`;
   return `
     <section class="dashboard-role-panel owner-workspace role-workspace role-${role}-workspace">
       ${renderRoleSidebar(role, data)}
-      <div class="owner-main role-main" id="${role}-overview">
+      <div class="owner-main role-main" id="${role}-overview" data-active-module="${activeModule}">
         ${content}
       </div>
     </section>
@@ -706,6 +715,10 @@ function renderTeacherPanel(data) {
         <article class="dashboard-card" id="teacher-student-register">
           <div class="eyebrow">Alta de alumnos</div>
           <h2>Registro en el aula</h2>
+          <div class="dashboard-highlight">
+            <strong>Aulas asignadas</strong>
+            <p>El docente puede registrar alumnos dentro de sus grupos asignados. La creacion de nuevos grupos queda en el panel institucional para mantener la estructura del centro ordenada.</p>
+          </div>
           <form id="createStudentForm" class="dashboard-form-grid dashboard-form-grid-compact">
             <select class="dashboard-input" name="classroom_id" required>
               ${data.classrooms.map((classroom) => `<option value="${classroom.id}">${classroom.name}</option>`).join("")}
@@ -969,7 +982,7 @@ function renderInstitutionPanel(data) {
         </div>
       </div>
 
-      <article class="dashboard-card">
+      <article class="dashboard-card" id="institution-plan">
         <div class="eyebrow">Plan institucional</div>
         <h2>${subscription.plan_key === "trial" ? "Piloto activo" : subscription.plan_key}</h2>
         <div class="dashboard-grid dashboard-grid-3">
@@ -980,6 +993,30 @@ function renderInstitutionPanel(data) {
         <div class="dashboard-highlight ${subscription.can_add_students ? "" : "secondary"}">
           <strong>Flujo recomendado</strong>
           <p>La institucion administra el espacio, crea docentes y aulas, registra alumnos y habilita familias por invitacion. El plan piloto permite validar el uso antes de contratar un plan escuela o convenio.</p>
+        </div>
+        <div class="dashboard-grid dashboard-grid-3 dashboard-plan-grid">
+          <article class="dashboard-mini-item dashboard-plan-card good">
+            <strong>Piloto</strong>
+            <span>90 dias para validar uso real con un grupo inicial.</span>
+            <small>Hasta 50 alumnos, 2 docentes, seguimiento institucional y soporte de activacion.</small>
+            <b>Ideal para empezar sin friccion.</b>
+          </article>
+          <article class="dashboard-mini-item dashboard-plan-card">
+            <strong>Escuela</strong>
+            <span>Plan mensual para operar con varios grupos del centro.</span>
+            <small>Hasta 300 alumnos, docentes por aula, familias vinculadas y metricas de avance.</small>
+            <b>Recomendado para continuidad.</b>
+          </article>
+          <article class="dashboard-mini-item dashboard-plan-card">
+            <strong>Red educativa</strong>
+            <span>Implementacion a medida para Ceibal, redes o convenios.</span>
+            <small>SSO, despliegue por instituciones, reportes agregados y acompanamiento.</small>
+            <b>Para escalar con evidencia.</b>
+          </article>
+        </div>
+        <div class="dashboard-alert good">
+          <strong>Siguiente paso sugerido</strong>
+          <p>Si el piloto ya tiene grupos y alumnos activos, conviene pasar a Plan Escuela para sostener el uso y presentar evidencia institucional.</p>
         </div>
       </article>
 
@@ -1237,6 +1274,8 @@ function bindCommonEvents(role) {
     if (role === "student") {
       goToWorldMap();
     } else {
+      appState.selectedDashboardModule = "";
+      appState.selectedOwnerMetric = "";
       goToStart();
     }
     window.renderApp();
@@ -1252,6 +1291,7 @@ function bindCommonEvents(role) {
     appState.dashboardData = null;
     appState.dashboardError = "";
     appState.selectedOwnerMetric = "";
+    appState.selectedDashboardModule = "";
     appState.selectedDashboardRole = "student";
     clearSession();
     goToStart();
@@ -1322,9 +1362,11 @@ function bindDashboardJumpLinks() {
 
       unlockAudio();
       playSelect();
-      document.querySelectorAll(".role-sidebar .owner-nav-item").forEach((item) => item.classList.remove("active"));
-      if (node.classList.contains("owner-nav-item")) {
-        node.classList.add("active");
+      const roleWorkspace = node.closest(".role-workspace");
+      if (roleWorkspace) {
+        appState.selectedDashboardModule = targetId;
+        window.renderApp();
+        return;
       }
       target.scrollIntoView({
         behavior: "smooth",
@@ -1341,9 +1383,53 @@ function bindOwnerMetricLinks() {
       playSelect();
       const moduleId = node.getAttribute("data-owner-module") || "overview";
       appState.selectedOwnerMetric = moduleId === "overview" ? "" : moduleId;
+      appState.selectedDashboardModule = "";
       window.renderApp();
     });
   });
+}
+
+function applyDashboardModuleVisibility() {
+  const main = document.querySelector(".role-main[data-active-module]");
+  if (!main) return;
+
+  const activeModule = main.getAttribute("data-active-module") || "";
+  const isOverview = activeModule.endsWith("-overview");
+  const directChildren = Array.from(main.children);
+
+  directChildren.forEach((child) => {
+    child.classList.remove("dashboard-module-hidden");
+    child.querySelectorAll(".dashboard-module-hidden").forEach((nested) => nested.classList.remove("dashboard-module-hidden"));
+  });
+
+  if (isOverview) {
+    directChildren.forEach((child) => {
+      const identifiedCards = child.matches(".dashboard-card[id]")
+        ? [child]
+        : Array.from(child.querySelectorAll(":scope > .dashboard-card[id]"));
+
+      identifiedCards.forEach((card) => card.classList.add("dashboard-module-hidden"));
+      if (identifiedCards.length && identifiedCards.length === child.children.length) {
+        child.classList.add("dashboard-module-hidden");
+      }
+    });
+    return;
+  }
+
+  const target = document.getElementById(activeModule);
+  directChildren.forEach((child) => {
+    const containsTarget = child === target || child.contains(target);
+    child.classList.toggle("dashboard-module-hidden", !containsTarget);
+  });
+
+  if (target) {
+    const parentGrid = target.parentElement;
+    if (parentGrid && parentGrid.classList.contains("dashboard-grid")) {
+      Array.from(parentGrid.children).forEach((sibling) => {
+        sibling.classList.toggle("dashboard-module-hidden", sibling !== target);
+      });
+    }
+  }
 }
 
 export function renderDashboard() {
@@ -1390,6 +1476,7 @@ export function renderDashboard() {
       `;
 
       bindCommonEvents(role);
+      applyDashboardModuleVisibility();
       bindDashboardJumpLinks();
       if (role === "owner") {
         bindOwnerMetricLinks();

@@ -14,6 +14,7 @@ export const appState = {
   startAccessData: null,
   selectedInstitutionPlan: "trial",
   selectedOwnerMetric: "",
+  selectedDashboardModule: "",
 
   coins: 350,
   gems: 25,

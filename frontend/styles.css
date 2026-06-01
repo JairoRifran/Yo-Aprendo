@@ -8171,6 +8171,40 @@ body::before {
   margin-bottom: 6px;
 }
 
+.dashboard-module-hidden {
+  display: none !important;
+}
+
+.role-main > .dashboard-hero {
+  margin-bottom: 0;
+}
+
+.role-main > .dashboard-grid,
+.role-main > .dashboard-card {
+  min-width: 0;
+}
+
+.dashboard-plan-grid {
+  margin-top: 16px;
+}
+
+.dashboard-plan-card {
+  align-content: start;
+  min-height: 190px;
+  gap: 10px;
+}
+
+.dashboard-plan-card strong {
+  font-size: 20px;
+}
+
+.dashboard-plan-card b {
+  display: block;
+  margin-top: 4px;
+  color: #137257;
+  font-size: 13px;
+}
+
 .dashboard-card[id] {
   scroll-margin-top: 110px;
 }
