@@ -12,6 +12,7 @@ export const appState = {
   dashboardLoading: false,
   dashboardError: "",
   startAccessData: null,
+  selectedInstitutionPlan: "trial",
 
   coins: 350,
   gems: 25,

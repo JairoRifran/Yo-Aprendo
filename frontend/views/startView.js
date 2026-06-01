@@ -226,24 +226,27 @@ function renderInstitutionLandingPanel() {
             </div>
 
             <div class="institution-plan-list">
-              <article class="institution-plan-card featured">
+              <button class="institution-plan-card featured" type="button" data-institution-plan="trial">
                 <div class="start-art-side-label small">Piloto</div>
                 <h3>90 dias gratis</h3>
                 <p>Para validar el uso en una escuela o grupo inicial.</p>
                 <strong>50 alumnos · 2 docentes</strong>
-              </article>
-              <article class="institution-plan-card">
+                <em>Crear piloto</em>
+              </button>
+              <button class="institution-plan-card" type="button" data-institution-plan="school">
                 <div class="start-art-side-label small">Escuela</div>
                 <h3>Plan mensual</h3>
                 <p>Para centros que ya quieren operar con varios grupos.</p>
                 <strong>Hasta 300 alumnos</strong>
-              </article>
-              <article class="institution-plan-card">
+                <em>Solicitar incorporacion</em>
+              </button>
+              <button class="institution-plan-card" type="button" data-institution-plan="enterprise">
                 <div class="start-art-side-label small">Red educativa</div>
                 <h3>A medida</h3>
                 <p>Para Ceibal, redes, convenios y despliegues con SSO.</p>
                 <strong>Integracion institucional</strong>
-              </article>
+                <em>Hablar con el equipo</em>
+              </button>
             </div>
           </div>
         </div>
@@ -253,6 +256,53 @@ function renderInstitutionLandingPanel() {
           <button id="backToInstitutionAccessBtn" class="btn btn-secondary start-art-submit" type="button">Entrar con acceso existente</button>
         </div>
       </div>
+    </section>
+  `;
+}
+
+function renderInstitutionPlanRequestPanel(planKey = "school") {
+  const planCopy = {
+    school: {
+      eyebrow: "Plan Escuela",
+      title: "Incorporar Yo Aprendo en tu centro",
+      text: "Dejanos los datos de la institucion y preparamos una propuesta para operar con varios grupos, docentes y seguimiento familiar.",
+      cta: "Solicitar plan escuela"
+    },
+    enterprise: {
+      eyebrow: "Red educativa",
+      title: "Despliegue para redes, convenios o Ceibal",
+      text: "Armamos una conversacion institucional para evaluar volumen, integraciones, SSO, auditoria y condiciones de despliegue.",
+      cta: "Solicitar reunion"
+    }
+  };
+  const copy = planCopy[planKey] || planCopy.school;
+
+  return `
+    <section class="start-art-login-panel start-art-register-panel">
+      <div class="start-art-login-top">
+        <div class="start-art-side-label">${copy.eyebrow}</div>
+        <button class="start-art-back-link" id="backToInstitutionLanding" type="button">Ver planes</button>
+      </div>
+      <h2>${copy.title}</h2>
+      <p>${copy.text}</p>
+
+      <form class="start-art-form" id="institutionPlanRequestForm">
+        <label class="start-field-label" for="requestInstitutionNameInput">Nombre del centro o red</label>
+        <input id="requestInstitutionNameInput" class="start-input" name="institution_name" type="text" maxlength="160" placeholder="Ej: Colegio, red educativa o programa" required />
+
+        <label class="start-field-label" for="requestContactNameInput">Persona de contacto</label>
+        <input id="requestContactNameInput" class="start-input" name="contact_name" type="text" maxlength="120" placeholder="Nombre y apellido" required />
+
+        <label class="start-field-label" for="requestEmailInput">Email institucional</label>
+        <input id="requestEmailInput" class="start-input" name="email" type="email" maxlength="160" placeholder="contacto@institucion.edu.uy" required />
+
+        <label class="start-field-label" for="requestSizeInput">Cantidad estimada de alumnos</label>
+        <input id="requestSizeInput" class="start-input" name="student_count" type="text" maxlength="80" placeholder="Ej: 450 alumnos" />
+
+        <button id="institutionPlanRequestBtn" class="btn btn-primary start-art-submit" type="submit">${copy.cta}</button>
+        <div class="start-role-note start-art-role-note">Te dejamos la solicitud preparada para contacto comercial. El piloto sigue disponible si queres probar hoy.</div>
+        <div class="start-art-form-error" id="institutionPlanRequestResult"></div>
+      </form>
     </section>
   `;
 }
@@ -345,9 +395,11 @@ export function renderStart() {
               ? renderChooserPanel(selectedRole)
               : accessMode === "institution-landing"
                 ? renderInstitutionLandingPanel()
-                : accessMode === "institution-register"
-                ? renderInstitutionRegisterPanel()
-                : renderLoginPanel(meta, currentName, currentCode)
+                : accessMode === "institution-plan-request"
+                  ? renderInstitutionPlanRequestPanel(appState.selectedInstitutionPlan)
+                  : accessMode === "institution-register"
+                    ? renderInstitutionRegisterPanel()
+                    : renderLoginPanel(meta, currentName, currentCode)
           }
         </div>
       </section>
@@ -433,6 +485,38 @@ export function renderStart() {
     playSelect();
     appState.startAccessMode = "institution-register";
     window.renderApp();
+  });
+
+  document.querySelectorAll("[data-institution-plan]").forEach((button) => {
+    button.addEventListener("click", () => {
+      unlockAudio();
+      playSelect();
+      const plan = button.dataset.institutionPlan;
+      if (plan === "trial") {
+        appState.startAccessMode = "institution-register";
+      } else {
+        appState.selectedInstitutionPlan = plan;
+        appState.startAccessMode = "institution-plan-request";
+      }
+      window.renderApp();
+    });
+  });
+
+  document.getElementById("backToInstitutionLanding")?.addEventListener("click", () => {
+    unlockAudio();
+    playUiClick();
+    appState.startAccessMode = "institution-landing";
+    window.renderApp();
+  });
+
+  document.getElementById("institutionPlanRequestForm")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    unlockAudio();
+    playSelect();
+    const resultNode = document.getElementById("institutionPlanRequestResult");
+    if (resultNode) {
+      resultNode.textContent = "Solicitud registrada. El siguiente paso es coordinar contacto institucional.";
+    }
   });
 
   document.getElementById("institutionRegisterForm")?.addEventListener("submit", async (event) => {
