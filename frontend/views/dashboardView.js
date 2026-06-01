@@ -856,6 +856,57 @@ function renderInstitutionPanel(data) {
 
 function renderOwnerPanel(data) {
   const summary = data.summary;
+  const detailCards = [
+    {
+      id: "owner-detail-institutions",
+      title: "Instituciones",
+      text: "Sirve para mostrar alcance comercial: cuantos centros entraron, con que plan y que tan avanzada esta su implementacion.",
+      rows: data.institutions.map((institution) => `${institution.name}: ${institution.students} alumnos, ${institution.classrooms} aulas, plan ${institution.plan}`)
+    },
+    {
+      id: "owner-detail-students",
+      title: "Alumnos",
+      text: "Mide volumen pedagogico y tamano potencial de contrato por institucion.",
+      rows: data.institutions.map((institution) => `${institution.name}: ${institution.students} alumnos cargados`)
+    },
+    {
+      id: "owner-detail-active",
+      title: "Actividad",
+      text: "Muestra adopcion real, no solo registros. Es clave para conversaciones con decisores.",
+      rows: data.institutions.map((institution) => `${institution.name}: ${institution.avg_completion}% avance promedio, ${institution.alerts} alertas`)
+    },
+    {
+      id: "owner-detail-progress",
+      title: "Avance pedagogico",
+      text: "Evidencia los conceptos trabajados y permite contar una historia de aprendizaje medible.",
+      rows: data.concept_overview.map((concept) => `${concept.title}: ${concept.percent}% de avance agregado`)
+    },
+    {
+      id: "owner-detail-teachers",
+      title: "Docentes",
+      text: "Indica capacidad operativa dentro de cada institucion y adopcion del equipo escolar.",
+      rows: data.institutions.map((institution) => `${institution.name}: ${institution.teachers} docentes`)
+    },
+    {
+      id: "owner-detail-families",
+      title: "Familias vinculadas",
+      text: "Demuestra valor extendido hacia el hogar y acompanamiento familiar.",
+      rows: data.institutions.map((institution) => `${institution.name}: ${institution.guardians} familias vinculadas`)
+    },
+    {
+      id: "owner-detail-minutes",
+      title: "Minutos semanales",
+      text: "Resume intensidad de uso y ayuda a defender recurrencia del producto.",
+      rows: data.institutions.map((institution) => `${institution.name}: ${institution.students} alumnos registrados para uso semanal`)
+    },
+    {
+      id: "owner-detail-alerts",
+      title: "Alertas",
+      text: "Convierte el panel en herramienta de seguimiento pedagogico, no solo analitica comercial.",
+      rows: data.institutions.map((institution) => `${institution.name}: ${institution.alerts} alumnos para seguimiento`)
+    }
+  ];
+
   return `
     <section class="dashboard-role-panel">
       <div class="dashboard-hero institution">
@@ -871,17 +922,36 @@ function renderOwnerPanel(data) {
       </div>
 
       <div class="dashboard-grid dashboard-grid-4">
-        ${renderStatCard("groups", "Instituciones", summary.institutions, "Centros registrados en la plataforma.")}
-        ${renderStatCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.")}
-        ${renderStatCard("today", "Activos", summary.active_students, "Alumnos con estado activo.")}
-        ${renderStatCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.")}
+        ${renderStatCard("groups", "Instituciones", summary.institutions, "Centros registrados en la plataforma.", "owner-detail-institutions")}
+        ${renderStatCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.", "owner-detail-students")}
+        ${renderStatCard("today", "Activos", summary.active_students, "Alumnos con estado activo.", "owner-detail-active")}
+        ${renderStatCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.", "owner-detail-progress")}
       </div>
 
       <div class="dashboard-grid dashboard-grid-4">
-        ${renderStatCard("teacher", "Docentes", summary.teachers, "Docentes vinculados a instituciones.")}
-        ${renderStatCard("family", "Familias vinculadas", summary.linked_guardians, "Seguimiento familiar activo.")}
-        ${renderStatCard("timer", "Minutos semanales", summary.weekly_minutes, "Uso acumulado reportado.")}
-        ${renderStatCard("support", "Alertas", summary.at_risk_students, "Alumnos para seguimiento.")}
+        ${renderStatCard("teacher", "Docentes", summary.teachers, "Docentes vinculados a instituciones.", "owner-detail-teachers")}
+        ${renderStatCard("family", "Familias vinculadas", summary.linked_guardians, "Seguimiento familiar activo.", "owner-detail-families")}
+        ${renderStatCard("timer", "Minutos semanales", summary.weekly_minutes, "Uso acumulado reportado.", "owner-detail-minutes")}
+        ${renderStatCard("support", "Alertas", summary.at_risk_students, "Alumnos para seguimiento.", "owner-detail-alerts")}
+      </div>
+
+      <div class="dashboard-owner-detail-grid">
+        ${detailCards
+          .map(
+            (detail) => `
+              <article class="dashboard-card owner-detail-card" id="${detail.id}">
+                <div class="eyebrow">Detalle de metrica</div>
+                <h2>${detail.title}</h2>
+                <p>${detail.text}</p>
+                <div class="dashboard-mini-list">
+                  ${detail.rows.length
+                    ? detail.rows.map((row) => `<div class="dashboard-mini-item"><span>${row}</span></div>`).join("")
+                    : `<div class="dashboard-mini-item"><span>Todavia no hay datos suficientes para esta metrica.</span></div>`}
+                </div>
+              </article>
+            `
+          )
+          .join("")}
       </div>
 
       <div class="dashboard-grid dashboard-grid-2">
