@@ -486,6 +486,23 @@ function renderRoleWorkspace(role, data, content) {
   `;
 }
 
+function renderInstitutionPlanCard({ name, badge, price, audience, features, cta, tone = "" }) {
+  return `
+    <article class="institution-plan-card ${tone}">
+      ${badge ? `<span class="institution-plan-badge">${badge}</span>` : ""}
+      <div>
+        <h3>${name}</h3>
+        <strong>${price}</strong>
+        <p>${audience}</p>
+      </div>
+      <ul>
+        ${features.map((item) => `<li>${item}</li>`).join("")}
+      </ul>
+      <button class="btn ${tone === "recommended" ? "btn-primary" : "btn-secondary"} institution-plan-cta" type="button">${cta}</button>
+    </article>
+  `;
+}
+
 function ownerMetricConfig(metric) {
   const configs = {
     institutions: {
@@ -983,40 +1000,63 @@ function renderInstitutionPanel(data) {
       </div>
 
       <article class="dashboard-card" id="institution-plan">
-        <div class="eyebrow">Plan institucional</div>
-        <h2>${subscription.plan_key === "trial" ? "Piloto activo" : subscription.plan_key}</h2>
-        <div class="dashboard-grid dashboard-grid-3">
-          ${renderStatCard("students", "Uso de alumnos", `${subscription.student_count} / ${studentLimitLabel}`, "Alumnos habilitados en el centro.", "institution-student-register")}
-          ${renderStatCard("teacher", "Docentes", `${subscription.teacher_count} / ${subscription.teacher_limit || "sin limite"}`, "Administrados por la institucion.", "institution-groups")}
-          ${renderStatCard("support", "Estado", subscription.status, "La institucion conserva sus datos aunque cambie el plan.", "institution-groups")}
+        <div class="institution-plan-hero">
+          <div>
+            <div class="eyebrow">Mi plan</div>
+            <h2>${subscription.plan_key === "trial" ? "Piloto activo" : subscription.plan_key}</h2>
+            <p>Converti el piloto en una implementacion estable con mas grupos, mas evidencia pedagogica y reportes listos para direccion o referentes institucionales.</p>
+          </div>
+          <div class="institution-plan-meter">
+            <span>Uso actual</span>
+            <strong>${subscription.student_count} / ${studentLimitLabel}</strong>
+            <small>alumnos habilitados</small>
+          </div>
         </div>
-        <div class="dashboard-highlight ${subscription.can_add_students ? "" : "secondary"}">
-          <strong>Flujo recomendado</strong>
-          <p>La institucion administra el espacio, crea docentes y aulas, registra alumnos y habilita familias por invitacion. El plan piloto permite validar el uso antes de contratar un plan escuela o convenio.</p>
+
+        <div class="institution-plan-signal">
+          <div>
+            <strong>Senal de compra</strong>
+            <span>Ya hay estructura creada. El siguiente valor esta en sostener uso, sumar docentes y demostrar impacto.</span>
+          </div>
+          <b>Plan Escuela recomendado</b>
         </div>
-        <div class="dashboard-grid dashboard-grid-3 dashboard-plan-grid">
-          <article class="dashboard-mini-item dashboard-plan-card good">
-            <strong>Piloto</strong>
-            <span>90 dias para validar uso real con un grupo inicial.</span>
-            <small>Hasta 50 alumnos, 2 docentes, seguimiento institucional y soporte de activacion.</small>
-            <b>Ideal para empezar sin friccion.</b>
-          </article>
-          <article class="dashboard-mini-item dashboard-plan-card">
-            <strong>Escuela</strong>
-            <span>Plan mensual para operar con varios grupos del centro.</span>
-            <small>Hasta 300 alumnos, docentes por aula, familias vinculadas y metricas de avance.</small>
-            <b>Recomendado para continuidad.</b>
-          </article>
-          <article class="dashboard-mini-item dashboard-plan-card">
-            <strong>Red educativa</strong>
-            <span>Implementacion a medida para Ceibal, redes o convenios.</span>
-            <small>SSO, despliegue por instituciones, reportes agregados y acompanamiento.</small>
-            <b>Para escalar con evidencia.</b>
-          </article>
+
+        <div class="institution-plan-grid">
+          ${renderInstitutionPlanCard({
+            name: "Piloto",
+            badge: "Activo ahora",
+            price: "90 dias gratis",
+            audience: "Para validar Yo Aprendo en una escuela o grupo inicial.",
+            features: ["Hasta 50 alumnos", "2 docentes", "Seguimiento institucional", "Soporte de activacion"],
+            cta: "Continuar piloto",
+            tone: "current"
+          })}
+          ${renderInstitutionPlanCard({
+            name: "Escuela",
+            badge: "Mas elegido",
+            price: "Plan mensual",
+            audience: "Para centros que ya quieren operar con varios grupos.",
+            features: ["Hasta 300 alumnos", "Docentes por aula", "Familias vinculadas", "Metricas para direccion"],
+            cta: "Solicitar Plan Escuela",
+            tone: "recommended"
+          })}
+          ${renderInstitutionPlanCard({
+            name: "Red educativa",
+            badge: "A medida",
+            price: "Convenio",
+            audience: "Para Ceibal, redes, inspecciones o despliegues con SSO.",
+            features: ["Multiples instituciones", "Reportes agregados", "Integracion institucional", "Acompanamiento de adopcion"],
+            cta: "Hablar por convenio",
+            tone: "enterprise"
+          })}
         </div>
-        <div class="dashboard-alert good">
-          <strong>Siguiente paso sugerido</strong>
-          <p>Si el piloto ya tiene grupos y alumnos activos, conviene pasar a Plan Escuela para sostener el uso y presentar evidencia institucional.</p>
+
+        <div class="institution-plan-proof">
+          <div>
+            <strong>Por que avanzar ahora</strong>
+            <p>Cuando el piloto pasa a uso semanal, el valor deja de estar en probar la herramienta y pasa a ordenar adopcion, seguimiento y evidencia para tomar decisiones.</p>
+          </div>
+          <button class="btn btn-primary" type="button">Quiero ampliar mi plan</button>
         </div>
       </article>
 

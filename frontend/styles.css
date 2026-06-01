@@ -8184,25 +8184,177 @@ body::before {
   min-width: 0;
 }
 
-.dashboard-plan-grid {
-  margin-top: 16px;
+.institution-plan-hero {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 4px 0 18px;
 }
 
-.dashboard-plan-card {
-  align-content: start;
-  min-height: 190px;
-  gap: 10px;
+.institution-plan-hero h2 {
+  font-size: 34px;
 }
 
-.dashboard-plan-card strong {
-  font-size: 20px;
+.institution-plan-hero p {
+  max-width: 760px;
 }
 
-.dashboard-plan-card b {
+.institution-plan-meter {
+  min-width: 170px;
+  padding: 18px;
+  border-radius: 18px;
+  color: #123a5e;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.9), transparent 34%),
+    linear-gradient(180deg, #fff2b8, #ffd06a);
+  box-shadow: 0 16px 28px rgba(255, 194, 73, 0.2);
+}
+
+.institution-plan-meter span,
+.institution-plan-meter small {
   display: block;
-  margin-top: 4px;
-  color: #137257;
-  font-size: 13px;
+  color: #5d6c73;
+  font-size: 12px;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.institution-plan-meter strong {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 30px;
+}
+
+.institution-plan-signal,
+.institution-plan-proof {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(70, 199, 160, 0.28);
+  background: linear-gradient(180deg, rgba(226, 255, 244, 0.92), rgba(240, 251, 255, 0.9));
+}
+
+.institution-plan-signal strong,
+.institution-plan-proof strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #113c67;
+}
+
+.institution-plan-signal span,
+.institution-plan-proof p {
+  margin: 0;
+  color: #557796;
+}
+
+.institution-plan-signal b {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: #0d654e;
+  background: rgba(90, 236, 190, 0.22);
+}
+
+.institution-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.institution-plan-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-height: 340px;
+  padding: 22px;
+  border-radius: 22px;
+  border: 1px solid rgba(141, 199, 231, 0.42);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(234, 247, 255, 0.88));
+  box-shadow: 0 16px 28px rgba(30, 104, 162, 0.1);
+}
+
+.institution-plan-card.recommended {
+  border-color: rgba(42, 199, 153, 0.58);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 225, 132, 0.38), transparent 30%),
+    linear-gradient(180deg, rgba(239, 255, 248, 0.98), rgba(225, 248, 255, 0.92));
+  box-shadow:
+    0 22px 36px rgba(30, 104, 162, 0.14),
+    0 0 0 4px rgba(57, 210, 157, 0.12);
+  transform: translateY(-8px);
+}
+
+.institution-plan-card h3 {
+  margin: 0 0 10px;
+  color: #113c67;
+  font-size: 25px;
+}
+
+.institution-plan-card strong {
+  display: block;
+  color: #102f50;
+  font-size: 22px;
+}
+
+.institution-plan-card p {
+  margin-top: 8px;
+}
+
+.institution-plan-card ul {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.institution-plan-card li {
+  position: relative;
+  padding-left: 22px;
+  color: #4f7191;
+  font-weight: 800;
+}
+
+.institution-plan-card li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #39d29d;
+}
+
+.institution-plan-badge {
+  justify-self: start;
+  padding: 7px 11px;
+  border-radius: 999px;
+  color: #0d654e;
+  font-size: 12px;
+  font-weight: 1000;
+  background: linear-gradient(180deg, #d8fff1, #a8f1d3);
+}
+
+.institution-plan-cta {
+  align-self: end;
+  margin-top: auto;
+}
+
+.institution-plan-proof {
+  margin: 18px 0 0;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 226, 137, 0.26), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(232, 248, 255, 0.92));
 }
 
 .dashboard-card[id] {
@@ -8324,8 +8476,13 @@ body::before {
   }
 
   .owner-kpi-strip,
-  .owner-stat-grid {
+  .owner-stat-grid,
+  .institution-plan-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .institution-plan-card.recommended {
+    transform: none;
   }
 }
 
@@ -8341,8 +8498,16 @@ body::before {
 
   .owner-nav,
   .owner-kpi-strip,
-  .owner-stat-grid {
+  .owner-stat-grid,
+  .institution-plan-grid {
     grid-template-columns: 1fr;
+  }
+
+  .institution-plan-hero,
+  .institution-plan-signal,
+  .institution-plan-proof {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
