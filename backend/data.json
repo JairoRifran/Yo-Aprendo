@@ -1,0 +1,215 @@
+{
+  "institutions": {
+    "inst-uy": {
+      "id": "inst-uy",
+      "name": "Escuela Demo Uruguay",
+      "code": "INST-4A",
+      "teacher_name": "Profe Lucia",
+      "teacher_email": "lucia@yoaprendo.demo",
+      "notes": "Centro piloto para pensamiento computacional."
+    }
+  },
+  "teachers": {
+    "teacher-lucia": {
+      "id": "teacher-lucia",
+      "institution_id": "inst-uy",
+      "name": "Profe Lucia",
+      "email": "lucia@yoaprendo.demo",
+      "code": "DOC-4A",
+      "classroom_ids": ["class-4a"]
+    }
+  },
+  "classrooms": {
+    "class-4a": {
+      "id": "class-4a",
+      "institution_id": "inst-uy",
+      "name": "4.o A",
+      "grade_label": "4.o de escuela",
+      "group_code": "AULA-4A",
+      "student_ids": ["stu-sofi", "stu-mateo", "stu-emma", "stu-benja"],
+      "assigned_worlds": ["Secuencias", "Bucles", "Decisiones"]
+    },
+    "class-4b": {
+      "id": "class-4b",
+      "institution_id": "inst-uy",
+      "name": "4.o B",
+      "grade_label": "4.o de escuela",
+      "group_code": "AULA-4B",
+      "student_ids": ["stu-mila", "stu-valen"],
+      "assigned_worlds": ["Secuencias", "Datos y creacion"]
+    }
+  },
+  "students": {
+    "stu-sofi": {
+      "id": "stu-sofi",
+      "name": "Sofi",
+      "display_name": "Sofi",
+      "avatar": "Exploradora",
+      "classroom_id": "class-4a",
+      "student_code": "Nivel 4",
+      "streak_days": 3,
+      "energy": 82,
+      "weekly_minutes": 42,
+      "attendance": "Activa",
+      "completed_missions": 8,
+      "total_missions": 28,
+      "strong_concept": "Secuencias",
+      "needs_support": "Bucles",
+      "autonomy": "En crecimiento",
+      "badges": ["Exploradora curiosa", "Ordena secuencias", "Primer faro desbloqueado"],
+      "focus_tip": "Hoy conviene seguir con una mision corta y sumar otra estrella.",
+      "next_mission": { "world": "Isla de los Bucles", "title": "Repite el camino", "number": 8 },
+      "concepts": [
+        { "title": "Secuencias", "completed": 6, "total": 7, "percent": 86 },
+        { "title": "Bucles", "completed": 1, "total": 7, "percent": 14 },
+        { "title": "Decisiones", "completed": 1, "total": 7, "percent": 14 },
+        { "title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0 }
+      ],
+      "teacher_message": "Le responde muy bien a desafios cortos y visuales."
+    },
+    "stu-mateo": {
+      "id": "stu-mateo",
+      "name": "Mateo",
+      "display_name": "Mateo",
+      "avatar": "Capitan",
+      "classroom_id": "class-4a",
+      "student_code": "MAT-4A",
+      "streak_days": 5,
+      "energy": 88,
+      "weekly_minutes": 68,
+      "attendance": "Activa",
+      "completed_missions": 11,
+      "total_missions": 28,
+      "strong_concept": "Bucles",
+      "needs_support": "Decisiones",
+      "autonomy": "Alta",
+      "badges": ["Capitan del ritmo", "Encuentra patrones"],
+      "focus_tip": "Puede sostener un desafio un poco mas largo.",
+      "next_mission": { "world": "Isla de las Decisiones", "title": "Puertas con reglas", "number": 12 },
+      "concepts": [
+        { "title": "Secuencias", "completed": 5, "total": 7, "percent": 71 },
+        { "title": "Bucles", "completed": 4, "total": 7, "percent": 57 },
+        { "title": "Decisiones", "completed": 2, "total": 7, "percent": 29 },
+        { "title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0 }
+      ],
+      "teacher_message": "Buen avance; necesita verbalizar mas por que elige una condicion."
+    },
+    "stu-emma": {
+      "id": "stu-emma",
+      "name": "Emma",
+      "display_name": "Emma",
+      "avatar": "Navegante",
+      "classroom_id": "class-4a",
+      "student_code": "EMM-4A",
+      "streak_days": 2,
+      "energy": 74,
+      "weekly_minutes": 51,
+      "attendance": "Activa",
+      "completed_missions": 9,
+      "total_missions": 28,
+      "strong_concept": "Secuencias",
+      "needs_support": "Datos y creacion",
+      "autonomy": "Media",
+      "badges": ["Ruta segura"],
+      "focus_tip": "Le sirve repetir una mision con una regla nueva.",
+      "next_mission": { "world": "Isla de las Decisiones", "title": "Si pasa, entonces", "number": 10 },
+      "concepts": [
+        { "title": "Secuencias", "completed": 5, "total": 7, "percent": 71 },
+        { "title": "Bucles", "completed": 2, "total": 7, "percent": 29 },
+        { "title": "Decisiones", "completed": 2, "total": 7, "percent": 29 },
+        { "title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0 }
+      ],
+      "teacher_message": "Participa mejor cuando puede explicar la solucion con dibujos."
+    },
+    "stu-benja": {
+      "id": "stu-benja",
+      "name": "Benja",
+      "display_name": "Benja",
+      "avatar": "Explorador",
+      "classroom_id": "class-4a",
+      "student_code": "BEN-4A",
+      "streak_days": 1,
+      "energy": 53,
+      "weekly_minutes": 12,
+      "attendance": "Acompanar",
+      "completed_missions": 2,
+      "total_missions": 28,
+      "strong_concept": "Exploracion inicial",
+      "needs_support": "Constancia",
+      "autonomy": "Baja",
+      "badges": ["Primer desembarco"],
+      "focus_tip": "Necesita consignas cortas y mucho feedback de logro rapido.",
+      "next_mission": { "world": "Isla de las Secuencias", "title": "Ordena los pasos", "number": 3 },
+      "concepts": [
+        { "title": "Secuencias", "completed": 2, "total": 7, "percent": 29 },
+        { "title": "Bucles", "completed": 0, "total": 7, "percent": 0 },
+        { "title": "Decisiones", "completed": 0, "total": 7, "percent": 0 },
+        { "title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0 }
+      ],
+      "teacher_message": "Conviene acompanar el ingreso y asegurar una mision ganable por sesion."
+    },
+    "stu-mila": {
+      "id": "stu-mila",
+      "name": "Mila",
+      "display_name": "Mila",
+      "avatar": "Brillante",
+      "classroom_id": "class-4b",
+      "student_code": "MIL-4B",
+      "streak_days": 6,
+      "energy": 90,
+      "weekly_minutes": 74,
+      "attendance": "Activa",
+      "completed_missions": 13,
+      "total_missions": 28,
+      "strong_concept": "Decisiones",
+      "needs_support": "Datos y creacion",
+      "autonomy": "Alta",
+      "badges": ["Resuelve retos", "Abre caminos"],
+      "focus_tip": "Puede pasar a consignas de creacion y comparacion.",
+      "next_mission": { "world": "Isla de Datos", "title": "Agrupa y crea", "number": 15 },
+      "concepts": [
+        { "title": "Secuencias", "completed": 5, "total": 7, "percent": 71 },
+        { "title": "Bucles", "completed": 3, "total": 7, "percent": 43 },
+        { "title": "Decisiones", "completed": 5, "total": 7, "percent": 71 },
+        { "title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0 }
+      ],
+      "teacher_message": "Muy buena autonomia. Lista para mas exploracion guiada."
+    },
+    "stu-valen": {
+      "id": "stu-valen",
+      "name": "Valen",
+      "display_name": "Valen",
+      "avatar": "Aventurero",
+      "classroom_id": "class-4b",
+      "student_code": "VAL-4B",
+      "streak_days": 2,
+      "energy": 67,
+      "weekly_minutes": 28,
+      "attendance": "Inactiva",
+      "completed_missions": 4,
+      "total_missions": 28,
+      "strong_concept": "Secuencias",
+      "needs_support": "Bucles",
+      "autonomy": "Media",
+      "badges": ["Primer mapa"],
+      "focus_tip": "Necesita volver al ritmo de ingreso semanal.",
+      "next_mission": { "world": "Isla de los Bucles", "title": "Atajo repetido", "number": 8 },
+      "concepts": [
+        { "title": "Secuencias", "completed": 4, "total": 7, "percent": 57 },
+        { "title": "Bucles", "completed": 0, "total": 7, "percent": 0 },
+        { "title": "Decisiones", "completed": 0, "total": 7, "percent": 0 },
+        { "title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0 }
+      ],
+      "teacher_message": "Necesita una reentrada suave con objetivos muy cortos."
+    }
+  },
+  "guardians": {
+    "guardian-sofi": {
+      "id": "guardian-sofi",
+      "name": "Familia de Sofi",
+      "code": "FAM-404",
+      "student_ids": ["stu-sofi"],
+      "contact": "familia.sofi@yoaprendo.demo"
+    }
+  }
+}

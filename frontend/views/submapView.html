@@ -1,0 +1,80 @@
+import { grade4Data } from "../data/grade4.js";
+import { appState } from "../state/appState.js";
+import { goToMission, goToWorldMap } from "../utils/navigation.js";
+import { isMissionCompleted } from "../utils/progress.js";
+
+export function renderSubmap() {
+  const world = grade4Data.worlds.find(w => w.id === appState.selectedWorldId);
+  const appShell = document.querySelector(".app-shell");
+
+  if (!world || !appShell) return;
+
+  appShell.innerHTML = `
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="pill level-pill">Nivel 4</div>
+        <div class="pill title-pill">${world.title}</div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="pill currency-pill">
+          <span class="currency-icon gold"></span>
+          <span>${appState.coins}</span>
+        </div>
+        <div class="pill currency-pill">
+          <span class="currency-icon gems"></span>
+          <span>${appState.gems}</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="submap-screen">
+      <section class="submap-panel">
+        <div class="submap-header">
+          <div>
+            <div class="eyebrow">Submapa</div>
+            <h1>${world.title}</h1>
+            <p>${world.description}</p>
+          </div>
+          <button id="backToWorldMapBtn" class="btn btn-secondary">← Volver al mapa</button>
+        </div>
+
+        <div class="submap-grid">
+          ${world.missions.map((mission, index) => {
+            const completed = isMissionCompleted(mission.id);
+            const available = completed || mission.status === "current" || mission.status === "completed";
+            const statusText = completed ? "Completada" : available ? "Disponible" : "Bloqueada";
+
+            return `
+              <article class="submap-node ${completed ? "completed" : available ? "available" : "locked"}">
+                <div class="node-number">${index + 1}</div>
+                <h3>${mission.title}</h3>
+                <p>Dificultad: ${mission.difficulty}</p>
+                <p>Estado: ${statusText}</p>
+                <button
+                  class="btn btn-primary openMissionBtn"
+                  data-mission-id="${mission.id}"
+                  ${!available ? "disabled" : ""}
+                >
+                  ${completed ? "Repetir" : available ? "Jugar" : "Bloqueada"}
+                </button>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      </section>
+    </main>
+  `;
+
+  document.getElementById("backToWorldMapBtn")?.addEventListener("click", () => {
+    goToWorldMap();
+    window.renderApp();
+  });
+
+  document.querySelectorAll(".openMissionBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      goToMission(world.id, btn.dataset.missionId);
+      window.renderApp();
+    });
+  });
+}

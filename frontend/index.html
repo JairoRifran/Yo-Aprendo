@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YoAprendo - Mundos de 4.º</title>
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Precarga de imagen de misión -->
+  <link rel="preload" as="image" href="./img/mision1.png" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="pill level-pill">Nivel 4</div>
+        <div class="pill title-pill">Mundos de 4.º</div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="pill currency-pill">
+          <span class="currency-icon gold"></span>
+          <span id="coinsValue">350</span>
+        </div>
+        <div class="pill currency-pill">
+          <span class="currency-icon gems"></span>
+          <span id="gemsValue">25</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="scene-panel">
+        <div id="sceneWrap">
+          <canvas id="scene"></canvas>
+          <div class="scene-vignette"></div>
+          <div class="scene-glow"></div>
+          <div class="scene-label">
+            Explorá los mundos de 4.º y elegí tu próxima aventura ✨
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="sidebar-card mission-card">
+          <div class="eyebrow">Mundo actual</div>
+          <h1 id="missionTitle">Seleccioná un mundo</h1>
+          <p id="missionDescription">
+            Hacé click en una isla del mapa para ver sus micro-misiones, su progreso y entrar a su aventura.
+          </p>
+
+          <div class="action-row">
+            <button id="playBtn" class="btn btn-primary" disabled>Entrar</button>
+            <button class="btn btn-secondary" type="button">Asignar</button>
+          </div>
+        </div>
+
+        <div class="sidebar-card progress-card">
+          <div class="eyebrow">Progreso general</div>
+          <div class="progress-stats">
+            <div class="stat-box">
+              <span class="stat-label">Micro-misiones</span>
+              <strong id="completedValue">0 / 28</strong>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Racha</span>
+              <strong>3 días</strong>
+            </div>
+          </div>
+
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div class="sidebar-card tips-card">
+          <div class="eyebrow">Consejo</div>
+          <p>
+            Cada isla representa un mundo de aprendizaje. Entrá a una isla para descubrir sus micro-misiones y avanzar paso a paso.
+          </p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Imagen disponible para usar desde JS -->
+  <img
+    id="mission1Asset"
+    src="./img/mision1.png"
+    alt="Misión 1"
+    hidden
+  />
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
