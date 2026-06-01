@@ -143,7 +143,7 @@ function renderLoginPanel(meta, currentName, currentCode) {
 
 function renderInstitutionRegisterPanel() {
   return `
-    <section class="start-art-login-panel">
+    <section class="start-art-login-panel start-art-register-panel">
       <div class="start-art-login-top">
         <div class="start-art-side-label">Alta institucional</div>
         <button class="start-art-back-link" id="backToInstitutionLogin" type="button">Ya tengo acceso</button>
@@ -174,6 +174,71 @@ function renderInstitutionRegisterPanel() {
         <div class="start-role-note start-art-role-note">Piloto inicial: 90 dias, hasta 50 alumnos y 2 docentes.</div>
         <div class="start-art-form-error" id="institutionRegisterError"></div>
       </form>
+    </section>
+  `;
+}
+
+function renderInstitutionLandingPanel() {
+  return `
+    <section class="start-art-login-panel start-art-institution-landing">
+      <div class="start-art-login-top">
+        <div class="start-art-side-label">Para instituciones</div>
+        <button class="start-art-back-link" id="backToInstitutionLogin" type="button">Ya tengo acceso</button>
+      </div>
+
+      <div class="institution-landing-scroll">
+        <h2>Una nueva forma de aprender pensamiento computacional</h2>
+        <p>Yo Aprendo convierte el aprendizaje en una aventura guiada: los ninos juegan, las docentes acompanan y la institucion obtiene una lectura clara del avance real.</p>
+
+        <div class="institution-value-grid">
+          <div class="institution-value-item">
+            <strong>Mas valor pedagogico</strong>
+            <span>Misiones cortas, visuales y progresivas para trabajar secuencias, bucles, decisiones y datos.</span>
+          </div>
+          <div class="institution-value-item">
+            <strong>Gestion ordenada</strong>
+            <span>La institucion crea docentes, aulas, alumnos y accesos familiares desde un mismo espacio.</span>
+          </div>
+          <div class="institution-value-item">
+            <strong>Seguimiento accionable</strong>
+            <span>Paneles para ver avance, actividad, alertas y necesidades de apoyo sin planillas dispersas.</span>
+          </div>
+        </div>
+
+        <div class="institution-flow">
+          <strong>Como empieza una institucion</strong>
+          <span>1. Crea el centro</span>
+          <span>2. Activa el piloto</span>
+          <span>3. Carga docentes y aulas</span>
+          <span>4. Invita familias cuando corresponde</span>
+        </div>
+
+        <div class="institution-plan-list">
+          <article class="institution-plan-card featured">
+            <div class="start-art-side-label small">Piloto</div>
+            <h3>90 dias gratis</h3>
+            <p>Para validar el uso en una escuela o grupo inicial.</p>
+            <strong>50 alumnos · 2 docentes</strong>
+          </article>
+          <article class="institution-plan-card">
+            <div class="start-art-side-label small">Escuela</div>
+            <h3>Plan mensual</h3>
+            <p>Para centros que ya quieren operar con varios grupos.</p>
+            <strong>Hasta 300 alumnos</strong>
+          </article>
+          <article class="institution-plan-card">
+            <div class="start-art-side-label small">Red educativa</div>
+            <h3>A medida</h3>
+            <p>Para Ceibal, redes, convenios y despliegues con SSO.</p>
+            <strong>Integracion institucional</strong>
+          </article>
+        </div>
+      </div>
+
+      <div class="institution-landing-actions">
+        <button id="startInstitutionRegisterBtn" class="btn btn-primary start-art-submit" type="button">Crear piloto institucional</button>
+        <button id="backToInstitutionAccessBtn" class="btn btn-secondary start-art-submit" type="button">Entrar con acceso existente</button>
+      </div>
     </section>
   `;
 }
@@ -264,7 +329,9 @@ export function renderStart() {
           ${
             accessMode === "chooser"
               ? renderChooserPanel(selectedRole)
-              : accessMode === "institution-register"
+              : accessMode === "institution-landing"
+                ? renderInstitutionLandingPanel()
+                : accessMode === "institution-register"
                 ? renderInstitutionRegisterPanel()
                 : renderLoginPanel(meta, currentName, currentCode)
           }
@@ -327,7 +394,7 @@ export function renderStart() {
   document.getElementById("openInstitutionRegisterBtn")?.addEventListener("click", () => {
     unlockAudio();
     playUiClick();
-    appState.startAccessMode = "institution-register";
+    appState.startAccessMode = "institution-landing";
     window.renderApp();
   });
 
@@ -336,6 +403,21 @@ export function renderStart() {
     playUiClick();
     appState.currentUserRole = "institution";
     appState.startAccessMode = "login";
+    window.renderApp();
+  });
+
+  document.getElementById("backToInstitutionAccessBtn")?.addEventListener("click", () => {
+    unlockAudio();
+    playUiClick();
+    appState.currentUserRole = "institution";
+    appState.startAccessMode = "login";
+    window.renderApp();
+  });
+
+  document.getElementById("startInstitutionRegisterBtn")?.addEventListener("click", () => {
+    unlockAudio();
+    playSelect();
+    appState.startAccessMode = "institution-register";
     window.renderApp();
   });
 

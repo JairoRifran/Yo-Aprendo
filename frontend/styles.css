@@ -11708,6 +11708,127 @@ body::before {
   min-height: 1.4em;
 }
 
+.start-art-institution-landing {
+  width: min(39%, 560px);
+  top: 4%;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  max-height: 88%;
+}
+
+.start-art-register-panel {
+  width: min(32%, 460px);
+  top: 4%;
+  max-height: 90%;
+  overflow: auto;
+}
+
+.start-art-institution-landing h2 {
+  font-size: clamp(28px, 2vw, 42px);
+  line-height: 0.98;
+}
+
+.institution-landing-scroll {
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.institution-value-grid {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.institution-value-item,
+.institution-flow,
+.institution-plan-card {
+  border: 1px solid rgba(47, 102, 154, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.64);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.64);
+}
+
+.institution-value-item {
+  padding: 12px 14px;
+}
+
+.institution-value-item strong,
+.institution-flow strong,
+.institution-plan-card h3 {
+  display: block;
+  color: #173057;
+  font-weight: 900;
+}
+
+.institution-value-item span,
+.institution-flow span,
+.institution-plan-card p {
+  display: block;
+  color: #547396;
+  font-size: 13px;
+  line-height: 1.35;
+  margin-top: 4px;
+}
+
+.institution-flow {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.institution-flow span {
+  color: #2d6a9f;
+  font-weight: 800;
+}
+
+.institution-plan-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.institution-plan-card {
+  padding: 12px;
+}
+
+.institution-plan-card.featured {
+  background: linear-gradient(180deg, rgba(234, 255, 247, 0.92), rgba(231, 245, 255, 0.88));
+  border-color: rgba(47, 201, 160, 0.32);
+}
+
+.institution-plan-card h3 {
+  margin: 5px 0 4px;
+  font-size: 18px;
+}
+
+.institution-plan-card strong {
+  display: block;
+  color: #1f835f;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.institution-landing-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.institution-landing-actions .start-art-submit {
+  font-size: 15px;
+  margin-top: 0;
+}
+
+.institution-landing-actions .btn-secondary {
+  color: #173057;
+  background: linear-gradient(180deg, #ffffff, #edf5ff);
+  border: 1px solid rgba(47, 102, 154, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+}
+
 .start-art-login-panel.chooser {
   background:
     radial-gradient(circle at top right, rgba(255,255,255,0.82), transparent 22%),
@@ -12015,6 +12136,27 @@ body::before {
   .start-art-login-panel {
     border-radius: 24px;
     padding: 18px;
+  }
+
+  .start-art-institution-landing {
+    width: auto;
+    max-height: none;
+  }
+
+  .start-art-register-panel {
+    width: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .institution-plan-list,
+  .institution-landing-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .institution-landing-scroll {
+    max-height: none;
+    overflow: visible;
   }
 
   .start-art-hero h1 {
