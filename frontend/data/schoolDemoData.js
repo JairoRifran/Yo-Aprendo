@@ -221,26 +221,6 @@ function percent(student) {
 
 function studentSummary(student) {
   const classroom = getClassroom(student.classroom_id);
-  const institutionRows = institutions.map((institution) => ({
-    id: institution.id,
-    name: institution.name,
-    plan: "trial",
-    status: "trialing",
-    students: students.length,
-    teachers: teachers.length,
-    classrooms: classrooms.length,
-    guardians: guardians.length,
-    avg_completion: percentValues.length ? Math.round(percentValues.reduce((a, b) => a + b, 0) / percentValues.length) : 0,
-    alerts: students.filter((student) => student.attendance !== "Activa").length
-  }));
-
-  const conceptOverview = ["Secuencias", "Bucles", "Decisiones", "Datos y creacion"].map((title) => {
-    const values = students.flatMap((student) =>
-      student.concepts.filter((concept) => concept.title === title).map((concept) => concept.percent)
-    );
-    return { title, percent: values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0 };
-  });
-
   return {
     id: student.id,
     name: student.name,
@@ -510,6 +490,24 @@ export function demoOwnerDashboard() {
   const teachers = Object.values(db.teachers);
   const guardians = Object.values(db.guardians);
   const percentValues = students.map((student) => percent(student));
+  const institutionRows = institutions.map((institution) => ({
+    id: institution.id,
+    name: institution.name,
+    plan: "trial",
+    status: "trialing",
+    students: students.length,
+    teachers: teachers.length,
+    classrooms: classrooms.length,
+    guardians: guardians.length,
+    avg_completion: percentValues.length ? Math.round(percentValues.reduce((a, b) => a + b, 0) / percentValues.length) : 0,
+    alerts: students.filter((student) => student.attendance !== "Activa").length
+  }));
+  const conceptOverview = ["Secuencias", "Bucles", "Decisiones", "Datos y creacion"].map((title) => {
+    const values = students.flatMap((student) =>
+      student.concepts.filter((concept) => concept.title === title).map((concept) => concept.percent)
+    );
+    return { title, percent: values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0 };
+  });
 
   return {
     owner: { name: "Jairo Rifran", role: "Product owner" },
