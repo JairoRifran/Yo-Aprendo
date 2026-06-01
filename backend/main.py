@@ -680,6 +680,74 @@ def owner_dashboard(session: Session) -> dict:
         },
         "concept_overview": concept_overview,
         "institutions": sorted(institution_rows, key=lambda item: item["students"], reverse=True),
+        "details": {
+            "institutions": institution_rows,
+            "students": [
+                {
+                    "id": student.id,
+                    "name": student.display_name,
+                    "institution": student.classroom.institution.name,
+                    "classroom": student.classroom.name,
+                    "code": student.student_code,
+                    "attendance": student.attendance,
+                    "progress": student_percent(student),
+                    "weekly_minutes": student.weekly_minutes,
+                    "needs_support": student.needs_support,
+                }
+                for student in students
+            ],
+            "active": [
+                {
+                    "name": student.display_name,
+                    "institution": student.classroom.institution.name,
+                    "classroom": student.classroom.name,
+                    "progress": student_percent(student),
+                    "weekly_minutes": student.weekly_minutes,
+                }
+                for student in students
+                if student.attendance == "Activa"
+            ],
+            "teachers": [
+                {
+                    "name": teacher.name,
+                    "email": teacher.email,
+                    "institution": teacher.institution.name,
+                    "classrooms": len(teacher.classrooms),
+                }
+                for teacher in teachers
+            ],
+            "families": [
+                {
+                    "name": guardian.name,
+                    "contact": guardian.contact,
+                    "students": len(guardian.students),
+                    "student_names": ", ".join(student.display_name for student in guardian.students),
+                }
+                for guardian in guardians
+            ],
+            "alerts": [
+                {
+                    "name": student.display_name,
+                    "institution": student.classroom.institution.name,
+                    "classroom": student.classroom.name,
+                    "attendance": student.attendance,
+                    "needs_support": student.needs_support,
+                    "message": student.teacher_message,
+                }
+                for student in students
+                if student.attendance != "Activa"
+            ],
+            "minutes": [
+                {
+                    "name": student.display_name,
+                    "institution": student.classroom.institution.name,
+                    "weekly_minutes": student.weekly_minutes,
+                    "progress": student_percent(student),
+                }
+                for student in sorted(students, key=lambda item: item.weekly_minutes, reverse=True)
+            ],
+            "progress": concept_overview,
+        },
         "expansion_candidates": expansion_candidates,
         "ceibal_evidence": [
             "Modelo institucional: la escuela administra docentes, aulas, alumnos y familias.",

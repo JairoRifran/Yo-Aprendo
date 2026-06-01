@@ -13,6 +13,7 @@ export const appState = {
   dashboardError: "",
   startAccessData: null,
   selectedInstitutionPlan: "trial",
+  selectedOwnerMetric: "",
 
   coins: 350,
   gems: 25,

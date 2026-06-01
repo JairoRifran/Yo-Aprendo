@@ -374,6 +374,158 @@ function renderActionItem(iconClass, title, text, targetId = "") {
   `;
 }
 
+function renderOwnerMetricCard(iconClass, label, value, text, metric) {
+  return `
+    <article class="dashboard-card stat dashboard-stat-card dashboard-jump-card" data-owner-metric="${metric}">
+      <div class="dashboard-stat-head">
+        <span class="dashboard-stat-icon ${iconClass}" aria-hidden="true">${renderDashboardIcon(iconClass)}</span>
+        <span>${label}</span>
+      </div>
+      <strong>${value}</strong>
+      <p>${text}</p>
+    </article>
+  `;
+}
+
+function ownerMetricConfig(metric) {
+  const configs = {
+    institutions: {
+      title: "Instituciones",
+      subtitle: "Centros registrados, plan, estado y traccion.",
+      columns: ["Institucion", "Plan", "Alumnos", "Docentes", "Familias", "Avance"],
+      rows: (data) => (data.details?.institutions || data.institutions || []).map((item) => [
+        item.name,
+        item.plan,
+        item.students,
+        item.teachers,
+        item.guardians,
+        `${item.avg_completion}%`
+      ])
+    },
+    students: {
+      title: "Alumnos",
+      subtitle: "Datos de estudiantes cargados por institucion y aula.",
+      columns: ["Alumno", "Institucion", "Aula", "Codigo", "Estado", "Avance"],
+      rows: (data) => (data.details?.students || []).map((item) => [
+        item.name,
+        item.institution,
+        item.classroom,
+        item.code,
+        item.attendance,
+        `${item.progress}%`
+      ])
+    },
+    active: {
+      title: "Alumnos activos",
+      subtitle: "Usuarios con estado activo y senales de uso.",
+      columns: ["Alumno", "Institucion", "Aula", "Minutos", "Avance"],
+      rows: (data) => (data.details?.active || []).map((item) => [
+        item.name,
+        item.institution,
+        item.classroom,
+        item.weekly_minutes,
+        `${item.progress}%`
+      ])
+    },
+    progress: {
+      title: "Avance promedio",
+      subtitle: "Progreso agregado por concepto para evidencia pedagogica.",
+      columns: ["Concepto", "Avance"],
+      rows: (data) => (data.details?.progress || data.concept_overview || []).map((item) => [
+        item.title,
+        `${item.percent}%`
+      ])
+    },
+    teachers: {
+      title: "Docentes",
+      subtitle: "Docentes vinculados y cantidad de aulas asignadas.",
+      columns: ["Docente", "Email", "Institucion", "Aulas"],
+      rows: (data) => (data.details?.teachers || []).map((item) => [
+        item.name,
+        item.email,
+        item.institution,
+        item.classrooms
+      ])
+    },
+    families: {
+      title: "Familias vinculadas",
+      subtitle: "Observadores familiares vinculados a estudiantes.",
+      columns: ["Familia", "Contacto", "Alumnos", "Ninos vinculados"],
+      rows: (data) => (data.details?.families || []).map((item) => [
+        item.name,
+        item.contact || "Sin contacto",
+        item.students,
+        item.student_names || "-"
+      ])
+    },
+    minutes: {
+      title: "Minutos semanales",
+      subtitle: "Ranking de uso para detectar adopcion y recurrencia.",
+      columns: ["Alumno", "Institucion", "Minutos", "Avance"],
+      rows: (data) => (data.details?.minutes || []).map((item) => [
+        item.name,
+        item.institution,
+        item.weekly_minutes,
+        `${item.progress}%`
+      ])
+    },
+    alerts: {
+      title: "Alertas",
+      subtitle: "Alumnos que requieren seguimiento pedagogico o de adopcion.",
+      columns: ["Alumno", "Institucion", "Aula", "Estado", "Necesita apoyo", "Mensaje"],
+      rows: (data) => (data.details?.alerts || []).map((item) => [
+        item.name,
+        item.institution,
+        item.classroom,
+        item.attendance,
+        item.needs_support,
+        item.message
+      ])
+    }
+  };
+  return configs[metric] || configs.institutions;
+}
+
+function renderOwnerMetricScreen(data, metric) {
+  const config = ownerMetricConfig(metric);
+  const rows = config.rows(data);
+  return `
+    <section class="dashboard-role-panel">
+      <div class="dashboard-hero institution">
+        <div>
+          <div class="eyebrow">Detalle de metrica</div>
+          <h1>${config.title}</h1>
+          <p>${config.subtitle}</p>
+        </div>
+        <button class="btn btn-secondary owner-back-btn" type="button" id="ownerMetricBackBtn">Volver al resumen</button>
+      </div>
+
+      <article class="dashboard-card">
+        <div class="eyebrow">Datos</div>
+        <h2>${rows.length} registros</h2>
+        <div class="dashboard-table owner-metric-table" style="--owner-cols:${config.columns.length};">
+          <div class="dashboard-table-row dashboard-table-row-wide owner-metric-head">
+            ${config.columns.map((column) => `<strong>${column}</strong>`).join("")}
+          </div>
+          ${
+            rows.length
+              ? rows
+                  .map(
+                    (row) => `
+                      <div class="dashboard-table-row dashboard-table-row-wide">
+                        ${row.map((cell, index) => (index === 0 ? `<strong>${cell}</strong>` : `<span>${cell}</span>`)).join("")}
+                      </div>
+                    `
+                  )
+                  .join("")
+              : `<div class="dashboard-mini-item"><span>Todavia no hay datos para esta metrica.</span></div>`
+          }
+        </div>
+      </article>
+    </section>
+  `;
+}
+
 function renderTeacherPanel(data) {
   return `
     <section class="dashboard-role-panel">
@@ -856,56 +1008,10 @@ function renderInstitutionPanel(data) {
 
 function renderOwnerPanel(data) {
   const summary = data.summary;
-  const detailCards = [
-    {
-      id: "owner-detail-institutions",
-      title: "Instituciones",
-      text: "Sirve para mostrar alcance comercial: cuantos centros entraron, con que plan y que tan avanzada esta su implementacion.",
-      rows: data.institutions.map((institution) => `${institution.name}: ${institution.students} alumnos, ${institution.classrooms} aulas, plan ${institution.plan}`)
-    },
-    {
-      id: "owner-detail-students",
-      title: "Alumnos",
-      text: "Mide volumen pedagogico y tamano potencial de contrato por institucion.",
-      rows: data.institutions.map((institution) => `${institution.name}: ${institution.students} alumnos cargados`)
-    },
-    {
-      id: "owner-detail-active",
-      title: "Actividad",
-      text: "Muestra adopcion real, no solo registros. Es clave para conversaciones con decisores.",
-      rows: data.institutions.map((institution) => `${institution.name}: ${institution.avg_completion}% avance promedio, ${institution.alerts} alertas`)
-    },
-    {
-      id: "owner-detail-progress",
-      title: "Avance pedagogico",
-      text: "Evidencia los conceptos trabajados y permite contar una historia de aprendizaje medible.",
-      rows: data.concept_overview.map((concept) => `${concept.title}: ${concept.percent}% de avance agregado`)
-    },
-    {
-      id: "owner-detail-teachers",
-      title: "Docentes",
-      text: "Indica capacidad operativa dentro de cada institucion y adopcion del equipo escolar.",
-      rows: data.institutions.map((institution) => `${institution.name}: ${institution.teachers} docentes`)
-    },
-    {
-      id: "owner-detail-families",
-      title: "Familias vinculadas",
-      text: "Demuestra valor extendido hacia el hogar y acompanamiento familiar.",
-      rows: data.institutions.map((institution) => `${institution.name}: ${institution.guardians} familias vinculadas`)
-    },
-    {
-      id: "owner-detail-minutes",
-      title: "Minutos semanales",
-      text: "Resume intensidad de uso y ayuda a defender recurrencia del producto.",
-      rows: data.institutions.map((institution) => `${institution.name}: ${institution.students} alumnos registrados para uso semanal`)
-    },
-    {
-      id: "owner-detail-alerts",
-      title: "Alertas",
-      text: "Convierte el panel en herramienta de seguimiento pedagogico, no solo analitica comercial.",
-      rows: data.institutions.map((institution) => `${institution.name}: ${institution.alerts} alumnos para seguimiento`)
-    }
-  ];
+  const selectedMetric = appState.selectedOwnerMetric || "";
+  if (selectedMetric) {
+    return renderOwnerMetricScreen(data, selectedMetric);
+  }
 
   return `
     <section class="dashboard-role-panel">
@@ -922,36 +1028,17 @@ function renderOwnerPanel(data) {
       </div>
 
       <div class="dashboard-grid dashboard-grid-4">
-        ${renderStatCard("groups", "Instituciones", summary.institutions, "Centros registrados en la plataforma.", "owner-detail-institutions")}
-        ${renderStatCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.", "owner-detail-students")}
-        ${renderStatCard("today", "Activos", summary.active_students, "Alumnos con estado activo.", "owner-detail-active")}
-        ${renderStatCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.", "owner-detail-progress")}
+        ${renderOwnerMetricCard("groups", "Instituciones", summary.institutions, "Centros registrados en la plataforma.", "institutions")}
+        ${renderOwnerMetricCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.", "students")}
+        ${renderOwnerMetricCard("today", "Activos", summary.active_students, "Alumnos con estado activo.", "active")}
+        ${renderOwnerMetricCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.", "progress")}
       </div>
 
       <div class="dashboard-grid dashboard-grid-4">
-        ${renderStatCard("teacher", "Docentes", summary.teachers, "Docentes vinculados a instituciones.", "owner-detail-teachers")}
-        ${renderStatCard("family", "Familias vinculadas", summary.linked_guardians, "Seguimiento familiar activo.", "owner-detail-families")}
-        ${renderStatCard("timer", "Minutos semanales", summary.weekly_minutes, "Uso acumulado reportado.", "owner-detail-minutes")}
-        ${renderStatCard("support", "Alertas", summary.at_risk_students, "Alumnos para seguimiento.", "owner-detail-alerts")}
-      </div>
-
-      <div class="dashboard-owner-detail-grid">
-        ${detailCards
-          .map(
-            (detail) => `
-              <article class="dashboard-card owner-detail-card" id="${detail.id}">
-                <div class="eyebrow">Detalle de metrica</div>
-                <h2>${detail.title}</h2>
-                <p>${detail.text}</p>
-                <div class="dashboard-mini-list">
-                  ${detail.rows.length
-                    ? detail.rows.map((row) => `<div class="dashboard-mini-item"><span>${row}</span></div>`).join("")
-                    : `<div class="dashboard-mini-item"><span>Todavia no hay datos suficientes para esta metrica.</span></div>`}
-                </div>
-              </article>
-            `
-          )
-          .join("")}
+        ${renderOwnerMetricCard("teacher", "Docentes", summary.teachers, "Docentes vinculados a instituciones.", "teachers")}
+        ${renderOwnerMetricCard("family", "Familias vinculadas", summary.linked_guardians, "Seguimiento familiar activo.", "families")}
+        ${renderOwnerMetricCard("timer", "Minutos semanales", summary.weekly_minutes, "Uso acumulado reportado.", "minutes")}
+        ${renderOwnerMetricCard("support", "Alertas", summary.at_risk_students, "Alumnos para seguimiento.", "alerts")}
       </div>
 
       <div class="dashboard-grid dashboard-grid-2">
@@ -1055,6 +1142,7 @@ function bindCommonEvents(role) {
     appState.session = null;
     appState.dashboardData = null;
     appState.dashboardError = "";
+    appState.selectedOwnerMetric = "";
     appState.selectedDashboardRole = "student";
     clearSession();
     goToStart();
@@ -1133,6 +1221,24 @@ function bindDashboardJumpLinks() {
   });
 }
 
+function bindOwnerMetricLinks() {
+  document.querySelectorAll("[data-owner-metric]").forEach((node) => {
+    node.addEventListener("click", () => {
+      unlockAudio();
+      playSelect();
+      appState.selectedOwnerMetric = node.getAttribute("data-owner-metric") || "";
+      window.renderApp();
+    });
+  });
+
+  document.getElementById("ownerMetricBackBtn")?.addEventListener("click", () => {
+    unlockAudio();
+    playUiClick();
+    appState.selectedOwnerMetric = "";
+    window.renderApp();
+  });
+}
+
 export function renderDashboard() {
   const appShell = document.querySelector(".app-shell");
   if (!appShell) return;
@@ -1186,6 +1292,9 @@ export function renderDashboard() {
 
       bindCommonEvents(role);
       bindDashboardJumpLinks();
+      if (role === "owner") {
+        bindOwnerMetricLinks();
+      }
       if (role === "institution" || role === "teacher") {
         bindInstitutionActions(data);
       }

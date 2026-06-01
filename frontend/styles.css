@@ -7818,6 +7818,27 @@ body::before {
     0 0 0 4px rgba(47, 201, 160, 0.16);
 }
 
+.owner-back-btn {
+  align-self: center;
+  color: #173057;
+  background: linear-gradient(180deg, #ffffff, #d9ebff);
+  border: 1px solid rgba(47, 102, 154, 0.2);
+  min-height: 48px;
+}
+
+.owner-metric-table {
+  overflow-x: auto;
+}
+
+.owner-metric-table .dashboard-table-row {
+  min-width: 860px;
+  grid-template-columns: repeat(var(--owner-cols, 6), minmax(130px, 1fr));
+}
+
+.owner-metric-head {
+  background: linear-gradient(180deg, rgba(218, 242, 255, 0.92), rgba(238, 248, 255, 0.86));
+}
+
 .dashboard-card[id] {
   scroll-margin-top: 110px;
 }

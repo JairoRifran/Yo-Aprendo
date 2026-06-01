@@ -221,6 +221,26 @@ function percent(student) {
 
 function studentSummary(student) {
   const classroom = getClassroom(student.classroom_id);
+  const institutionRows = institutions.map((institution) => ({
+    id: institution.id,
+    name: institution.name,
+    plan: "trial",
+    status: "trialing",
+    students: students.length,
+    teachers: teachers.length,
+    classrooms: classrooms.length,
+    guardians: guardians.length,
+    avg_completion: percentValues.length ? Math.round(percentValues.reduce((a, b) => a + b, 0) / percentValues.length) : 0,
+    alerts: students.filter((student) => student.attendance !== "Activa").length
+  }));
+
+  const conceptOverview = ["Secuencias", "Bucles", "Decisiones", "Datos y creacion"].map((title) => {
+    const values = students.flatMap((student) =>
+      student.concepts.filter((concept) => concept.title === title).map((concept) => concept.percent)
+    );
+    return { title, percent: values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0 };
+  });
+
   return {
     id: student.id,
     name: student.name,
@@ -513,24 +533,56 @@ export function demoOwnerDashboard() {
       with_students: institutions.length,
       with_family_links: guardians.length
     },
-    concept_overview: ["Secuencias", "Bucles", "Decisiones", "Datos y creacion"].map((title) => {
-      const values = students.flatMap((student) =>
-        student.concepts.filter((concept) => concept.title === title).map((concept) => concept.percent)
-      );
-      return { title, percent: values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0 };
-    }),
-    institutions: institutions.map((institution) => ({
-      id: institution.id,
-      name: institution.name,
-      plan: "trial",
-      status: "trialing",
-      students: students.length,
-      teachers: teachers.length,
-      classrooms: classrooms.length,
-      guardians: guardians.length,
-      avg_completion: percentValues.length ? Math.round(percentValues.reduce((a, b) => a + b, 0) / percentValues.length) : 0,
-      alerts: students.filter((student) => student.attendance !== "Activa").length
-    })),
+    concept_overview: conceptOverview,
+    institutions: institutionRows,
+    details: {
+      institutions: institutionRows,
+      students: students.map((student) => ({
+        id: student.id,
+        name: student.display_name,
+        institution: "Escuela Demo Uruguay",
+        classroom: db.classrooms[student.classroom_id]?.name || "",
+        code: student.student_code,
+        attendance: student.attendance,
+        progress: percent(student),
+        weekly_minutes: student.weekly_minutes,
+        needs_support: student.needs_support
+      })),
+      active: students.filter((student) => student.attendance === "Activa").map((student) => ({
+        name: student.display_name,
+        institution: "Escuela Demo Uruguay",
+        classroom: db.classrooms[student.classroom_id]?.name || "",
+        progress: percent(student),
+        weekly_minutes: student.weekly_minutes
+      })),
+      teachers: teachers.map((teacher) => ({
+        name: teacher.name,
+        email: teacher.email,
+        institution: db.institutions[teacher.institution_id]?.name || "",
+        classrooms: teacher.classroom_ids.length
+      })),
+      families: guardians.map((guardian) => ({
+        name: guardian.name,
+        contact: guardian.contact,
+        students: guardian.student_ids.length,
+        student_names: guardian.student_ids.map((id) => db.students[id]?.display_name).join(", ")
+      })),
+      alerts: students.filter((student) => student.attendance !== "Activa").map((student) => ({
+        name: student.display_name,
+        institution: "Escuela Demo Uruguay",
+        classroom: db.classrooms[student.classroom_id]?.name || "",
+        attendance: student.attendance,
+        needs_support: student.needs_support,
+        message: student.teacher_message
+      })),
+      minutes: [...students].sort((a, b) => b.weekly_minutes - a.weekly_minutes).map((student) => ({
+        name: student.display_name,
+        institution: "Escuela Demo Uruguay",
+        weekly_minutes: student.weekly_minutes,
+        progress: percent(student)
+      })),
+      progress: conceptOverview
+    },
     expansion_candidates: [],
     ceibal_evidence: [
       "Modelo institucional: la escuela administra docentes, aulas, alumnos y familias.",
