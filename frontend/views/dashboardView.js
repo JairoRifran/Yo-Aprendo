@@ -376,7 +376,7 @@ function renderActionItem(iconClass, title, text, targetId = "") {
 
 function renderOwnerMetricCard(iconClass, label, value, text, metric) {
   return `
-    <article class="dashboard-card stat dashboard-stat-card dashboard-jump-card" data-owner-metric="${metric}">
+    <article class="dashboard-card stat dashboard-stat-card dashboard-jump-card" data-owner-module="${metric}">
       <div class="dashboard-stat-head">
         <span class="dashboard-stat-icon ${iconClass}" aria-hidden="true">${renderDashboardIcon(iconClass)}</span>
         <span>${label}</span>
@@ -385,6 +385,20 @@ function renderOwnerMetricCard(iconClass, label, value, text, metric) {
       <p>${text}</p>
     </article>
   `;
+}
+
+function ownerModules() {
+  return [
+    { id: "overview", icon: "progress", label: "Resumen ejecutivo", hint: "Adopcion, planes y evidencia" },
+    { id: "institutions", icon: "groups", label: "Instituciones", hint: "Centros, plan y traccion" },
+    { id: "students", icon: "students", label: "Alumnos", hint: "Usuarios cargados por aula" },
+    { id: "active", icon: "today", label: "Actividad", hint: "Uso real y recurrencia" },
+    { id: "progress", icon: "progress", label: "Aprendizajes", hint: "Avance por concepto" },
+    { id: "teachers", icon: "teacher", label: "Docentes", hint: "Equipos vinculados" },
+    { id: "families", icon: "family", label: "Familias", hint: "Acompanamiento familiar" },
+    { id: "minutes", icon: "timer", label: "Uso semanal", hint: "Minutos y adopcion" },
+    { id: "alerts", icon: "support", label: "Alertas", hint: "Riesgos de seguimiento" }
+  ];
 }
 
 function ownerMetricConfig(metric) {
@@ -486,23 +500,48 @@ function ownerMetricConfig(metric) {
   return configs[metric] || configs.institutions;
 }
 
-function renderOwnerMetricScreen(data, metric) {
+function renderOwnerSidebar(activeModule) {
+  return `
+    <aside class="owner-sidebar" aria-label="Modulos del producto">
+      <div class="owner-sidebar-brand">
+        <span class="owner-brand-mark" aria-hidden="true">Y</span>
+        <div>
+          <strong>Yo Aprendo</strong>
+          <span>Producto</span>
+        </div>
+      </div>
+      <nav class="owner-nav">
+        ${ownerModules()
+          .map(
+            (item) => `
+              <button class="owner-nav-item${activeModule === item.id ? " active" : ""}" type="button" data-owner-module="${item.id}">
+                <span class="owner-nav-icon ${item.icon}" aria-hidden="true">${renderDashboardIcon(item.icon)}</span>
+                <span>
+                  <strong>${item.label}</strong>
+                  <small>${item.hint}</small>
+                </span>
+              </button>
+            `
+          )
+          .join("")}
+      </nav>
+    </aside>
+  `;
+}
+
+function renderOwnerTable(data, metric) {
   const config = ownerMetricConfig(metric);
   const rows = config.rows(data);
   return `
-    <section class="dashboard-role-panel">
-      <div class="dashboard-hero institution">
-        <div>
-          <div class="eyebrow">Detalle de metrica</div>
-          <h1>${config.title}</h1>
-          <p>${config.subtitle}</p>
+      <article class="dashboard-card owner-module-card">
+        <div class="owner-module-head">
+          <div>
+            <div class="eyebrow">Modulo</div>
+            <h2>${config.title}</h2>
+            <p>${config.subtitle}</p>
+          </div>
+          <span class="owner-count-pill">${rows.length} registros</span>
         </div>
-        <button class="btn btn-secondary owner-back-btn" type="button" id="ownerMetricBackBtn">Volver al resumen</button>
-      </div>
-
-      <article class="dashboard-card">
-        <div class="eyebrow">Datos</div>
-        <h2>${rows.length} registros</h2>
         <div class="dashboard-table owner-metric-table" style="--owner-cols:${config.columns.length};">
           <div class="dashboard-table-row dashboard-table-row-wide owner-metric-head">
             ${config.columns.map((column) => `<strong>${column}</strong>`).join("")}
@@ -522,7 +561,6 @@ function renderOwnerMetricScreen(data, metric) {
           }
         </div>
       </article>
-    </section>
   `;
 }
 
@@ -1008,115 +1046,110 @@ function renderInstitutionPanel(data) {
 
 function renderOwnerPanel(data) {
   const summary = data.summary;
-  const selectedMetric = appState.selectedOwnerMetric || "";
-  if (selectedMetric) {
-    return renderOwnerMetricScreen(data, selectedMetric);
-  }
+  const activeModule = appState.selectedOwnerMetric || "overview";
 
   return `
-    <section class="dashboard-role-panel">
-      <div class="dashboard-hero institution">
-        <div>
-          <div class="eyebrow">Panel del producto</div>
-          <h1>${data.owner.name}</h1>
-          <p>Metricas agregadas para medir adopcion, demostrar valor pedagogico y preparar conversaciones con instituciones o Ceibal.</p>
-        </div>
-        <div class="dashboard-hero-badge">
-          <strong>${summary.institutions}</strong>
-          <span>instituciones</span>
-        </div>
-      </div>
+    <section class="dashboard-role-panel owner-workspace">
+      ${renderOwnerSidebar(activeModule)}
 
-      <div class="dashboard-grid dashboard-grid-4">
-        ${renderOwnerMetricCard("groups", "Instituciones", summary.institutions, "Centros registrados en la plataforma.", "institutions")}
-        ${renderOwnerMetricCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.", "students")}
-        ${renderOwnerMetricCard("today", "Activos", summary.active_students, "Alumnos con estado activo.", "active")}
-        ${renderOwnerMetricCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.", "progress")}
-      </div>
-
-      <div class="dashboard-grid dashboard-grid-4">
-        ${renderOwnerMetricCard("teacher", "Docentes", summary.teachers, "Docentes vinculados a instituciones.", "teachers")}
-        ${renderOwnerMetricCard("family", "Familias vinculadas", summary.linked_guardians, "Seguimiento familiar activo.", "families")}
-        ${renderOwnerMetricCard("timer", "Minutos semanales", summary.weekly_minutes, "Uso acumulado reportado.", "minutes")}
-        ${renderOwnerMetricCard("support", "Alertas", summary.at_risk_students, "Alumnos para seguimiento.", "alerts")}
-      </div>
-
-      <div class="dashboard-grid dashboard-grid-2">
-        <article class="dashboard-card">
-          <div class="eyebrow">Embudo institucional</div>
-          <h2>Adopcion</h2>
-          <div class="dashboard-mini-list">
-            <div class="dashboard-mini-item"><strong>Registradas</strong><span>${data.funnel.registered_institutions} instituciones</span></div>
-            <div class="dashboard-mini-item"><strong>Con aulas</strong><span>${data.funnel.with_classrooms} instituciones ordenaron grupos</span></div>
-            <div class="dashboard-mini-item"><strong>Con alumnos</strong><span>${data.funnel.with_students} instituciones cargaron estudiantes</span></div>
-            <div class="dashboard-mini-item"><strong>Con familias</strong><span>${data.funnel.with_family_links} instituciones vincularon observadores</span></div>
+      <div class="owner-main">
+        <div class="owner-topline">
+          <div>
+            <div class="eyebrow">Panel del producto</div>
+            <h1>${data.owner.name}</h1>
+            <p>Metricas agregadas para medir adopcion, demostrar valor pedagogico y preparar conversaciones con instituciones o Ceibal.</p>
           </div>
-        </article>
-
-        <article class="dashboard-card">
-          <div class="eyebrow">Planes</div>
-          <h2>Estado comercial</h2>
-          <div class="dashboard-mini-list">
-            <div class="dashboard-mini-item"><strong>Piloto</strong><span>${data.plan_breakdown.trial || 0} instituciones</span></div>
-            <div class="dashboard-mini-item"><strong>Escuela</strong><span>${data.plan_breakdown.school || 0} instituciones</span></div>
-            <div class="dashboard-mini-item"><strong>Red educativa</strong><span>${data.plan_breakdown.enterprise || 0} instituciones</span></div>
-            <div class="dashboard-mini-item good"><strong>Candidatas a expansion</strong><span>${summary.expansion_candidates} pilotos con senales de traccion</span></div>
+          <div class="owner-topline-actions">
+            <span class="owner-health-pill">Piloto activo</span>
+            <span class="owner-date-pill">Vista comercial</span>
           </div>
-        </article>
-      </div>
+        </div>
 
-      <div class="dashboard-grid dashboard-grid-2">
-        <article class="dashboard-card">
-          <div class="eyebrow">Evidencia pedagogica</div>
-          <h2>Conceptos trabajados</h2>
-          <div class="dashboard-progress-list">
-            ${data.concept_overview
-              .map(
-                (item) => `
-                  <div class="dashboard-progress-item">
-                    <div class="dashboard-progress-head">
-                      <strong>${item.title}</strong>
-                      <span>${item.percent}%</span>
-                    </div>
-                    <div class="dashboard-meter">
-                      <div class="dashboard-meter-fill" style="width:${item.percent}%;"></div>
-                    </div>
+        <div class="owner-kpi-strip">
+          <div><span>Instituciones</span><strong>${summary.institutions}</strong></div>
+          <div><span>Alumnos</span><strong>${summary.students}</strong></div>
+          <div><span>Activos</span><strong>${summary.active_students}</strong></div>
+          <div><span>Avance</span><strong>${summary.avg_completion}%</strong></div>
+          <div><span>Minutos</span><strong>${summary.weekly_minutes}</strong></div>
+        </div>
+
+        ${
+          activeModule === "overview"
+            ? `
+              <div class="owner-overview-grid">
+                <section class="owner-summary-area">
+                  <div class="dashboard-grid dashboard-grid-4 owner-stat-grid">
+                    ${renderOwnerMetricCard("groups", "Instituciones", summary.institutions, "Centros registrados en la plataforma.", "institutions")}
+                    ${renderOwnerMetricCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.", "students")}
+                    ${renderOwnerMetricCard("today", "Activos", summary.active_students, "Alumnos con estado activo.", "active")}
+                    ${renderOwnerMetricCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.", "progress")}
+                    ${renderOwnerMetricCard("teacher", "Docentes", summary.teachers, "Docentes vinculados a instituciones.", "teachers")}
+                    ${renderOwnerMetricCard("family", "Familias vinculadas", summary.linked_guardians, "Seguimiento familiar activo.", "families")}
+                    ${renderOwnerMetricCard("timer", "Minutos semanales", summary.weekly_minutes, "Uso acumulado reportado.", "minutes")}
+                    ${renderOwnerMetricCard("support", "Alertas", summary.at_risk_students, "Alumnos para seguimiento.", "alerts")}
                   </div>
-                `
-              )
-              .join("")}
-          </div>
-        </article>
 
-        <article class="dashboard-card">
-          <div class="eyebrow">Argumentos para vender</div>
-          <h2>Ceibal readiness</h2>
-          <ul class="dashboard-list">
-            ${data.ceibal_evidence.map((item) => `<li>${item}</li>`).join("")}
-          </ul>
-        </article>
+                  <div class="dashboard-grid dashboard-grid-2">
+                    <article class="dashboard-card">
+                      <div class="eyebrow">Embudo institucional</div>
+                      <h2>Adopcion</h2>
+                      <div class="dashboard-mini-list">
+                        <div class="dashboard-mini-item"><strong>Registradas</strong><span>${data.funnel.registered_institutions} instituciones</span></div>
+                        <div class="dashboard-mini-item"><strong>Con aulas</strong><span>${data.funnel.with_classrooms} instituciones ordenaron grupos</span></div>
+                        <div class="dashboard-mini-item"><strong>Con alumnos</strong><span>${data.funnel.with_students} instituciones cargaron estudiantes</span></div>
+                        <div class="dashboard-mini-item"><strong>Con familias</strong><span>${data.funnel.with_family_links} instituciones vincularon observadores</span></div>
+                      </div>
+                    </article>
+
+                    <article class="dashboard-card">
+                      <div class="eyebrow">Planes</div>
+                      <h2>Estado comercial</h2>
+                      <div class="dashboard-mini-list">
+                        <div class="dashboard-mini-item"><strong>Piloto</strong><span>${data.plan_breakdown.trial || 0} instituciones</span></div>
+                        <div class="dashboard-mini-item"><strong>Escuela</strong><span>${data.plan_breakdown.school || 0} instituciones</span></div>
+                        <div class="dashboard-mini-item"><strong>Red educativa</strong><span>${data.plan_breakdown.enterprise || 0} instituciones</span></div>
+                        <div class="dashboard-mini-item good"><strong>Candidatas a expansion</strong><span>${summary.expansion_candidates} pilotos con senales de traccion</span></div>
+                      </div>
+                    </article>
+                  </div>
+                </section>
+
+                <aside class="owner-insight-rail">
+                  <article class="dashboard-card">
+                    <div class="eyebrow">Evidencia pedagogica</div>
+                    <h2>Conceptos trabajados</h2>
+                    <div class="dashboard-progress-list">
+                      ${data.concept_overview
+                        .map(
+                          (item) => `
+                            <div class="dashboard-progress-item">
+                              <div class="dashboard-progress-head">
+                                <strong>${item.title}</strong>
+                                <span>${item.percent}%</span>
+                              </div>
+                              <div class="dashboard-meter">
+                                <div class="dashboard-meter-fill" style="width:${item.percent}%;"></div>
+                              </div>
+                            </div>
+                          `
+                        )
+                        .join("")}
+                    </div>
+                  </article>
+
+                  <article class="dashboard-card">
+                    <div class="eyebrow">Argumentos para vender</div>
+                    <h2>Ceibal readiness</h2>
+                    <ul class="dashboard-list compact">
+                      ${data.ceibal_evidence.map((item) => `<li>${item}</li>`).join("")}
+                    </ul>
+                  </article>
+                </aside>
+              </div>
+            `
+            : renderOwnerTable(data, activeModule)
+        }
       </div>
-
-      <article class="dashboard-card">
-        <div class="eyebrow">Instituciones</div>
-        <h2>Ranking de traccion</h2>
-        <div class="dashboard-table">
-          ${data.institutions
-            .map(
-              (institution) => `
-                <div class="dashboard-table-row dashboard-table-row-wide">
-                  <strong>${institution.name}</strong>
-                  <span>${institution.plan}</span>
-                  <span>${institution.students} alumnos</span>
-                  <span>${institution.teachers} docentes</span>
-                  <span>${institution.guardians} familias</span>
-                  <span>${institution.avg_completion}% avance</span>
-                </div>
-              `
-            )
-            .join("")}
-        </div>
-      </article>
     </section>
   `;
 }
@@ -1222,20 +1255,14 @@ function bindDashboardJumpLinks() {
 }
 
 function bindOwnerMetricLinks() {
-  document.querySelectorAll("[data-owner-metric]").forEach((node) => {
+  document.querySelectorAll("[data-owner-module]").forEach((node) => {
     node.addEventListener("click", () => {
       unlockAudio();
       playSelect();
-      appState.selectedOwnerMetric = node.getAttribute("data-owner-metric") || "";
+      const moduleId = node.getAttribute("data-owner-module") || "overview";
+      appState.selectedOwnerMetric = moduleId === "overview" ? "" : moduleId;
       window.renderApp();
     });
-  });
-
-  document.getElementById("ownerMetricBackBtn")?.addEventListener("click", () => {
-    unlockAudio();
-    playUiClick();
-    appState.selectedOwnerMetric = "";
-    window.renderApp();
   });
 }
 
@@ -1274,7 +1301,7 @@ export function renderDashboard() {
         </header>
 
         <main class="dashboard-screen">
-          <section class="dashboard-panel">
+          <section class="dashboard-panel${role === "owner" ? " owner-dashboard-panel" : ""}">
             ${
               role === "student"
                 ? renderStudentPanel(data)
