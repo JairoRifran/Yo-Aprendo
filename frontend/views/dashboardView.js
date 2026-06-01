@@ -138,7 +138,7 @@ async function ensureDashboardData() {
   }
 }
 
-function renderLoadingShell(backLabel, showCurrency = true) {
+function renderLoadingShell(backLabel) {
   return `
     <header class="topbar">
       <div class="topbar-left">
@@ -149,20 +149,6 @@ function renderLoadingShell(backLabel, showCurrency = true) {
       <div class="topbar-right">
         <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span><span>${backLabel}</span></button>
         <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesion</span></button>
-        ${
-          showCurrency
-            ? `
-              <div class="pill currency-pill">
-                <span class="currency-icon gold"></span>
-                <span>${appState.coins}</span>
-              </div>
-              <div class="pill currency-pill">
-                <span class="currency-icon gems"></span>
-                <span>${appState.gems}</span>
-              </div>
-            `
-            : ""
-        }
       </div>
     </header>
 
@@ -408,6 +394,87 @@ function ownerModules() {
     { id: "minutes", icon: "timer", label: "Uso semanal", hint: "Minutos y adopcion" },
     { id: "alerts", icon: "support", label: "Alertas", hint: "Riesgos de seguimiento" }
   ];
+}
+
+function roleModules(role) {
+  const configs = {
+    student: [
+      { id: "student-overview", icon: "compass", label: "Resumen", hint: "Progreso y proxima mision" },
+      { id: "student-progress-map", icon: "trending-up", label: "Mapa de avance", hint: "Conceptos por isla" },
+      { id: "student-showcase", icon: "badge", label: "Logros", hint: "Vitrina y foco" }
+    ],
+    parent: [
+      { id: "parent-overview", icon: "heart", label: "Resumen familiar", hint: "Lectura simple del avance" },
+      { id: "parent-weekly-reading", icon: "clock", label: "Semana", hint: "Uso y seguimiento" },
+      { id: "parent-home-actions", icon: "lightbulb", label: "Acompanamiento", hint: "Ideas para casa" }
+    ],
+    teacher: [
+      { id: "teacher-overview", icon: "monitor", label: "Resumen docente", hint: "Aula, actividad y alertas" },
+      { id: "teacher-groups", icon: "users", label: "Grupos", hint: "Aulas y codigos" },
+      { id: "teacher-student-register", icon: "user", label: "Alumnos", hint: "Registro en aula" },
+      { id: "teacher-guardian-access", icon: "heart", label: "Familias", hint: "Accesos observadores" },
+      { id: "teacher-alerts", icon: "check", label: "Alertas", hint: "A quien acompanar" }
+    ],
+    institution: [
+      { id: "institution-overview", icon: "school", label: "Resumen institucional", hint: "Centro, plan y uso" },
+      { id: "institution-groups", icon: "users", label: "Grupos", hint: "Estructura escolar" },
+      { id: "institution-student-register", icon: "user", label: "Alumnos", hint: "Registro y accesos" },
+      { id: "institution-guardian-access", icon: "heart", label: "Familias", hint: "Invitaciones" },
+      { id: "institution-alerts", icon: "activity", label: "Alertas", hint: "Seguimiento pedagogico" }
+    ]
+  };
+  return configs[role] || configs.student;
+}
+
+function roleSidebarMeta(role, data) {
+  const configs = {
+    student: { title: data.student?.display_name || "Alumno", subtitle: "Aprendizaje", icon: "user" },
+    parent: { title: data.guardian?.name || "Familia", subtitle: "Familias", icon: "heart" },
+    teacher: { title: data.teacher?.name || "Docente", subtitle: "Docencia", icon: "monitor" },
+    institution: { title: data.institution?.name || "Institucion", subtitle: "Institucion", icon: "school" }
+  };
+  return configs[role] || configs.student;
+}
+
+function renderRoleSidebar(role, data) {
+  const meta = roleSidebarMeta(role, data);
+  return `
+    <aside class="owner-sidebar role-sidebar" aria-label="Modulos del dashboard">
+      <div class="owner-sidebar-brand">
+        <span class="owner-brand-mark role-brand-mark" aria-hidden="true">${uiIcon(meta.icon)}</span>
+        <div>
+          <strong>${meta.title}</strong>
+          <span>${meta.subtitle}</span>
+        </div>
+      </div>
+      <nav class="owner-nav">
+        ${roleModules(role)
+          .map(
+            (item, index) => `
+              <button class="owner-nav-item${index === 0 ? " active" : ""}" type="button" data-scroll-target="${item.id}">
+                <span class="owner-nav-icon ${item.icon}" aria-hidden="true">${uiIcon(item.icon, "dashboard-svg-icon ui-icon")}</span>
+                <span>
+                  <strong>${item.label}</strong>
+                  <small>${item.hint}</small>
+                </span>
+              </button>
+            `
+          )
+          .join("")}
+      </nav>
+    </aside>
+  `;
+}
+
+function renderRoleWorkspace(role, data, content) {
+  return `
+    <section class="dashboard-role-panel owner-workspace role-workspace role-${role}-workspace">
+      ${renderRoleSidebar(role, data)}
+      <div class="owner-main role-main" id="${role}-overview">
+        ${content}
+      </div>
+    </section>
+  `;
 }
 
 function ownerMetricConfig(metric) {
@@ -1255,6 +1322,10 @@ function bindDashboardJumpLinks() {
 
       unlockAudio();
       playSelect();
+      document.querySelectorAll(".role-sidebar .owner-nav-item").forEach((item) => item.classList.remove("active"));
+      if (node.classList.contains("owner-nav-item")) {
+        node.classList.add("active");
+      }
       target.scrollIntoView({
         behavior: "smooth",
         block: "start"
@@ -1283,7 +1354,7 @@ export function renderDashboard() {
   const backLabel = role === "student" ? "Volver al mapa" : "Cambiar acceso";
   setAmbientMode("mission");
 
-  appShell.innerHTML = renderLoadingShell(backLabel, role !== "owner");
+  appShell.innerHTML = renderLoadingShell(backLabel);
   bindCommonEvents(role);
 
   ensureDashboardData()
@@ -1298,35 +1369,21 @@ export function renderDashboard() {
           <div class="topbar-right">
             <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span><span>${backLabel}</span></button>
             <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesion</span></button>
-            ${
-              role !== "owner"
-                ? `
-                  <div class="pill currency-pill">
-                    <span class="currency-icon gold"></span>
-                    <span>${appState.coins}</span>
-                  </div>
-                  <div class="pill currency-pill">
-                    <span class="currency-icon gems"></span>
-                    <span>${appState.gems}</span>
-                  </div>
-                `
-                : ""
-            }
           </div>
         </header>
 
         <main class="dashboard-screen">
-          <section class="dashboard-panel${role === "owner" ? " owner-dashboard-panel" : ""}">
+          <section class="dashboard-panel owner-dashboard-panel">
             ${
               role === "student"
-                ? renderStudentPanel(data)
+                ? renderRoleWorkspace("student", data, renderStudentPanel(data))
                 : role === "parent"
-                  ? renderParentPanel(data)
+                  ? renderRoleWorkspace("parent", data, renderParentPanel(data))
                   : role === "owner"
                     ? renderOwnerPanel(data)
                     : role === "teacher"
-                      ? renderTeacherPanel(data)
-                      : renderInstitutionPanel(data)
+                      ? renderRoleWorkspace("teacher", data, renderTeacherPanel(data))
+                      : renderRoleWorkspace("institution", data, renderInstitutionPanel(data))
             }
           </section>
         </main>
