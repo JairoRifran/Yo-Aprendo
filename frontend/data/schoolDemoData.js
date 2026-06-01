@@ -332,6 +332,18 @@ export function demoLogin({ role, name = "", code = "" }) {
     };
   }
 
+  if (roleName === "owner") {
+    if (safeName !== "rifranjairo@gmail.com") {
+      throw new Error("No encontramos ese acceso de producto.");
+    }
+    return {
+      role: "owner",
+      display_name: "Jairo Rifran",
+      entity_id: "owner",
+      redirect_view: "dashboard"
+    };
+  }
+
   throw new Error("Rol no soportado.");
 }
 

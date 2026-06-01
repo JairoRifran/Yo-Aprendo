@@ -748,14 +748,18 @@ def resolve_login(session: Session, payload: LoginRequest) -> dict:
     role = payload.role.lower()
     code = payload.code.strip().lower()
     name = payload.name.strip().lower()
-    owner_code = os.getenv("PRODUCT_OWNER_CODE", "YOAPRENDO-OWNER").lower()
+    owner_email = os.getenv("PRODUCT_OWNER_EMAIL", "rifranjairo@gmail.com").lower()
+    owner_password = os.getenv("PRODUCT_OWNER_PASSWORD", "")
+    owner_code = os.getenv("PRODUCT_OWNER_CODE", "").lower()
 
     if role in {"owner", "platform_admin"}:
-        if code != owner_code:
+        password_matches = bool(owner_password) and name == owner_email and payload.code.strip() == owner_password
+        legacy_code_matches = bool(owner_code) and code == owner_code
+        if not password_matches and not legacy_code_matches:
             raise HTTPException(status_code=404, detail="Owner access not found")
         return {
             "role": "owner",
-            "display_name": payload.name.strip() or "Jairo Rifran",
+            "display_name": "Jairo Rifran",
             "entity_id": "owner",
             "redirect_view": "dashboard",
             "context": {"scope": "platform"},
@@ -929,7 +933,7 @@ def access_demo():
         "parent": {"name": "Familia de Sofi", "code": "FAM-404"},
         "teacher": {"name": "Profe Lucia", "code": "DOC-4A"},
         "institution": {"name": "Escuela Demo Uruguay", "code": "INST-4A"},
-        "owner": {"name": "Jairo Rifran", "code": "YOAPRENDO-OWNER"},
+        "owner": {"name": "rifranjairo@gmail.com", "code": "Clave privada"},
     }
 
 

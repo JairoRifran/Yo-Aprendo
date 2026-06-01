@@ -63,13 +63,14 @@ const ROLE_META = {
     title: "Producto",
     subtitle: "Medir adopcion, uso y evidencia comercial.",
     helper: "Panel de metricas para venta, seguimiento y expansion institucional.",
-    namePlaceholder: "Tu nombre",
-    codeLabel: "Clave de owner",
-    codePlaceholder: "YOAPRENDO-OWNER",
+    namePlaceholder: "rifranjairo@gmail.com",
+    codeLabel: "Contrasena",
+    codePlaceholder: "Tu contrasena",
+    codeType: "password",
     cta: "Abrir metricas",
     loginNote: "Vas a entrar al panel del producto.",
-    demoName: "Jairo Rifran",
-    demoCode: "YOAPRENDO-OWNER"
+    demoName: "rifranjairo@gmail.com",
+    demoCode: "clave privada"
   }
 };
 
@@ -135,7 +136,7 @@ function renderLoginPanel(meta, currentName, currentCode) {
         <input
           id="startCodeInput"
           class="start-input"
-          type="text"
+          type="${meta.codeType || "text"}"
           maxlength="40"
           value="${currentCode}"
           placeholder="${meta.codePlaceholder}"
@@ -457,7 +458,7 @@ export function renderStart() {
       playSelect();
       appState.currentUserRole = button.dataset.roleCard;
       appState.currentUserName = ROLE_META[button.dataset.roleCard].demoName;
-      appState.currentAccessCode = ROLE_META[button.dataset.roleCard].demoCode;
+      appState.currentAccessCode = button.dataset.roleCard === "owner" ? "" : ROLE_META[button.dataset.roleCard].demoCode;
       appState.startAccessMode = "login";
       window.renderApp();
     });
@@ -604,7 +605,7 @@ export function renderStart() {
       appState.currentUserRole = session.role;
       appState.selectedDashboardRole = session.role;
       appState.currentUserName = session.display_name;
-      appState.currentAccessCode = code;
+      appState.currentAccessCode = session.role === "owner" ? "" : code;
       appState.session = session;
       appState.dashboardData = null;
       appState.dashboardError = "";
