@@ -590,6 +590,105 @@ def teacher_dashboard(session: Session, teacher_id: str) -> dict:
     }
 
 
+def owner_dashboard(session: Session) -> dict:
+    institutions = session.scalars(select(Institution)).all()
+    classrooms = session.scalars(select(Classroom)).all()
+    students = session.scalars(select(Student)).all()
+    teachers = session.scalars(select(Teacher)).all()
+    guardians = session.scalars(select(Guardian)).all()
+
+    plan_counts = {"trial": 0, "school": 0, "enterprise": 0}
+    institution_rows = []
+    expansion_candidates = []
+
+    for institution in institutions:
+        institution_classrooms = institution.classrooms
+        institution_students = [student for classroom in institution_classrooms for student in classroom.students]
+        institution_guardians = [
+            guardian
+            for guardian in guardians
+            if any(student.classroom.institution_id == institution.id for student in guardian.students)
+        ]
+        plan = institution.subscription.plan_key if institution.subscription else "trial"
+        plan_counts[plan] = plan_counts.get(plan, 0) + 1
+        avg_completion = round(mean(student_percent(student) for student in institution_students)) if institution_students else 0
+        alerts = sum(1 for student in institution_students if student.attendance != "Activa")
+        row = {
+            "id": institution.id,
+            "name": institution.name,
+            "plan": plan,
+            "status": institution.subscription.status if institution.subscription else "trialing",
+            "students": len(institution_students),
+            "teachers": len(institution.teachers),
+            "classrooms": len(institution_classrooms),
+            "guardians": len(institution_guardians),
+            "avg_completion": avg_completion,
+            "alerts": alerts,
+        }
+        institution_rows.append(row)
+        if plan == "trial" and (len(institution_students) >= 20 or avg_completion >= 35 or len(institution_guardians) >= 5):
+            expansion_candidates.append(row)
+
+    concept_names = ["Secuencias", "Bucles", "Decisiones", "Datos y creacion"]
+    concept_overview = []
+    for concept_name in concept_names:
+        values = [
+            concept["percent"]
+            for student in students
+            for concept in student.concepts
+            if concept["title"] == concept_name
+        ]
+        concept_overview.append({"title": concept_name, "percent": round(mean(values)) if values else 0})
+
+    active_students = sum(1 for student in students if student.attendance == "Activa")
+    linked_guardians = sum(1 for guardian in guardians if guardian.students)
+    avg_completion = round(mean(student_percent(student) for student in students)) if students else 0
+
+    return {
+        "owner": {"name": "Jairo Rifran", "role": "Product owner"},
+        "summary": {
+            "institutions": len(institutions),
+            "classrooms": len(classrooms),
+            "students": len(students),
+            "teachers": len(teachers),
+            "guardians": len(guardians),
+            "linked_guardians": linked_guardians,
+            "active_students": active_students,
+            "avg_completion": avg_completion,
+            "weekly_minutes": sum(student.weekly_minutes for student in students),
+            "at_risk_students": sum(1 for student in students if student.attendance != "Activa"),
+            "expansion_candidates": len(expansion_candidates),
+        },
+        "plan_breakdown": plan_counts,
+        "funnel": {
+            "registered_institutions": len(institutions),
+            "with_classrooms": sum(1 for institution in institutions if institution.classrooms),
+            "with_students": sum(
+                1
+                for institution in institutions
+                if any(classroom.students for classroom in institution.classrooms)
+            ),
+            "with_family_links": sum(
+                1
+                for institution in institutions
+                if any(
+                    guardian.students
+                    and any(student.classroom.institution_id == institution.id for student in guardian.students)
+                    for guardian in guardians
+                )
+            ),
+        },
+        "concept_overview": concept_overview,
+        "institutions": sorted(institution_rows, key=lambda item: item["students"], reverse=True),
+        "expansion_candidates": expansion_candidates,
+        "ceibal_evidence": [
+            "Modelo institucional: la escuela administra docentes, aulas, alumnos y familias.",
+            "Datos agregados para medir adopcion, actividad, progreso y alertas pedagogicas.",
+            "Arquitectura portable con PostgreSQL y roles preparados para integracion institucional.",
+        ],
+    }
+
+
 def guardian_payload(guardian: Guardian) -> dict:
     return {
         "id": guardian.id,
@@ -649,6 +748,18 @@ def resolve_login(session: Session, payload: LoginRequest) -> dict:
     role = payload.role.lower()
     code = payload.code.strip().lower()
     name = payload.name.strip().lower()
+    owner_code = os.getenv("PRODUCT_OWNER_CODE", "YOAPRENDO-OWNER").lower()
+
+    if role in {"owner", "platform_admin"}:
+        if code != owner_code:
+            raise HTTPException(status_code=404, detail="Owner access not found")
+        return {
+            "role": "owner",
+            "display_name": payload.name.strip() or "Jairo Rifran",
+            "entity_id": "owner",
+            "redirect_view": "dashboard",
+            "context": {"scope": "platform"},
+        }
 
     if role == "student":
         student = session.scalars(select(Student)).all()
@@ -818,6 +929,7 @@ def access_demo():
         "parent": {"name": "Familia de Sofi", "code": "FAM-404"},
         "teacher": {"name": "Profe Lucia", "code": "DOC-4A"},
         "institution": {"name": "Escuela Demo Uruguay", "code": "INST-4A"},
+        "owner": {"name": "Jairo Rifran", "code": "YOAPRENDO-OWNER"},
     }
 
 
@@ -849,6 +961,12 @@ def get_institution_dashboard(institution_id: str):
 def get_teacher_dashboard(teacher_id: str):
     with db_session() as session:
         return teacher_dashboard(session, teacher_id)
+
+
+@app.get("/api/dashboard/owner/{owner_id}")
+def get_owner_dashboard(owner_id: str):
+    with db_session() as session:
+        return owner_dashboard(session)
 
 
 @app.post("/api/institutions/{institution_id}/classrooms")

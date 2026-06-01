@@ -58,6 +58,18 @@ const ROLE_META = {
     loginNote: "Vas a entrar al panel institucional.",
     demoName: "Escuela Demo Uruguay",
     demoCode: "INST-4A"
+  },
+  owner: {
+    title: "Producto",
+    subtitle: "Medir adopcion, uso y evidencia comercial.",
+    helper: "Panel de metricas para venta, seguimiento y expansion institucional.",
+    namePlaceholder: "Tu nombre",
+    codeLabel: "Clave de owner",
+    codePlaceholder: "YOAPRENDO-OWNER",
+    cta: "Abrir metricas",
+    loginNote: "Vas a entrar al panel del producto.",
+    demoName: "Jairo Rifran",
+    demoCode: "YOAPRENDO-OWNER"
   }
 };
 
@@ -87,6 +99,7 @@ function renderChooserPanel(selectedRole) {
         ${roleCard("parent", selectedRole)}
         ${roleCard("teacher", selectedRole)}
         ${roleCard("institution", selectedRole)}
+        ${roleCard("owner", selectedRole)}
       </div>
     </section>
   `;

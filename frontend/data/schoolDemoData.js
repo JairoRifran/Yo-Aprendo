@@ -471,6 +471,63 @@ export function demoTeacherDashboard(teacherId) {
   };
 }
 
+export function demoOwnerDashboard() {
+  const institutions = Object.values(db.institutions);
+  const classrooms = Object.values(db.classrooms);
+  const students = Object.values(db.students);
+  const teachers = Object.values(db.teachers);
+  const guardians = Object.values(db.guardians);
+  const percentValues = students.map((student) => percent(student));
+
+  return {
+    owner: { name: "Jairo Rifran", role: "Product owner" },
+    summary: {
+      institutions: institutions.length,
+      classrooms: classrooms.length,
+      students: students.length,
+      teachers: teachers.length,
+      guardians: guardians.length,
+      linked_guardians: guardians.filter((guardian) => guardian.student_ids.length).length,
+      active_students: students.filter((student) => student.attendance === "Activa").length,
+      avg_completion: percentValues.length ? Math.round(percentValues.reduce((a, b) => a + b, 0) / percentValues.length) : 0,
+      weekly_minutes: students.reduce((total, student) => total + student.weekly_minutes, 0),
+      at_risk_students: students.filter((student) => student.attendance !== "Activa").length,
+      expansion_candidates: 1
+    },
+    plan_breakdown: { trial: institutions.length, school: 0, enterprise: 0 },
+    funnel: {
+      registered_institutions: institutions.length,
+      with_classrooms: institutions.length,
+      with_students: institutions.length,
+      with_family_links: guardians.length
+    },
+    concept_overview: ["Secuencias", "Bucles", "Decisiones", "Datos y creacion"].map((title) => {
+      const values = students.flatMap((student) =>
+        student.concepts.filter((concept) => concept.title === title).map((concept) => concept.percent)
+      );
+      return { title, percent: values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0 };
+    }),
+    institutions: institutions.map((institution) => ({
+      id: institution.id,
+      name: institution.name,
+      plan: "trial",
+      status: "trialing",
+      students: students.length,
+      teachers: teachers.length,
+      classrooms: classrooms.length,
+      guardians: guardians.length,
+      avg_completion: percentValues.length ? Math.round(percentValues.reduce((a, b) => a + b, 0) / percentValues.length) : 0,
+      alerts: students.filter((student) => student.attendance !== "Activa").length
+    })),
+    expansion_candidates: [],
+    ceibal_evidence: [
+      "Modelo institucional: la escuela administra docentes, aulas, alumnos y familias.",
+      "Datos agregados para medir adopcion, actividad, progreso y alertas pedagogicas.",
+      "Arquitectura portable con PostgreSQL y roles preparados para integracion institucional."
+    ]
+  };
+}
+
 export function demoCreateClassroom(institutionId, payload) {
   const id = `class-${payload.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   db.classrooms[id] = {

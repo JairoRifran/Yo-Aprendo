@@ -37,6 +37,11 @@ const DEMO_SESSION_BY_ROLE = {
     role: "institution",
     entity_id: "inst-uy",
     display_name: "Escuela Demo Uruguay"
+  },
+  owner: {
+    role: "owner",
+    entity_id: "owner",
+    display_name: "Jairo Rifran"
   }
 };
 
@@ -849,6 +854,116 @@ function renderInstitutionPanel(data) {
   `;
 }
 
+function renderOwnerPanel(data) {
+  const summary = data.summary;
+  return `
+    <section class="dashboard-role-panel">
+      <div class="dashboard-hero institution">
+        <div>
+          <div class="eyebrow">Panel del producto</div>
+          <h1>${data.owner.name}</h1>
+          <p>Metricas agregadas para medir adopcion, demostrar valor pedagogico y preparar conversaciones con instituciones o Ceibal.</p>
+        </div>
+        <div class="dashboard-hero-badge">
+          <strong>${summary.institutions}</strong>
+          <span>instituciones</span>
+        </div>
+      </div>
+
+      <div class="dashboard-grid dashboard-grid-4">
+        ${renderStatCard("groups", "Instituciones", summary.institutions, "Centros registrados en la plataforma.")}
+        ${renderStatCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.")}
+        ${renderStatCard("today", "Activos", summary.active_students, "Alumnos con estado activo.")}
+        ${renderStatCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.")}
+      </div>
+
+      <div class="dashboard-grid dashboard-grid-4">
+        ${renderStatCard("teacher", "Docentes", summary.teachers, "Docentes vinculados a instituciones.")}
+        ${renderStatCard("family", "Familias vinculadas", summary.linked_guardians, "Seguimiento familiar activo.")}
+        ${renderStatCard("timer", "Minutos semanales", summary.weekly_minutes, "Uso acumulado reportado.")}
+        ${renderStatCard("support", "Alertas", summary.at_risk_students, "Alumnos para seguimiento.")}
+      </div>
+
+      <div class="dashboard-grid dashboard-grid-2">
+        <article class="dashboard-card">
+          <div class="eyebrow">Embudo institucional</div>
+          <h2>Adopcion</h2>
+          <div class="dashboard-mini-list">
+            <div class="dashboard-mini-item"><strong>Registradas</strong><span>${data.funnel.registered_institutions} instituciones</span></div>
+            <div class="dashboard-mini-item"><strong>Con aulas</strong><span>${data.funnel.with_classrooms} instituciones ordenaron grupos</span></div>
+            <div class="dashboard-mini-item"><strong>Con alumnos</strong><span>${data.funnel.with_students} instituciones cargaron estudiantes</span></div>
+            <div class="dashboard-mini-item"><strong>Con familias</strong><span>${data.funnel.with_family_links} instituciones vincularon observadores</span></div>
+          </div>
+        </article>
+
+        <article class="dashboard-card">
+          <div class="eyebrow">Planes</div>
+          <h2>Estado comercial</h2>
+          <div class="dashboard-mini-list">
+            <div class="dashboard-mini-item"><strong>Piloto</strong><span>${data.plan_breakdown.trial || 0} instituciones</span></div>
+            <div class="dashboard-mini-item"><strong>Escuela</strong><span>${data.plan_breakdown.school || 0} instituciones</span></div>
+            <div class="dashboard-mini-item"><strong>Red educativa</strong><span>${data.plan_breakdown.enterprise || 0} instituciones</span></div>
+            <div class="dashboard-mini-item good"><strong>Candidatas a expansion</strong><span>${summary.expansion_candidates} pilotos con senales de traccion</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dashboard-grid dashboard-grid-2">
+        <article class="dashboard-card">
+          <div class="eyebrow">Evidencia pedagogica</div>
+          <h2>Conceptos trabajados</h2>
+          <div class="dashboard-progress-list">
+            ${data.concept_overview
+              .map(
+                (item) => `
+                  <div class="dashboard-progress-item">
+                    <div class="dashboard-progress-head">
+                      <strong>${item.title}</strong>
+                      <span>${item.percent}%</span>
+                    </div>
+                    <div class="dashboard-meter">
+                      <div class="dashboard-meter-fill" style="width:${item.percent}%;"></div>
+                    </div>
+                  </div>
+                `
+              )
+              .join("")}
+          </div>
+        </article>
+
+        <article class="dashboard-card">
+          <div class="eyebrow">Argumentos para vender</div>
+          <h2>Ceibal readiness</h2>
+          <ul class="dashboard-list">
+            ${data.ceibal_evidence.map((item) => `<li>${item}</li>`).join("")}
+          </ul>
+        </article>
+      </div>
+
+      <article class="dashboard-card">
+        <div class="eyebrow">Instituciones</div>
+        <h2>Ranking de traccion</h2>
+        <div class="dashboard-table">
+          ${data.institutions
+            .map(
+              (institution) => `
+                <div class="dashboard-table-row dashboard-table-row-wide">
+                  <strong>${institution.name}</strong>
+                  <span>${institution.plan}</span>
+                  <span>${institution.students} alumnos</span>
+                  <span>${institution.teachers} docentes</span>
+                  <span>${institution.guardians} familias</span>
+                  <span>${institution.avg_completion}% avance</span>
+                </div>
+              `
+            )
+            .join("")}
+        </div>
+      </article>
+    </section>
+  `;
+}
+
 function bindCommonEvents(role) {
   document.getElementById("backToMapBtn")?.addEventListener("click", () => {
     unlockAudio();
@@ -989,9 +1104,11 @@ export function renderDashboard() {
                 ? renderStudentPanel(data)
                 : role === "parent"
                   ? renderParentPanel(data)
-                  : role === "teacher"
-                    ? renderTeacherPanel(data)
-                    : renderInstitutionPanel(data)
+                  : role === "owner"
+                    ? renderOwnerPanel(data)
+                    : role === "teacher"
+                      ? renderTeacherPanel(data)
+                      : renderInstitutionPanel(data)
             }
           </section>
         </main>

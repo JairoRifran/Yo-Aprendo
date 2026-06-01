@@ -5,6 +5,7 @@ import {
   demoInstitutionDashboard,
   demoLinkGuardian,
   demoLogin,
+  demoOwnerDashboard,
   demoParentDashboard,
   demoStudentDashboard,
   demoTeacherDashboard
@@ -75,6 +76,7 @@ export async function fetchDashboardByRole(role, entityId) {
     if (role === "parent") return demoParentDashboard(entityId);
     if (role === "teacher") return demoTeacherDashboard(entityId);
     if (role === "institution") return demoInstitutionDashboard(entityId);
+    if (role === "owner") return demoOwnerDashboard();
     throw error;
   }
 }
