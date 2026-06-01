@@ -54,6 +54,17 @@ export async function loginWithAccess(payload) {
   }
 }
 
+export async function registerInstitution(payload) {
+  const response = await fetch(`${API_BASE}/institutions/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  return await readJson(response);
+}
+
 export async function fetchDashboardByRole(role, entityId) {
   try {
     const response = await fetch(`${API_BASE}/dashboard/${role}/${entityId}`);

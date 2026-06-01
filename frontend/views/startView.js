@@ -1,6 +1,6 @@
 import { appState } from "../state/appState.js";
 import { goToDashboard, goToWorldMap } from "../utils/navigation.js";
-import { loginWithAccess } from "../utils/api.js";
+import { loginWithAccess, registerInstitution } from "../utils/api.js";
 import { saveSession } from "../utils/storage.js";
 import {
   unlockAudio,
@@ -129,9 +129,51 @@ function renderLoginPanel(meta, currentName, currentCode) {
         />
 
         <button id="startEnterBtn" class="btn btn-primary start-art-submit" type="button">${meta.cta}</button>
+        ${
+          meta.title === "Institucion"
+            ? `<button id="openInstitutionRegisterBtn" class="btn btn-secondary start-art-submit" type="button">Registrar institucion</button>`
+            : ""
+        }
         <div class="start-role-note start-art-role-note" id="startRoleNote">${meta.loginNote}</div>
         <div class="start-art-form-error" id="startAccessError"></div>
       </div>
+    </section>
+  `;
+}
+
+function renderInstitutionRegisterPanel() {
+  return `
+    <section class="start-art-login-panel">
+      <div class="start-art-login-top">
+        <div class="start-art-side-label">Alta institucional</div>
+        <button class="start-art-back-link" id="backToInstitutionLogin" type="button">Ya tengo acceso</button>
+      </div>
+      <h2>Crear institucion</h2>
+      <p>La institucion crea el espacio, queda en plan piloto y luego habilita docentes, aulas, alumnos y familias.</p>
+
+      <form class="start-art-form" id="institutionRegisterForm">
+        <label class="start-field-label" for="institutionNameInput">Nombre del centro</label>
+        <input id="institutionNameInput" class="start-input" name="institution_name" type="text" maxlength="160" placeholder="Ej: Escuela Nro. 12" required />
+
+        <label class="start-field-label" for="institutionCodeInput">Codigo institucional</label>
+        <input id="institutionCodeInput" class="start-input" name="institution_code" type="text" maxlength="40" placeholder="Ej: ESC-12-UY" required />
+
+        <label class="start-field-label" for="adminNameInput">Responsable institucional</label>
+        <input id="adminNameInput" class="start-input" name="admin_name" type="text" maxlength="120" placeholder="Nombre del administrador" required />
+
+        <label class="start-field-label" for="adminEmailInput">Email institucional</label>
+        <input id="adminEmailInput" class="start-input" name="admin_email" type="email" maxlength="160" placeholder="admin@centro.edu.uy" required />
+
+        <label class="start-field-label" for="adminCodeInput">Clave de administrador</label>
+        <input id="adminCodeInput" class="start-input" name="admin_access_code" type="text" maxlength="80" placeholder="Minimo 6 caracteres" required />
+
+        <label class="start-field-label" for="departmentInput">Departamento</label>
+        <input id="departmentInput" class="start-input" name="department" type="text" maxlength="80" placeholder="Montevideo, Canelones..." />
+
+        <button id="institutionRegisterBtn" class="btn btn-primary start-art-submit" type="submit">Crear piloto institucional</button>
+        <div class="start-role-note start-art-role-note">Piloto inicial: 90 dias, hasta 50 alumnos y 2 docentes.</div>
+        <div class="start-art-form-error" id="institutionRegisterError"></div>
+      </form>
     </section>
   `;
 }
@@ -219,7 +261,13 @@ export function renderStart() {
             <div class="start-art-note">Explora, resuelve retos y desbloquea nuevos caminos.</div>
           </div>
 
-          ${accessMode === "chooser" ? renderChooserPanel(selectedRole) : renderLoginPanel(meta, currentName, currentCode)}
+          ${
+            accessMode === "chooser"
+              ? renderChooserPanel(selectedRole)
+              : accessMode === "institution-register"
+                ? renderInstitutionRegisterPanel()
+                : renderLoginPanel(meta, currentName, currentCode)
+          }
         </div>
       </section>
     </main>
@@ -274,6 +322,74 @@ export function renderStart() {
     playUiClick();
     appState.startAccessMode = "chooser";
     window.renderApp();
+  });
+
+  document.getElementById("openInstitutionRegisterBtn")?.addEventListener("click", () => {
+    unlockAudio();
+    playUiClick();
+    appState.startAccessMode = "institution-register";
+    window.renderApp();
+  });
+
+  document.getElementById("backToInstitutionLogin")?.addEventListener("click", () => {
+    unlockAudio();
+    playUiClick();
+    appState.currentUserRole = "institution";
+    appState.startAccessMode = "login";
+    window.renderApp();
+  });
+
+  document.getElementById("institutionRegisterForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    unlockAudio();
+    playSelect();
+
+    const form = new FormData(event.currentTarget);
+    const errorNode = document.getElementById("institutionRegisterError");
+    const submitButton = document.getElementById("institutionRegisterBtn");
+    if (errorNode) errorNode.textContent = "";
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Creando...";
+    }
+
+    try {
+      const result = await registerInstitution({
+        institution_name: form.get("institution_name"),
+        institution_code: form.get("institution_code"),
+        admin_name: form.get("admin_name"),
+        admin_email: form.get("admin_email"),
+        admin_access_code: form.get("admin_access_code"),
+        department: form.get("department"),
+        billing_email: form.get("admin_email")
+      });
+      const session = result.session;
+      appState.currentUserRole = session.role;
+      appState.selectedDashboardRole = session.role;
+      appState.currentUserName = session.display_name;
+      appState.currentAccessCode = form.get("admin_access_code");
+      appState.session = session;
+      appState.dashboardData = null;
+      appState.dashboardError = "";
+      appState.startAccessMode = "login";
+      saveSession({
+        currentUserRole: appState.currentUserRole,
+        currentUserName: appState.currentUserName,
+        currentAccessCode: appState.currentAccessCode,
+        selectedDashboardRole: appState.selectedDashboardRole,
+        startAccessMode: appState.startAccessMode,
+        session: appState.session
+      });
+      goToDashboard("institution");
+      window.renderApp();
+    } catch (error) {
+      if (errorNode) errorNode.textContent = error.message || "No pudimos crear la institucion.";
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Crear piloto institucional";
+      }
+    }
   });
 
   document.getElementById("startEnterBtn")?.addEventListener("click", async () => {

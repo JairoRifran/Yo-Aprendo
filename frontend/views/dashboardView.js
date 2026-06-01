@@ -673,6 +673,17 @@ function renderParentPanel(data) {
 }
 
 function renderInstitutionPanel(data) {
+  const subscription = data.subscription || {
+    plan_key: "trial",
+    status: "trialing",
+    student_limit: 50,
+    teacher_limit: 2,
+    student_count: data.summary.student_count,
+    teacher_count: 0,
+    can_add_students: true
+  };
+  const studentLimitLabel = subscription.plan_key === "enterprise" ? "sin limite" : subscription.student_limit;
+
   return `
     <section class="dashboard-role-panel">
       <div class="dashboard-hero institution">
@@ -686,6 +697,20 @@ function renderInstitutionPanel(data) {
           <span>avance promedio</span>
         </div>
       </div>
+
+      <article class="dashboard-card">
+        <div class="eyebrow">Plan institucional</div>
+        <h2>${subscription.plan_key === "trial" ? "Piloto activo" : subscription.plan_key}</h2>
+        <div class="dashboard-grid dashboard-grid-3">
+          ${renderStatCard("students", "Uso de alumnos", `${subscription.student_count} / ${studentLimitLabel}`, "Alumnos habilitados en el centro.", "institution-student-register")}
+          ${renderStatCard("teacher", "Docentes", `${subscription.teacher_count} / ${subscription.teacher_limit || "sin limite"}`, "Administrados por la institucion.", "institution-groups")}
+          ${renderStatCard("support", "Estado", subscription.status, "La institucion conserva sus datos aunque cambie el plan.", "institution-groups")}
+        </div>
+        <div class="dashboard-highlight ${subscription.can_add_students ? "" : "secondary"}">
+          <strong>Flujo recomendado</strong>
+          <p>La institucion administra el espacio, crea docentes y aulas, registra alumnos y habilita familias por invitacion. El plan piloto permite validar el uso antes de contratar un plan escuela o convenio.</p>
+        </div>
+      </article>
 
       <div class="dashboard-grid dashboard-grid-2">
         ${renderGuideCard(

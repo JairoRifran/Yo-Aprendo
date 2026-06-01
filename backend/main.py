@@ -1,13 +1,14 @@
 import json
 import os
 from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from statistics import mean
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, Text, create_engine, select
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text, create_engine, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 from sqlalchemy.types import JSON
@@ -60,6 +61,38 @@ class Institution(Base):
 
     classrooms: Mapped[list["Classroom"]] = relationship(back_populates="institution")
     teachers: Mapped[list["Teacher"]] = relationship(back_populates="institution")
+    subscription: Mapped["InstitutionSubscription"] = relationship(back_populates="institution", uselist=False)
+    users: Mapped[list["InstitutionUser"]] = relationship(back_populates="institution")
+
+
+class InstitutionSubscription(Base):
+    __tablename__ = "institution_subscriptions"
+
+    institution_id: Mapped[str] = mapped_column(ForeignKey("institutions.id", ondelete="CASCADE"), primary_key=True)
+    plan_key: Mapped[str] = mapped_column(String(40), default="trial")
+    status: Mapped[str] = mapped_column(String(40), default="trialing", index=True)
+    student_limit: Mapped[int] = mapped_column(Integer, default=50)
+    teacher_limit: Mapped[int] = mapped_column(Integer, default=2)
+    billing_email: Mapped[str] = mapped_column(String(160), default="")
+    billing_provider: Mapped[str] = mapped_column(String(80), default="manual")
+    billing_customer_id: Mapped[str] = mapped_column(String(160), default="")
+    trial_ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    institution: Mapped[Institution] = relationship(back_populates="subscription")
+
+
+class InstitutionUser(Base):
+    __tablename__ = "institution_users"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    institution_id: Mapped[str] = mapped_column(ForeignKey("institutions.id", ondelete="CASCADE"), index=True)
+    role: Mapped[str] = mapped_column(String(40), default="institution_admin", index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    email: Mapped[str] = mapped_column(String(160), index=True, nullable=False)
+    access_code: Mapped[str] = mapped_column(String(80), unique=True, index=True, nullable=False)
+    status: Mapped[str] = mapped_column(String(40), default="active")
+
+    institution: Mapped[Institution] = relationship(back_populates="users")
 
 
 class Teacher(Base):
@@ -154,6 +187,16 @@ class GuardianLinkRequest(BaseModel):
     contact: str = Field(default="")
 
 
+class InstitutionRegisterRequest(BaseModel):
+    institution_name: str = Field(min_length=2, max_length=160)
+    institution_code: str = Field(min_length=4, max_length=40)
+    admin_name: str = Field(min_length=2, max_length=120)
+    admin_email: str = Field(min_length=5, max_length=160)
+    admin_access_code: str = Field(min_length=6, max_length=80)
+    department: str = Field(default="", max_length=80)
+    billing_email: str = Field(default="", max_length=160)
+
+
 app = FastAPI(title="YoAprendo API", version="0.3.0")
 
 app.add_middleware(
@@ -181,6 +224,19 @@ def db_session():
 def load_seed() -> dict:
     seed_path = Path(__file__).with_name("data.json")
     return json.loads(seed_path.read_text(encoding="utf-8"))
+
+
+def default_subscription(institution_id: str, billing_email: str = "") -> InstitutionSubscription:
+    return InstitutionSubscription(
+        institution_id=institution_id,
+        plan_key="trial",
+        status="trialing",
+        student_limit=50,
+        teacher_limit=2,
+        billing_email=billing_email,
+        billing_provider="manual",
+        trial_ends_at=datetime.now(timezone.utc) + timedelta(days=90),
+    )
 
 
 def seed_database(session: Session) -> None:
@@ -271,12 +327,47 @@ def seed_database(session: Session) -> None:
         guardians.append(guardian)
     session.add_all(guardians)
 
+    for institution in institutions.values():
+        session.add(default_subscription(institution.id, institution.teacher_email))
+
+    demo_institution = institutions.get("inst-uy")
+    if demo_institution:
+        session.add(
+            InstitutionUser(
+                id="user-inst-admin-demo",
+                institution_id=demo_institution.id,
+                role="institution_admin",
+                name=demo_institution.teacher_name or demo_institution.name,
+                email=demo_institution.teacher_email or "admin@yoaprendo.demo",
+                access_code=demo_institution.code,
+            )
+        )
+
+
+def ensure_subscription_rows(session: Session) -> None:
+    institutions = session.scalars(select(Institution)).all()
+    for institution in institutions:
+        if institution.subscription is None:
+            session.add(default_subscription(institution.id, institution.teacher_email))
+        if not institution.users:
+            session.add(
+                InstitutionUser(
+                    id=unique_id(session, InstitutionUser, "user", institution.name),
+                    institution_id=institution.id,
+                    role="institution_admin",
+                    name=institution.teacher_name or institution.name,
+                    email=institution.teacher_email or f"{institution.id}@yoaprendo.local",
+                    access_code=institution.code,
+                )
+            )
+
 
 @app.on_event("startup")
 def init_database() -> None:
     Base.metadata.create_all(bind=engine)
     with db_session() as session:
         seed_database(session)
+        ensure_subscription_rows(session)
 
 
 def slugify(value: str) -> str:
@@ -291,6 +382,26 @@ def unique_id(session: Session, model: type[Base], prefix: str, value: str) -> s
     candidate = base
     suffix = 1
     while session.get(model, candidate):
+        suffix += 1
+        candidate = f"{base}-{suffix}"
+    return candidate
+
+
+def unique_group_code(session: Session, value: str) -> str:
+    base = f"AULA-{value.upper().replace(' ', '')[:12]}" or "AULA-NUEVA"
+    candidate = base
+    suffix = 1
+    while session.scalar(select(Classroom).where(Classroom.group_code == candidate)):
+        suffix += 1
+        candidate = f"{base}-{suffix}"
+    return candidate
+
+
+def unique_student_code(session: Session, value: str) -> str:
+    base = value or "ALUMNO"
+    candidate = base
+    suffix = 1
+    while session.scalar(select(Student).where(Student.student_code == candidate)):
         suffix += 1
         candidate = f"{base}-{suffix}"
     return candidate
@@ -356,6 +467,21 @@ def classroom_summary(classroom: Classroom) -> dict:
     }
 
 
+def subscription_payload(institution: Institution, student_count: int, teacher_count: int) -> dict:
+    subscription = institution.subscription or default_subscription(institution.id, institution.teacher_email)
+    return {
+        "plan_key": subscription.plan_key,
+        "status": subscription.status,
+        "student_limit": subscription.student_limit,
+        "teacher_limit": subscription.teacher_limit,
+        "student_count": student_count,
+        "teacher_count": teacher_count,
+        "trial_ends_at": subscription.trial_ends_at.isoformat() if subscription.trial_ends_at else None,
+        "can_add_students": student_count < subscription.student_limit or subscription.plan_key == "enterprise",
+        "can_add_teachers": teacher_count < subscription.teacher_limit or subscription.plan_key == "enterprise",
+    }
+
+
 def institution_dashboard(session: Session, institution_id: str) -> dict:
     institution = session.get(Institution, institution_id)
     if not institution:
@@ -397,6 +523,7 @@ def institution_dashboard(session: Session, institution_id: str) -> dict:
             "avg_weekly_minutes": round(mean(student.weekly_minutes for student in students)) if students else 0,
             "avg_completion": round(mean(student_percent(student) for student in students)) if students else 0,
         },
+        "subscription": subscription_payload(institution, len(students), len(institution.teachers)),
         "classrooms": [classroom_summary(classroom) for classroom in classrooms],
         "students": [student_summary(student) for student in students],
         "guardians": [guardian_payload(guardian) for guardian in guardians],
@@ -550,6 +677,23 @@ def resolve_login(session: Session, payload: LoginRequest) -> dict:
         }
 
     if role == "institution":
+        admins = session.scalars(select(InstitutionUser).where(InstitutionUser.role == "institution_admin")).all()
+        admin_match = next(
+            (item for item in admins if item.access_code.lower() == code or item.email.lower() == name),
+            None,
+        )
+        if admin_match:
+            return {
+                "role": "institution",
+                "display_name": admin_match.institution.name,
+                "entity_id": admin_match.institution_id,
+                "redirect_view": "dashboard",
+                "context": {
+                    "admin_name": admin_match.name,
+                    "plan": admin_match.institution.subscription.plan_key if admin_match.institution.subscription else "trial",
+                },
+            }
+
         institutions = session.scalars(select(Institution)).all()
         match = next((item for item in institutions if item.code.lower() == code or item.name.lower() == name), None)
         if not match:
@@ -583,6 +727,88 @@ def health():
     with db_session() as session:
         institution_count = session.query(Institution).count()
     return {"ok": True, "database": "connected", "institutions": institution_count}
+
+
+@app.get("/api/plans")
+def plans():
+    return {
+        "plans": [
+            {
+                "key": "trial",
+                "name": "Piloto",
+                "price": "90 dias gratis",
+                "student_limit": 50,
+                "teacher_limit": 2,
+            },
+            {
+                "key": "school",
+                "name": "Escuela",
+                "price": "USD 49-99/mes",
+                "student_limit": 300,
+                "teacher_limit": 999,
+            },
+            {
+                "key": "enterprise",
+                "name": "Gobierno / Red educativa",
+                "price": "A medida",
+                "student_limit": None,
+                "teacher_limit": None,
+            },
+        ]
+    }
+
+
+@app.post("/api/institutions/register")
+def register_institution(payload: InstitutionRegisterRequest):
+    with db_session() as session:
+        institution_code = payload.institution_code.strip()
+        admin_email = payload.admin_email.strip().lower()
+        admin_access_code = payload.admin_access_code.strip()
+
+        if session.scalar(select(Institution).where(Institution.code == institution_code)):
+            raise HTTPException(status_code=409, detail="Ya existe una institucion con ese codigo.")
+        if session.scalar(select(InstitutionUser).where(InstitutionUser.email == admin_email)):
+            raise HTTPException(status_code=409, detail="Ya existe un administrador con ese email.")
+        if session.scalar(select(InstitutionUser).where(InstitutionUser.access_code == admin_access_code)):
+            raise HTTPException(status_code=409, detail="Ese codigo de administrador ya esta en uso.")
+
+        institution_id = unique_id(session, Institution, "inst", payload.institution_name)
+        institution = Institution(
+            id=institution_id,
+            name=payload.institution_name.strip(),
+            code=institution_code,
+            teacher_name=payload.admin_name.strip(),
+            teacher_email=admin_email,
+            notes=f"Departamento: {payload.department.strip()}" if payload.department.strip() else "",
+        )
+        session.add(institution)
+        session.flush()
+
+        subscription = default_subscription(institution_id, payload.billing_email.strip() or admin_email)
+        session.add(subscription)
+        session.add(
+            InstitutionUser(
+                id=unique_id(session, InstitutionUser, "user", payload.admin_name),
+                institution_id=institution_id,
+                role="institution_admin",
+                name=payload.admin_name.strip(),
+                email=admin_email,
+                access_code=admin_access_code,
+            )
+        )
+        session.flush()
+
+        return {
+            "ok": True,
+            "session": {
+                "role": "institution",
+                "display_name": institution.name,
+                "entity_id": institution.id,
+                "redirect_view": "dashboard",
+                "context": {"admin_name": payload.admin_name.strip(), "plan": "trial"},
+            },
+            "subscription": subscription_payload(institution, 0, 0),
+        }
 
 
 @app.get("/api/access/demo")
@@ -637,7 +863,7 @@ def create_classroom(institution_id: str, payload: ClassroomCreateRequest):
             institution_id=institution_id,
             name=payload.name.strip(),
             grade_label=payload.grade_label.strip(),
-            group_code=f"AULA-{payload.name.upper().replace(' ', '')[:12]}",
+            group_code=unique_group_code(session, payload.name),
             assigned_worlds=["Secuencias"],
         )
         session.add(classroom)
@@ -649,6 +875,13 @@ def create_classroom(institution_id: str, payload: ClassroomCreateRequest):
 def create_student(classroom_id: str, payload: StudentCreateRequest):
     with db_session() as session:
         classroom = get_classroom(session, classroom_id)
+        subscription = classroom.institution.subscription
+        current_students = sum(len(item.students) for item in classroom.institution.classrooms)
+        if subscription and subscription.plan_key != "enterprise" and current_students >= subscription.student_limit:
+            raise HTTPException(
+                status_code=402,
+                detail="El plan actual alcanzo el limite de alumnos. Actualiza el plan para sumar mas estudiantes.",
+            )
         student_name = payload.name.strip()
         student = Student(
             id=unique_id(session, Student, "stu", student_name),
@@ -656,7 +889,10 @@ def create_student(classroom_id: str, payload: StudentCreateRequest):
             name=student_name,
             display_name=payload.display_name.strip() or student_name,
             avatar="Nuevo tripulante",
-            student_code=payload.student_code.strip() or f"{student_name[:3].upper()}-{classroom.name.replace(' ', '')}",
+            student_code=unique_student_code(
+                session,
+                payload.student_code.strip() or f"{student_name[:3].upper()}-{classroom.name.replace(' ', '')}",
+            ),
             streak_days=0,
             energy=70,
             weekly_minutes=0,
