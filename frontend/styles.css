@@ -1011,6 +1011,165 @@ body::before {
   height: 20px;
 }
 
+/* =========================
+   START ACCESS UX REFRESH
+========================= */
+.start-art-hero {
+  width: min(520px, 40vw);
+  padding: 34px 36px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(13, 106, 160, 0.42), rgba(8, 69, 122, 0.44));
+  backdrop-filter: blur(12px);
+}
+
+.start-art-hero h1 {
+  font-size: clamp(54px, 5.4vw, 86px);
+  line-height: 0.92;
+}
+
+.start-art-hero h1 .accent {
+  color: #ffcf4e;
+}
+
+.start-art-hero p {
+  max-width: 470px;
+  font-size: 20px;
+  line-height: 1.42;
+}
+
+.start-art-note {
+  max-width: 440px;
+  font-size: 15px;
+}
+
+.start-art-login-panel.chooser {
+  width: min(460px, 34vw);
+  max-height: calc(100vh - 116px);
+  padding: 28px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 232, 151, 0.18), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(235, 248, 255, 0.92));
+}
+
+.start-art-login-panel.chooser h2 {
+  margin-bottom: 8px;
+  color: #142f53;
+  font-size: 36px;
+  letter-spacing: 0;
+}
+
+.start-art-login-panel.chooser > p {
+  max-width: 370px;
+  color: #55708c;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.chooser-grid.start-art-access-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.chooser-grid .start-art-role-card {
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 34px;
+  grid-template-rows: auto auto auto;
+  column-gap: 14px;
+  align-items: center;
+  padding: 15px 16px;
+  border-radius: 18px;
+  text-align: left;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 248, 255, 0.94));
+  border: 1px solid rgba(134, 190, 226, 0.48);
+  box-shadow: 0 12px 24px rgba(30, 104, 162, 0.1);
+}
+
+.chooser-grid .start-art-role-card.active {
+  border-color: rgba(44, 166, 236, 0.7);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(89, 212, 255, 0.18), transparent 34%),
+    linear-gradient(180deg, #ffffff, #e8f7ff);
+  box-shadow:
+    0 16px 28px rgba(30, 104, 162, 0.16),
+    0 0 0 4px rgba(93, 195, 255, 0.18);
+}
+
+.chooser-grid .start-art-role-icon {
+  grid-row: 1 / 4;
+  width: 54px;
+  height: 54px;
+  border-radius: 17px;
+  color: #1b7fc7;
+  background:
+    linear-gradient(180deg, rgba(232, 249, 255, 1), rgba(196, 235, 255, 0.96));
+}
+
+.chooser-grid .start-art-role-icon .ui-icon {
+  width: 25px;
+  height: 25px;
+}
+
+.chooser-grid .start-art-role-card strong {
+  color: #14365d;
+  font-size: 17px;
+  line-height: 1.1;
+}
+
+.chooser-grid .start-art-role-card > span:not(.start-art-role-icon):not(.start-art-role-arrow) {
+  color: #486a89;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.chooser-grid .start-art-role-demo {
+  display: block;
+  margin-top: 4px;
+  color: #216ea9;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.chooser-grid .start-art-role-arrow {
+  grid-column: 3;
+  grid-row: 1 / 4;
+  width: 34px;
+  height: 34px;
+  place-self: center;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(180deg, #3eb7ff, #176bd1);
+  box-shadow: 0 8px 14px rgba(31, 111, 198, 0.22);
+}
+
+@media (max-width: 1080px) {
+  .start-art-hero {
+    width: min(560px, calc(100vw - 40px));
+  }
+
+  .start-art-login-panel.chooser {
+    width: min(560px, calc(100vw - 40px));
+  }
+}
+
+@media (max-width: 680px) {
+  .start-art-hero {
+    padding: 26px;
+  }
+
+  .start-art-login-panel.chooser {
+    padding: 22px;
+  }
+}
+
 .mission-header-badge {
   background:
     radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.62), transparent 25%),

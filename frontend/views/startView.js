@@ -13,33 +13,33 @@ import { uiIcon } from "../utils/icons.js";
 
 const ROLE_META = {
   student: {
-    title: "Jugador",
-    subtitle: "Entrar al mapa y seguir la aventura.",
-    helper: "Explora islas, resuelve retos y avanza jugando.",
+    title: "Soy estudiante",
+    subtitle: "Jugar misiones y avanzar en el mapa.",
+    helper: "Entra a tus islas, resuelve retos y gana progreso paso a paso.",
     namePlaceholder: "Nombre del explorador",
     codeLabel: "Isla o grupo",
     codePlaceholder: "Nivel 4",
-    cta: "Jugar ahora",
+    cta: "Entrar a jugar",
     loginNote: "Vas a entrar directo al mundo de juego.",
     demoName: "Sofi",
     demoCode: "Nivel 4"
   },
   parent: {
-    title: "Familia",
-    subtitle: "Ver progreso, aprendizajes y acompanamiento.",
-    helper: "Segui avances, fortalezas y sugerencias para casa.",
+    title: "Soy familia",
+    subtitle: "Ver avances y acompanar desde casa.",
+    helper: "Consulta progreso, fortalezas y sugerencias simples para acompanar.",
     namePlaceholder: "Familia de...",
-    codeLabel: "Codigo de seguimiento",
+    codeLabel: "Codigo familiar",
     codePlaceholder: "FAM-404",
-    cta: "Ver panel",
+    cta: "Ver seguimiento",
     loginNote: "Vas a entrar al panel de familias.",
     demoName: "Familia de Sofi",
     demoCode: "FAM-404"
   },
   teacher: {
-    title: "Docente",
-    subtitle: "Gestionar grupos, alumnos y acompanamiento.",
-    helper: "Organiza aulas, registra ninos y sigue el avance de tu grupo.",
+    title: "Soy docente",
+    subtitle: "Gestionar aulas y acompanamiento.",
+    helper: "Revisa grupos asignados, registra alumnos y detecta quienes necesitan apoyo.",
     namePlaceholder: "Nombre docente",
     codeLabel: "Codigo docente",
     codePlaceholder: "DOC-4A",
@@ -49,19 +49,19 @@ const ROLE_META = {
     demoCode: "DOC-4A"
   },
   institution: {
-    title: "Institucion",
-    subtitle: "Abrir seguimiento del grupo y lectura pedagogica.",
-    helper: "Consulta actividad, conceptos trabajados y estado del grupo.",
+    title: "Soy institucion",
+    subtitle: "Administrar el centro y sus planes.",
+    helper: "Consulta actividad, crea grupos, habilita familias y revisa el plan institucional.",
     namePlaceholder: "Escuela o grupo",
     codeLabel: "Clave institucional",
     codePlaceholder: "INST-4A",
-    cta: "Abrir panel",
+    cta: "Abrir panel institucional",
     loginNote: "Vas a entrar al panel institucional.",
     demoName: "Escuela Demo Uruguay",
     demoCode: "INST-4A"
   },
   owner: {
-    title: "Producto",
+    title: "Soy producto",
     subtitle: "Medir adopcion, uso y evidencia comercial.",
     helper: "Panel de metricas para venta, seguimiento y expansion institucional.",
     namePlaceholder: "rifranjairo@gmail.com",
@@ -100,9 +100,9 @@ function roleCard(role, selectedRole) {
 function renderChooserPanel(selectedRole) {
   return `
     <section class="start-art-login-panel chooser">
-      <div class="start-art-side-label">Elige tu acceso</div>
-      <h2>Quien va a entrar</h2>
-      <p>Selecciona un perfil para abrir su acceso correspondiente.</p>
+      <div class="start-art-side-label">Acceso a Yo Aprendo</div>
+      <h2>Elegí cómo querés entrar</h2>
+      <p>Cada perfil abre una experiencia distinta: juego, seguimiento, gestión o métricas.</p>
       <div class="start-art-access-grid chooser-grid">
         ${roleCard("student", selectedRole)}
         ${roleCard("parent", selectedRole)}
@@ -393,15 +393,12 @@ export function renderStart() {
         </div>
 
         <div class="start-art-overlay">
-          <div class="start-art-chip chip-map">Mapa de aventura</div>
-
           <div class="start-art-hero">
             <h1>
-              <span>Zarpa hacia</span>
-              <span>una isla y</span>
-              <span class="accent">aprende jugando</span>
+              <span>Yo Aprendo</span>
+              <span class="accent">Nivel 4</span>
             </h1>
-            <p>Una aventura para aprender jugando.</p>
+            <p>Pensamiento computacional para 4.º de primaria, con misiones cortas, seguimiento y evidencia para instituciones.</p>
 
             <div class="start-art-pill-row">
               <span class="start-art-pill green">4 islas</span>
@@ -409,7 +406,7 @@ export function renderStart() {
               <span class="start-art-pill purple">pensamiento computacional</span>
             </div>
 
-            <div class="start-art-note">Explora, resuelve retos y desbloquea nuevos caminos.</div>
+            <div class="start-art-note">Elegí tu perfil para entrar al juego, al seguimiento o a la gestión institucional.</div>
           </div>
 
           ${
