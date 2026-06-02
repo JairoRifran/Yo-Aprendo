@@ -1170,6 +1170,159 @@ body::before {
   }
 }
 
+/* Final start screen composition: keep the role choice readable on desktop. */
+.start-art-overlay {
+  display: grid;
+  grid-template-columns: minmax(360px, 480px) minmax(480px, 520px);
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 72px);
+  padding: clamp(24px, 5vw, 64px);
+  overflow: hidden;
+}
+
+.start-art-overlay > .start-art-hero,
+.start-art-overlay > .start-art-login-panel {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+}
+
+.start-art-overlay > .start-art-hero {
+  width: 100%;
+  max-width: 480px;
+  padding: 30px;
+}
+
+.start-art-overlay > .start-art-hero h1 {
+  max-width: 390px;
+  font-size: clamp(46px, 4.4vw, 64px);
+  line-height: 0.94;
+}
+
+.start-art-overlay > .start-art-hero p {
+  max-width: 410px;
+  font-size: 17px;
+  line-height: 1.38;
+  overflow-wrap: anywhere;
+}
+
+.start-art-overlay > .start-art-hero .start-art-note {
+  max-width: 360px;
+  padding: 14px 18px;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.start-art-overlay > .start-art-login-panel {
+  justify-self: end;
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - 104px);
+  overflow: auto;
+}
+
+.start-art-login-panel.chooser {
+  padding: 22px;
+}
+
+.start-art-login-panel.chooser h2 {
+  font-size: clamp(30px, 3vw, 38px);
+  line-height: 0.98;
+}
+
+.start-art-login-panel.chooser > p {
+  font-size: 14px;
+  line-height: 1.38;
+}
+
+.chooser-grid.start-art-access-grid {
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.chooser-grid .start-art-role-card {
+  min-height: 76px;
+  grid-template-columns: 46px minmax(0, 1fr) 30px;
+  column-gap: 12px;
+  padding: 11px 12px;
+  border-radius: 16px;
+}
+
+.chooser-grid .start-art-role-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+.chooser-grid .start-art-role-icon .ui-icon {
+  width: 21px;
+  height: 21px;
+}
+
+.chooser-grid .start-art-role-card strong {
+  font-size: 15px;
+}
+
+.chooser-grid .start-art-role-card > span:not(.start-art-role-icon):not(.start-art-role-arrow) {
+  font-size: 12px;
+}
+
+.chooser-grid .start-art-role-demo {
+  font-size: 10px;
+}
+
+.chooser-grid .start-art-role-arrow {
+  width: 30px;
+  height: 30px;
+}
+
+@media (min-width: 981px) {
+  .chooser-grid.start-art-access-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chooser-grid .start-art-role-card {
+    position: relative;
+    min-height: 112px;
+    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: start;
+    padding: 14px;
+  }
+
+  .chooser-grid .start-art-role-card:nth-child(5) {
+    grid-column: 1 / -1;
+    min-height: 82px;
+  }
+
+  .chooser-grid .start-art-role-arrow {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .chooser-grid .start-art-role-card strong,
+  .chooser-grid .start-art-role-card > span:not(.start-art-role-icon):not(.start-art-role-arrow),
+  .chooser-grid .start-art-role-demo {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 980px) {
+  .start-art-overlay {
+    grid-template-columns: 1fr;
+    align-content: start;
+    overflow: auto;
+  }
+
+  .start-art-overlay > .start-art-hero,
+  .start-art-overlay > .start-art-login-panel {
+    justify-self: center;
+    max-width: min(560px, calc(100vw - 32px));
+  }
+}
+
 .mission-header-badge {
   background:
     radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.62), transparent 25%),
