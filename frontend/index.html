@@ -3,12 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YoAprendo - Mundos de 4.º</title>
+  <title>YoAprendo | Juego educativo de pensamiento computacional para 4.º</title>
+  <meta
+    name="description"
+    content="YoAprendo es una aventura educativa para niños de 4.º que enseña pensamiento computacional con mundos, misiones, secuencias, bucles, decisiones y datos."
+  />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0b74d1" />
+  <meta name="application-name" content="YoAprendo" />
+  <link rel="canonical" href="https://yoaprendo-lake.vercel.app/" />
   <link rel="icon" type="image/png" href="./img/favicon.png" />
   <link rel="shortcut icon" type="image/png" href="./img/favicon.png" />
   <link rel="apple-touch-icon" href="./img/favicon.png" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_UY" />
+  <meta property="og:site_name" content="YoAprendo" />
+  <meta property="og:title" content="YoAprendo | Aventura educativa de programación para niños" />
+  <meta
+    property="og:description"
+    content="Explorá mundos, resolvé misiones y aprendé pensamiento computacional con una experiencia interactiva para 4.º."
+  />
+  <meta property="og:url" content="https://yoaprendo-lake.vercel.app/" />
+  <meta property="og:image" content="https://yoaprendo-lake.vercel.app/img/worlds-ocean-story-bg.png" />
+  <meta property="og:image:alt" content="Mapa de mundos de YoAprendo sobre un océano de aventura" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="YoAprendo | Juego educativo de pensamiento computacional" />
+  <meta
+    name="twitter:description"
+    content="Una aventura interactiva para aprender secuencias, bucles, decisiones y datos en 4.º."
+  />
+  <meta name="twitter:image" content="https://yoaprendo-lake.vercel.app/img/worlds-ocean-story-bg.png" />
   <link rel="stylesheet" href="./styles.css" />
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js" defer></script>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalApplication",
+      "name": "YoAprendo",
+      "url": "https://yoaprendo-lake.vercel.app/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "es",
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "student"
+      },
+      "educationalLevel": "4.º primaria",
+      "learningResourceType": "interactive game",
+      "teaches": [
+        "Pensamiento computacional",
+        "Secuencias",
+        "Bucles",
+        "Decisiones",
+        "Datos"
+      ],
+      "description": "Juego educativo interactivo para niños de 4.º que enseña pensamiento computacional mediante mundos, misiones y recompensas."
+    }
+  </script>
 
   <!-- Precarga de imagen de misión -->
   <link rel="preload" as="image" href="./img/mision1.png" />
@@ -40,7 +93,7 @@
           <div class="scene-vignette"></div>
           <div class="scene-glow"></div>
           <div class="scene-label">
-            Explorá los mundos de 4.º y elegí tu próxima aventura ✨
+            Explorá los mundos de 4.º y elegí tu próxima aventura
           </div>
         </div>
       </section>

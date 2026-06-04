@@ -1,0 +1,19 @@
+{
+  "name": "YoAprendo",
+  "short_name": "YoAprendo",
+  "description": "Aventura educativa para aprender pensamiento computacional en 4.º.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#072a5a",
+  "theme_color": "#0b74d1",
+  "icons": [
+    {
+      "src": "/img/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
