@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yoaprendo-lake.vercel.app/sitemap.xml
+Sitemap: https://yoaprendo.org/sitemap.xml
