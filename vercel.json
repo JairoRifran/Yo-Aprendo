@@ -20,6 +20,30 @@
       "dest": "/frontend/index.html"
     },
     {
+      "src": "/sobre",
+      "dest": "/frontend/sobre.html"
+    },
+    {
+      "src": "/alineacion-curricular",
+      "dest": "/frontend/alineacion-curricular.html"
+    },
+    {
+      "src": "/pensamiento-computacional-primaria",
+      "dest": "/frontend/pensamiento-computacional-primaria.html"
+    },
+    {
+      "src": "/privacidad",
+      "dest": "/frontend/privacidad.html"
+    },
+    {
+      "src": "/terminos",
+      "dest": "/frontend/terminos.html"
+    },
+    {
+      "src": "/contacto",
+      "dest": "/frontend/contacto.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/$1"
     }

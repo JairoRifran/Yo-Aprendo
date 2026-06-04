@@ -36,10 +36,19 @@ function sendFile(filePath, res) {
   });
 }
 
+function resolveStaticPath(filePath) {
+  if (path.extname(filePath)) return filePath;
+
+  const htmlPath = `${filePath}.html`;
+  if (fs.existsSync(htmlPath)) return htmlPath;
+
+  return filePath;
+}
+
 const server = http.createServer((req, res) => {
   const requestPath = req.url === "/" ? "/index.html" : decodeURIComponent(req.url.split("?")[0]);
   const safePath = path.normalize(requestPath).replace(/^(\.\.[\\/])+/, "");
-  const filePath = path.join(root, safePath);
+  const filePath = resolveStaticPath(path.join(root, safePath));
 
   if (!filePath.startsWith(root)) {
     res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });

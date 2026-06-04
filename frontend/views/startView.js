@@ -344,6 +344,28 @@ function renderInstitutionPlanRequestPanel(planKey = "school") {
   `;
 }
 
+function renderStartFooter() {
+  return `
+    <footer class="start-site-footer" aria-label="Informacion institucional">
+      <div class="start-site-footer-inner">
+        <div class="start-site-footer-brand">
+          <strong>YoAprendo</strong>
+          <p>Herramienta educativa independiente para practicar pensamiento computacional en Primaria.</p>
+          <small>No es un sitio oficial de ANEP, CODICEN, DGEIP ni Plan Ceibal.</small>
+        </div>
+        <nav class="start-site-footer-links" aria-label="Enlaces legales y educativos">
+          <a href="/sobre">Sobre YoAprendo</a>
+          <a href="/pensamiento-computacional-primaria">Pensamiento computacional</a>
+          <a href="/alineacion-curricular">Alineacion curricular</a>
+          <a href="/privacidad">Privacidad</a>
+          <a href="/terminos">Terminos</a>
+          <a href="/contacto">Contacto</a>
+        </nav>
+      </div>
+    </footer>
+  `;
+}
+
 export function renderStart() {
   const appShell = document.querySelector(".app-shell");
   if (!appShell) return;
@@ -443,6 +465,7 @@ export function renderStart() {
           }
         </div>
       </section>
+      ${renderStartFooter()}
     </main>
   `;
   renderImportedIcons();
