@@ -1,9 +1,13 @@
+import { soundCatalog } from "./soundCatalog.js";
+
 let audioContext = null;
 let masterGain = null;
 let ambientGain = null;
-let ambientStarted = false;
+let currentAmbient = null;
+let currentAmbientMode = null;
 let unlocked = false;
 let resumePromise = null;
+const decodedSoundCache = new Map();
 
 function getAudioContext() {
   if (!audioContext) {
@@ -61,6 +65,102 @@ function runWhenReady(callback) {
       }
     });
   }
+}
+
+async function loadSound(sound) {
+  if (!sound?.file) return null;
+
+  if (!decodedSoundCache.has(sound.file)) {
+    decodedSoundCache.set(
+      sound.file,
+      fetch(sound.file)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Audio asset missing: ${sound.file}`);
+          }
+          return response.arrayBuffer();
+        })
+        .then((arrayBuffer) => getAudioContext()?.decodeAudioData(arrayBuffer))
+        .catch(() => null)
+    );
+  }
+
+  return decodedSoundCache.get(sound.file);
+}
+
+function playSoundAsset(soundName, { fallback = null, volume = 1, loop = false } = {}) {
+  const sound = soundCatalog[soundName];
+
+  runWhenReady(async (ctx) => {
+    const buffer = await loadSound(sound);
+
+    if (!buffer) {
+      fallback?.();
+      return;
+    }
+
+    const source = ctx.createBufferSource();
+    const gainNode = ctx.createGain();
+
+    source.buffer = buffer;
+    source.loop = loop || sound.loop || false;
+    gainNode.gain.value = (sound.volume ?? 0.35) * volume;
+
+    source.connect(gainNode);
+    gainNode.connect(masterGain);
+    source.start();
+  });
+}
+
+async function startAmbientAsset(mode = "world") {
+  const modeKey =
+    mode === "mission" ? "ambientMission" : mode === "submap" ? "ambientSubmap" : "ambientWorld";
+  const sound = soundCatalog[modeKey];
+
+  if (currentAmbientMode === mode && currentAmbient) return;
+
+  runWhenReady(async (ctx) => {
+    const buffer = await loadSound(sound);
+
+    if (!buffer) {
+      stopAmbient(ctx);
+      currentAmbientMode = mode;
+      return;
+    }
+
+    stopAmbient(ctx, 0.55);
+
+    const source = ctx.createBufferSource();
+    const gainNode = ctx.createGain();
+    const startAt = ctx.currentTime;
+    const targetVolume = sound.volume ?? 0.12;
+
+    source.buffer = buffer;
+    source.loop = true;
+    gainNode.gain.setValueAtTime(0.0001, startAt);
+    gainNode.gain.exponentialRampToValueAtTime(targetVolume, startAt + 1.2);
+
+    source.connect(gainNode);
+    gainNode.connect(ambientGain);
+    source.start(startAt);
+
+    currentAmbient = { source, gainNode };
+    currentAmbientMode = mode;
+  });
+}
+
+function stopAmbient(ctx = getAudioContext(), fadeSeconds = 0.35) {
+  if (!ctx || !currentAmbient) return;
+
+  const { source, gainNode } = currentAmbient;
+  const stopAt = ctx.currentTime + fadeSeconds;
+
+  gainNode.gain.cancelScheduledValues(ctx.currentTime);
+  gainNode.gain.setValueAtTime(Math.max(0.0001, gainNode.gain.value), ctx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+  source.stop(stopAt + 0.03);
+
+  currentAmbient = null;
 }
 
 function withEnvelope(node, startAt, attack, decay, peak = 1, sustain = 0.0001) {
@@ -144,191 +244,185 @@ export function unlockAudio() {
 }
 
 export function playUiClick() {
-  playTone({
-    type: "triangle",
-    frequency: 780,
-    slideTo: 620,
-    duration: 0.06,
-    attack: 0.003,
-    decay: 0.07,
-    volume: 0.09
-  });
-  playNoise({
-    duration: 0.03,
-    decay: 0.03,
-    volume: 0.015,
-    highpass: 1800
+  playSoundAsset("uiClick", {
+    fallback: () => {
+      playTone({
+        type: "triangle",
+        frequency: 780,
+        slideTo: 620,
+        duration: 0.06,
+        attack: 0.003,
+        decay: 0.07,
+        volume: 0.09
+      });
+      playNoise({
+        duration: 0.03,
+        decay: 0.03,
+        volume: 0.015,
+        highpass: 1800
+      });
+    }
   });
 }
 
 export function playHoverTick() {
-  playTone({
-    type: "sine",
-    frequency: 520,
-    duration: 0.03,
-    attack: 0.002,
-    decay: 0.03,
-    volume: 0.03
+  playSoundAsset("hoverTick", {
+    fallback: () =>
+      playTone({
+        type: "sine",
+        frequency: 520,
+        duration: 0.03,
+        attack: 0.002,
+        decay: 0.03,
+        volume: 0.03
+      })
   });
 }
 
 export function playSelect() {
-  playTone({
-    type: "triangle",
-    frequency: 540,
-    slideTo: 760,
-    duration: 0.11,
-    attack: 0.004,
-    decay: 0.11,
-    volume: 0.08
+  playSoundAsset("select", {
+    fallback: () =>
+      playTone({
+        type: "triangle",
+        frequency: 540,
+        slideTo: 760,
+        duration: 0.11,
+        attack: 0.004,
+        decay: 0.11,
+        volume: 0.08
+      })
   });
 }
 
 export function playError() {
-  playTone({
-    type: "sawtooth",
-    frequency: 280,
-    slideTo: 180,
-    duration: 0.12,
-    attack: 0.005,
-    decay: 0.16,
-    volume: 0.075
+  playSoundAsset("error", {
+    fallback: () =>
+      playTone({
+        type: "sawtooth",
+        frequency: 280,
+        slideTo: 180,
+        duration: 0.12,
+        attack: 0.005,
+        decay: 0.16,
+        volume: 0.075
+      })
   });
 }
 
 export function playSuccess() {
-  playTone({
-    type: "triangle",
-    frequency: 520,
-    duration: 0.12,
-    attack: 0.004,
-    decay: 0.12,
-    volume: 0.08
-  });
-  playTone({
-    type: "triangle",
-    frequency: 660,
-    duration: 0.14,
-    attack: 0.004,
-    decay: 0.14,
-    volume: 0.08,
-    when: 0.08
-  });
-  playTone({
-    type: "triangle",
-    frequency: 880,
-    duration: 0.18,
-    attack: 0.006,
-    decay: 0.18,
-    volume: 0.08,
-    when: 0.16
+  playSoundAsset("success", {
+    fallback: () => {
+      playTone({
+        type: "triangle",
+        frequency: 520,
+        duration: 0.12,
+        attack: 0.004,
+        decay: 0.12,
+        volume: 0.08
+      });
+      playTone({
+        type: "triangle",
+        frequency: 660,
+        duration: 0.14,
+        attack: 0.004,
+        decay: 0.14,
+        volume: 0.08,
+        when: 0.08
+      });
+      playTone({
+        type: "triangle",
+        frequency: 880,
+        duration: 0.18,
+        attack: 0.006,
+        decay: 0.18,
+        volume: 0.08,
+        when: 0.16
+      });
+    }
   });
 }
 
 export function playReward() {
-  [880, 1170, 1400].forEach((frequency, index) => {
-    playTone({
-      type: "sine",
-      frequency,
-      duration: 0.1,
-      attack: 0.002,
-      decay: 0.09,
-      volume: 0.05,
-      when: index * 0.05
-    });
+  playSoundAsset("reward", {
+    fallback: () => {
+      [880, 1170, 1400].forEach((frequency, index) => {
+        playTone({
+          type: "sine",
+          frequency,
+          duration: 0.1,
+          attack: 0.002,
+          decay: 0.09,
+          volume: 0.05,
+          when: index * 0.05
+        });
+      });
+    }
   });
 }
 
 export function playStep() {
-  playTone({
-    type: "square",
-    frequency: 200,
-    slideTo: 150,
-    duration: 0.04,
-    attack: 0.002,
-    decay: 0.05,
-    volume: 0.025
+  playSoundAsset("step", {
+    fallback: () =>
+      playTone({
+        type: "square",
+        frequency: 200,
+        slideTo: 150,
+        duration: 0.04,
+        attack: 0.002,
+        decay: 0.05,
+        volume: 0.025
+      })
   });
 }
 
 export function playTurn() {
-  playTone({
-    type: "triangle",
-    frequency: 420,
-    slideTo: 520,
-    duration: 0.05,
-    attack: 0.003,
-    decay: 0.05,
-    volume: 0.03
+  playSoundAsset("turn", {
+    fallback: () =>
+      playTone({
+        type: "triangle",
+        frequency: 420,
+        slideTo: 520,
+        duration: 0.05,
+        attack: 0.003,
+        decay: 0.05,
+        volume: 0.03
+      })
   });
 }
 
 export function playBlocked() {
-  playNoise({
-    duration: 0.04,
-    decay: 0.06,
-    volume: 0.025,
-    highpass: 1200
-  });
-  playTone({
-    type: "sawtooth",
-    frequency: 190,
-    slideTo: 130,
-    duration: 0.06,
-    attack: 0.002,
-    decay: 0.06,
-    volume: 0.03
+  playSoundAsset("blocked", {
+    fallback: () => {
+      playNoise({
+        duration: 0.04,
+        decay: 0.06,
+        volume: 0.025,
+        highpass: 1200
+      });
+      playTone({
+        type: "sawtooth",
+        frequency: 190,
+        slideTo: 130,
+        duration: 0.06,
+        attack: 0.002,
+        decay: 0.06,
+        volume: 0.03
+      });
+    }
   });
 }
 
 export function playAmbient(mode = "adventure") {
-  runWhenReady((ctx) => {
-    if (ambientStarted) return;
-
-    ambientStarted = true;
-    ambientGain.gain.cancelScheduledValues(ctx.currentTime);
-    ambientGain.gain.linearRampToValueAtTime(mode === "mission" ? 0.12 : 0.08, ctx.currentTime + 1.2);
-
-    const base = ctx.createOscillator();
-    const shimmer = ctx.createOscillator();
-    const wobble = ctx.createOscillator();
-    const baseFilter = ctx.createBiquadFilter();
-    const shimmerGain = ctx.createGain();
-    const wobbleGain = ctx.createGain();
-
-    base.type = "sine";
-    base.frequency.value = mode === "mission" ? 196 : 164;
-
-    shimmer.type = "triangle";
-    shimmer.frequency.value = mode === "mission" ? 392 : 328;
-    shimmerGain.gain.value = 0.08;
-
-    wobble.type = "sine";
-    wobble.frequency.value = 0.18;
-    wobbleGain.gain.value = 16;
-
-    baseFilter.type = "lowpass";
-    baseFilter.frequency.value = 680;
-
-    wobble.connect(wobbleGain);
-    wobbleGain.connect(baseFilter.frequency);
-
-    base.connect(baseFilter);
-    shimmer.connect(shimmerGain);
-    baseFilter.connect(ambientGain);
-    shimmerGain.connect(ambientGain);
-
-    base.start();
-    shimmer.start();
-    wobble.start();
-  });
+  startAmbientAsset(mode === "adventure" ? "world" : mode);
 }
 
 export function setAmbientMode(mode = "mission") {
   const ctx = getAudioContext();
   if (!ctx || !ambientGain) return;
 
-  const nextValue = mode === "mission" ? 0.1 : mode === "submap" ? 0.07 : 0.06;
+  startAmbientAsset(mode);
+
+  const nextValue = mode === "mission" ? 0.9 : mode === "submap" ? 0.88 : 0.82;
   ambientGain.gain.cancelScheduledValues(ctx.currentTime);
   ambientGain.gain.linearRampToValueAtTime(nextValue, ctx.currentTime + 0.8);
 }
