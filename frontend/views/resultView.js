@@ -1,7 +1,7 @@
 import { grade4Data } from "../data/grade4.js";
 import { appState } from "../state/appState.js";
 import { goToDashboard, goToMission, goToStart, goToSubmap } from "../utils/navigation.js";
-import { unlockAudio, playUiClick, playSuccess, playError } from "../utils/audio.js";
+import { unlockAudio, playUiClick, playSuccess, playError, playCoinCount } from "../utils/audio.js";
 import { uiIcon } from "../utils/icons.js";
 
 const RESULT_ROBOT_ART = "./img/mission-robot-pirate.png";
@@ -126,6 +126,8 @@ function animateResultCounters() {
 
       if (progress < 1) {
         requestAnimationFrame(tick);
+      } else if (target > 0) {
+        playCoinCount();
       }
     }
 

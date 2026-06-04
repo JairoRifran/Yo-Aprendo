@@ -94,5 +94,93 @@ export const soundCatalog = {
     durationSeconds: 0.8,
     loop: false,
     volume: 0.34
+  },
+  worldEnter: {
+    file: "./audio/generated/world-enter.mp3",
+    prompt:
+      "Short magical whoosh for entering an island world in a children's adventure game, warm portal shimmer, exciting but soft, one-shot",
+    durationSeconds: 1,
+    loop: false,
+    volume: 0.42
+  },
+  missionOpen: {
+    file: "./audio/generated/mission-open.mp3",
+    prompt:
+      "Friendly mission start sound for a children's coding game, small adventure stinger with soft map unfurl and sparkle, one-shot",
+    durationSeconds: 1.1,
+    loop: false,
+    volume: 0.44
+  },
+  locked: {
+    file: "./audio/generated/locked.mp3",
+    prompt:
+      "Gentle locked area sound for a children's game, soft wooden latch and tiny magical wobble, friendly, not harsh, one-shot",
+    durationSeconds: 0.8,
+    loop: false,
+    volume: 0.34
+  },
+  panelOpen: {
+    file: "./audio/generated/panel-open.mp3",
+    prompt:
+      "Soft helper panel open sound for a children's educational game, paper card slide with tiny sparkle, clean and gentle, one-shot",
+    durationSeconds: 0.7,
+    loop: false,
+    volume: 0.36
+  },
+  commandAdd: {
+    file: "./audio/generated/command-add.mp3",
+    prompt:
+      "Playful command tile placed into a coding sequence, soft wooden tile snap with tiny digital sparkle, one-shot",
+    durationSeconds: 0.55,
+    loop: false,
+    volume: 0.38
+  },
+  commandMove: {
+    file: "./audio/generated/command-move.mp3",
+    prompt:
+      "Short sound for moving an instruction card up or down, soft paper slide and click, friendly children's game UI, one-shot",
+    durationSeconds: 0.55,
+    loop: false,
+    volume: 0.34
+  },
+  commandUndo: {
+    file: "./audio/generated/command-undo.mp3",
+    prompt:
+      "Short undo sound for a coding puzzle, soft reverse blip and small card lift, gentle and clear, one-shot",
+    durationSeconds: 0.6,
+    loop: false,
+    volume: 0.34
+  },
+  commandReset: {
+    file: "./audio/generated/command-reset.mp3",
+    prompt:
+      "Short reset sound for clearing a coding sequence, soft sweep and tidy click, playful but subtle, one-shot",
+    durationSeconds: 0.7,
+    loop: false,
+    volume: 0.36
+  },
+  programRun: {
+    file: "./audio/generated/program-run.mp3",
+    prompt:
+      "Short run program sound for a children's coding game, friendly robot startup chirp and tiny mechanical sparkle, one-shot",
+    durationSeconds: 0.9,
+    loop: false,
+    volume: 0.4
+  },
+  goalBurst: {
+    file: "./audio/generated/goal-burst.mp3",
+    prompt:
+      "Brief goal reached burst for a children's adventure puzzle, warm magical pop, star sparkle, tiny celebratory swell, one-shot",
+    durationSeconds: 1.1,
+    loop: false,
+    volume: 0.46
+  },
+  coinCount: {
+    file: "./audio/generated/coin-count.mp3",
+    prompt:
+      "Short reward counter sound, a few tiny gold coin ticks with soft sparkle, child-friendly game UI, one-shot",
+    durationSeconds: 0.9,
+    loop: false,
+    volume: 0.35
   }
 };

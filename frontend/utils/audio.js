@@ -412,6 +412,172 @@ export function playBlocked() {
   });
 }
 
+export function playWorldEnter() {
+  playSoundAsset("worldEnter", {
+    fallback: () =>
+      playTone({
+        type: "triangle",
+        frequency: 360,
+        slideTo: 720,
+        duration: 0.22,
+        attack: 0.006,
+        decay: 0.16,
+        volume: 0.06
+      })
+  });
+}
+
+export function playMissionOpen() {
+  playSoundAsset("missionOpen", {
+    fallback: () => {
+      playTone({
+        type: "triangle",
+        frequency: 440,
+        slideTo: 660,
+        duration: 0.16,
+        attack: 0.004,
+        decay: 0.12,
+        volume: 0.06
+      });
+      playTone({
+        type: "sine",
+        frequency: 880,
+        duration: 0.1,
+        attack: 0.004,
+        decay: 0.1,
+        volume: 0.04,
+        when: 0.08
+      });
+    }
+  });
+}
+
+export function playLocked() {
+  playSoundAsset("locked", {
+    fallback: () =>
+      playTone({
+        type: "square",
+        frequency: 180,
+        slideTo: 150,
+        duration: 0.08,
+        attack: 0.002,
+        decay: 0.08,
+        volume: 0.025
+      })
+  });
+}
+
+export function playPanelOpen() {
+  playSoundAsset("panelOpen", {
+    fallback: () =>
+      playNoise({
+        duration: 0.08,
+        decay: 0.08,
+        volume: 0.018,
+        highpass: 1700
+      })
+  });
+}
+
+export function playCommandAdd() {
+  playSoundAsset("commandAdd", {
+    fallback: () =>
+      playTone({
+        type: "triangle",
+        frequency: 620,
+        duration: 0.06,
+        attack: 0.002,
+        decay: 0.06,
+        volume: 0.04
+      })
+  });
+}
+
+export function playCommandMove() {
+  playSoundAsset("commandMove", {
+    fallback: () =>
+      playTone({
+        type: "triangle",
+        frequency: 500,
+        slideTo: 620,
+        duration: 0.07,
+        attack: 0.002,
+        decay: 0.06,
+        volume: 0.035
+      })
+  });
+}
+
+export function playCommandUndo() {
+  playSoundAsset("commandUndo", {
+    fallback: () =>
+      playTone({
+        type: "sine",
+        frequency: 520,
+        slideTo: 360,
+        duration: 0.1,
+        attack: 0.003,
+        decay: 0.08,
+        volume: 0.035
+      })
+  });
+}
+
+export function playCommandReset() {
+  playSoundAsset("commandReset", {
+    fallback: () =>
+      playNoise({
+        duration: 0.09,
+        decay: 0.08,
+        volume: 0.022,
+        highpass: 1300
+      })
+  });
+}
+
+export function playProgramRun() {
+  playSoundAsset("programRun", {
+    fallback: () =>
+      playTone({
+        type: "sawtooth",
+        frequency: 260,
+        slideTo: 520,
+        duration: 0.16,
+        attack: 0.004,
+        decay: 0.12,
+        volume: 0.035
+      })
+  });
+}
+
+export function playGoalBurst() {
+  playSoundAsset("goalBurst", {
+    fallback: () => {
+      playSuccess();
+      playNoise({
+        duration: 0.12,
+        decay: 0.1,
+        volume: 0.02,
+        highpass: 2100
+      });
+    }
+  });
+}
+
+export function playCoinCount() {
+  playSoundAsset("coinCount", {
+    fallback: () =>
+      playTone({
+        type: "triangle",
+        frequency: 980,
+        duration: 0.05,
+        attack: 0.002,
+        decay: 0.05,
+        volume: 0.035
+      })
+  });
+}
+
 export function playAmbient(mode = "adventure") {
   startAmbientAsset(mode === "adventure" ? "world" : mode);
 }

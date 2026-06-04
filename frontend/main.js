@@ -18,6 +18,8 @@ import {
   playUiClick,
   playHoverTick,
   playSelect,
+  playLocked,
+  playWorldEnter,
   playAmbient,
   setAmbientMode
 } from "./utils/audio.js";
@@ -2078,6 +2080,7 @@ function bootstrapWorldMap() {
 
     const visualStatus = getWorldVisualStatus(world);
     if (visualStatus === "locked") {
+      playLocked();
       if (sceneGuideText) {
         sceneGuideText.textContent =
           "Esa isla todavia esta bloqueada. Primero completa la isla disponible para reunir energia del faro; cuando avances, Bit abrira nuevos caminos del mapa.";
@@ -2088,6 +2091,7 @@ function bootstrapWorldMap() {
       return;
     }
 
+    playWorldEnter();
     goToSubmap(world.id);
     window.renderApp();
   }
@@ -2099,7 +2103,7 @@ function bootstrapWorldMap() {
     const visualStatus = getWorldVisualStatus(selectedWorld);
     if (visualStatus === "locked") return;
 
-    playUiClick();
+    playWorldEnter();
     appState.selectedWorldId = selectedWorld.id;
     goToSubmap(selectedWorld.id);
     window.renderApp();

@@ -2,7 +2,15 @@ import { grade4Data } from "../data/grade4.js";
 import { appState } from "../state/appState.js";
 import { goToDashboard, goToMission, goToStart, goToWorldMap } from "../utils/navigation.js";
 import { getMissionState, getWorldProgress } from "../utils/progress.js";
-import { unlockAudio, playUiClick, playHoverTick, playSelect } from "../utils/audio.js";
+import {
+  unlockAudio,
+  playUiClick,
+  playHoverTick,
+  playSelect,
+  playLocked,
+  playMissionOpen,
+  playPanelOpen
+} from "../utils/audio.js";
 import { uiIcon } from "../utils/icons.js";
 
 const SUBMAP_VISUALS = [
@@ -511,11 +519,11 @@ export function renderSubmap() {
     updateSelectedMission(node.id);
 
     if (node.missionState === "locked") {
-      playSelect();
+      playLocked();
       return;
     }
 
-    playUiClick();
+    playMissionOpen();
     goToMission(world.id, node.id);
     window.renderApp();
   }
@@ -529,7 +537,7 @@ export function renderSubmap() {
     const node = missionNodes.find((entry) => entry.id === activeMissionId);
     if (!node || node.missionState === "locked") return;
 
-    playUiClick();
+    playMissionOpen();
     goToMission(world.id, node.id);
     window.renderApp();
   }
@@ -566,8 +574,12 @@ export function renderSubmap() {
   dialogBackToWorldMapBtn?.addEventListener("click", onBack);
   guideRobotBtn?.addEventListener("click", () => {
     unlockAudio();
-    playUiClick();
     const isOpen = !guideCardEl?.classList.contains("is-open");
+    if (isOpen) {
+      playPanelOpen();
+    } else {
+      playUiClick();
+    }
     guideCardEl?.classList.toggle("is-open", isOpen);
     guideRobotBtn.setAttribute("aria-expanded", String(isOpen));
   });

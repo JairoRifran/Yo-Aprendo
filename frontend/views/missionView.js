@@ -11,7 +11,14 @@ import {
   playReward,
   playStep,
   playTurn,
-  playBlocked
+  playBlocked,
+  playPanelOpen,
+  playCommandAdd,
+  playCommandMove,
+  playCommandUndo,
+  playCommandReset,
+  playProgramRun,
+  playGoalBurst
 } from "../utils/audio.js";
 import { uiIcon } from "../utils/icons.js";
 
@@ -1858,7 +1865,7 @@ export function renderMission() {
       } else {
         animationTimer = setTimeout(() => {
           if (simulation.success) {
-            playSuccess();
+            playGoalBurst();
           } else if (simulation.reason === "obstacle" || simulation.reason === "outside") {
             playError();
           }
@@ -2025,7 +2032,11 @@ export function renderMission() {
     document.querySelectorAll("[data-assistant-toggle]").forEach((btn) => {
       btn.addEventListener("click", () => {
         unlockAudio();
-        playUiClick();
+        if (localState.assistantPinned) {
+          playUiClick();
+        } else {
+          playPanelOpen();
+        }
         localState = {
           ...localState,
           assistantPinned: !localState.assistantPinned
@@ -2049,7 +2060,7 @@ export function renderMission() {
     document.querySelectorAll("[data-assistant-topic]").forEach((btn) => {
       btn.addEventListener("click", () => {
         unlockAudio();
-        playSelect();
+        playPanelOpen();
         localState = {
           ...localState,
           assistantPinned: true,
@@ -2089,7 +2100,7 @@ export function renderMission() {
         unlockAudio();
         const index = Number(btn.dataset.index);
         if (index > 0) {
-          playUiClick();
+          playCommandMove();
           localState = {
             ...localState,
             orderedItems: moveItem(localState.orderedItems, index, index - 1),
@@ -2105,7 +2116,7 @@ export function renderMission() {
         unlockAudio();
         const index = Number(btn.dataset.index);
         if (index < localState.orderedItems.length - 1) {
-          playUiClick();
+          playCommandMove();
           localState = {
             ...localState,
             orderedItems: moveItem(localState.orderedItems, index, index + 1),
@@ -2156,7 +2167,7 @@ export function renderMission() {
         const maxSteps = challenge.maxSteps || 6;
         if (!command || localState.program.length >= maxSteps || localState.isRunning) return;
 
-        playUiClick();
+        playCommandAdd();
         localState = {
           ...localState,
           program: [...localState.program, command],
@@ -2169,14 +2180,14 @@ export function renderMission() {
     document.getElementById("runProgramBtn")?.addEventListener("click", () => {
       unlockAudio();
       if (!localState.program.length || localState.isRunning) return;
-      playSelect();
+      playProgramRun();
       const shouldCompleteAfterRun = mission.id === "4-1-3" && missionModel.validate(localState);
       scheduleProgramPlayback();
 
       if (shouldCompleteAfterRun) {
         const completionDelay = Math.max(1100, localState.program.length * 420 + 720);
         completionTimer = setTimeout(() => {
-          playSuccess();
+          playGoalBurst();
           const reward = completeMission(mission);
           if (reward.awarded) playReward();
 
@@ -2197,7 +2208,7 @@ export function renderMission() {
     document.getElementById("removeLastCommandBtn")?.addEventListener("click", () => {
       unlockAudio();
       if (localState.isRunning) return;
-      playUiClick();
+      playCommandUndo();
       stopAnimation();
       localState = {
         ...localState,
@@ -2210,7 +2221,7 @@ export function renderMission() {
     document.getElementById("resetProgramBtn")?.addEventListener("click", () => {
       unlockAudio();
       if (localState.isRunning) return;
-      playUiClick();
+      playCommandReset();
       stopAnimation();
       localState = {
         ...localState,
