@@ -15865,7 +15865,7 @@ body::before {
 .mission-screen-error-hunt::before {
   background:
     linear-gradient(180deg, rgba(0, 22, 44, 0.02), rgba(0, 38, 65, 0.08)),
-    url("./img/path-guided-bg.png") center center / cover no-repeat;
+    url("./img/mission4-kitchen-bg.png") center center / cover no-repeat;
 }
 
 .mission-screen-error-hunt .mission-panel {
@@ -16724,5 +16724,1820 @@ body::before {
   50% {
     opacity: 0.76;
     transform: translateX(2%);
+  }
+}
+
+/* =========================
+   UX polish and text fit pass
+========================= */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.btn,
+.pill,
+.sidebar-card,
+.dashboard-card,
+.dashboard-hero,
+.dashboard-mini-item,
+.dashboard-table-row,
+.mission-card,
+.mission-panel,
+.start-art-hero,
+.start-art-login-panel,
+.start-art-role-card,
+.institution-modal-panel {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.btn,
+.pill,
+.start-art-submit,
+.start-art-login-link,
+.start-art-back-link,
+.dashboard-role-tab,
+.dashboard-action-item,
+.dashboard-jump-card {
+  min-width: 0;
+  white-space: normal;
+}
+
+.start-art-screen {
+  min-height: 100vh;
+  padding: clamp(10px, 2vw, 22px);
+  overflow: auto;
+}
+
+.start-art-board {
+  min-height: min(860px, calc(100vh - 28px));
+  border-radius: clamp(20px, 2.2vw, 30px);
+}
+
+.start-art-overlay {
+  grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 520px);
+  min-height: inherit;
+  align-items: center;
+  gap: clamp(20px, 4vw, 64px);
+  padding: clamp(18px, 4vw, 54px);
+}
+
+.start-art-overlay > .start-art-hero {
+  max-width: 470px;
+  padding: clamp(22px, 2.3vw, 32px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    radial-gradient(circle at 14% 8%, rgba(255, 236, 156, 0.18), transparent 30%),
+    linear-gradient(180deg, rgba(11, 93, 151, 0.48), rgba(7, 58, 112, 0.58));
+  box-shadow:
+    0 20px 44px rgba(4, 57, 108, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.start-art-overlay > .start-art-hero h1 {
+  max-width: 100%;
+  font-size: clamp(40px, 4.2vw, 62px);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.start-art-overlay > .start-art-hero p {
+  max-width: 38ch;
+  font-size: clamp(15px, 1.18vw, 18px);
+  line-height: 1.5;
+  white-space: normal !important;
+}
+
+.start-art-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.start-art-pill {
+  max-width: 100%;
+  padding: 0.68em 0.94em;
+  border-radius: 999px;
+  font-size: clamp(11px, 0.82vw, 13px);
+  line-height: 1.15;
+}
+
+.start-art-overlay > .start-art-hero .start-art-note {
+  max-width: 39ch;
+  font-size: clamp(12px, 0.9vw, 14px);
+  line-height: 1.42;
+}
+
+.start-art-overlay > .start-art-login-panel {
+  max-width: 520px;
+  border-radius: 24px;
+}
+
+.start-art-login-panel.chooser {
+  padding: clamp(18px, 2vw, 24px);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 219, 118, 0.2), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(233, 248, 255, 0.94));
+  box-shadow:
+    0 24px 46px rgba(18, 95, 154, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.start-art-login-panel.chooser h2 {
+  max-width: 12ch;
+  font-size: clamp(28px, 2.6vw, 36px);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.start-art-login-panel.chooser > p {
+  max-width: 42ch;
+  font-size: clamp(13px, 0.96vw, 15px);
+  line-height: 1.48;
+}
+
+.chooser-grid.start-art-access-grid {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.chooser-grid .start-art-role-card,
+.chooser-grid .start-art-role-card:nth-child(5) {
+  min-height: 92px;
+  grid-column: auto;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+  align-items: start;
+  gap: 6px 12px;
+  padding: 14px;
+  border-radius: 16px;
+}
+
+.chooser-grid .start-art-role-icon {
+  grid-row: 1 / 4;
+  width: 42px;
+  height: 42px;
+}
+
+.chooser-grid .start-art-role-card strong,
+.chooser-grid .start-art-role-card > span:not(.start-art-role-icon):not(.start-art-role-arrow),
+.chooser-grid .start-art-role-demo {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.chooser-grid .start-art-role-card strong {
+  font-size: clamp(14px, 1vw, 16px);
+  line-height: 1.18;
+}
+
+.chooser-grid .start-art-role-card > span:not(.start-art-role-icon):not(.start-art-role-arrow) {
+  font-size: clamp(11px, 0.85vw, 13px);
+  line-height: 1.35;
+}
+
+.chooser-grid .start-art-role-demo {
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.chooser-grid .start-art-role-arrow {
+  right: 10px;
+  bottom: 10px;
+  width: 28px;
+  height: 28px;
+}
+
+.start-art-login-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.start-art-login-link {
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+.start-art-form .start-input,
+.dashboard-input {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
+.start-art-submit {
+  height: auto;
+  min-height: 52px;
+  padding: 12px 16px;
+  font-size: clamp(15px, 1vw, 18px);
+  line-height: 1.16;
+}
+
+.dashboard-hero h1,
+.dashboard-card h2,
+.mission-title,
+.mission-panel h1,
+.sidebar-card h1 {
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.dashboard-card.stat strong,
+.dashboard-table-row strong,
+.dashboard-mini-item strong,
+.stat-box strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1080px) {
+  .start-art-board {
+    aspect-ratio: auto;
+    min-height: 100vh;
+  }
+
+  .start-art-overlay {
+    grid-template-columns: 1fr;
+    overflow: visible;
+    align-content: start;
+    background:
+      linear-gradient(180deg, rgba(102, 194, 238, 0.88), rgba(24, 116, 190, 0.93));
+  }
+
+  .start-art-scene {
+    min-height: 340px;
+  }
+
+  .start-art-hero {
+    margin-top: 64px;
+  }
+
+  .start-art-overlay > .start-art-hero,
+  .start-art-overlay > .start-art-login-panel {
+    width: min(100%, 620px);
+    max-width: min(100%, 620px);
+  }
+}
+
+@media (max-width: 680px) {
+  .start-art-screen {
+    padding: 0;
+  }
+
+  .start-art-board {
+    border-radius: 0;
+  }
+
+  .start-art-overlay {
+    padding: 14px;
+  }
+
+  .start-art-scene {
+    min-height: 260px;
+  }
+
+  .start-art-hero {
+    margin-top: 42px;
+  }
+
+  .start-art-overlay > .start-art-hero h1 {
+    font-size: clamp(34px, 13vw, 48px);
+  }
+
+  .chooser-grid.start-art-access-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chooser-grid .start-art-role-card,
+  .chooser-grid .start-art-role-card:nth-child(5) {
+    min-height: 94px;
+    grid-template-columns: 42px minmax(0, 1fr) 28px;
+    grid-template-rows: auto auto auto;
+    align-items: center;
+  }
+
+  .chooser-grid .start-art-role-arrow {
+    position: static;
+    grid-column: 3;
+    grid-row: 1 / 4;
+    place-self: center;
+  }
+
+  .start-art-login-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
+   Minimal access cards
+========================= */
+.chooser-grid.start-art-access-grid {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.chooser-grid .start-art-role-card,
+.chooser-grid .start-art-role-card:nth-child(5) {
+  --role-accent: #2f86d8;
+  --role-accent-soft: rgba(47, 134, 216, 0.1);
+  isolation: isolate;
+  min-height: 94px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 26px;
+  grid-template-rows: 1fr;
+  align-items: start;
+  gap: 12px;
+  padding: 15px 16px;
+  color: #18395d;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 252, 255, 0.9));
+  border: 1px solid rgba(113, 163, 204, 0.34);
+  box-shadow:
+    0 10px 22px rgba(24, 93, 152, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  overflow: hidden;
+}
+
+.chooser-grid .start-art-role-card[data-role-card="parent"] {
+  --role-accent: #20a47b;
+  --role-accent-soft: rgba(32, 164, 123, 0.1);
+}
+
+.chooser-grid .start-art-role-card[data-role-card="teacher"] {
+  --role-accent: #376edc;
+  --role-accent-soft: rgba(55, 110, 220, 0.1);
+}
+
+.chooser-grid .start-art-role-card[data-role-card="institution"] {
+  --role-accent: #c87935;
+  --role-accent-soft: rgba(200, 121, 53, 0.12);
+}
+
+.chooser-grid .start-art-role-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 0% 0%, var(--role-accent-soft), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 248, 255, 0.96));
+  transform: none;
+  animation: none;
+  transition: opacity 0.18s ease;
+}
+
+.chooser-grid .start-art-role-card:hover::before,
+.chooser-grid .start-art-role-card.active::before {
+  opacity: 1;
+}
+
+.chooser-grid .start-art-role-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--role-accent), white 42%);
+  box-shadow:
+    0 16px 28px rgba(24, 93, 152, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.chooser-grid .start-art-role-card.active {
+  border-color: color-mix(in srgb, var(--role-accent), white 26%);
+  background:
+    radial-gradient(circle at 0% 0%, var(--role-accent-soft), transparent 44%),
+    linear-gradient(180deg, #ffffff, #f0f8ff);
+  box-shadow:
+    0 16px 30px rgba(24, 93, 152, 0.14),
+    0 0 0 3px color-mix(in srgb, var(--role-accent), transparent 82%),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.chooser-grid .start-art-role-icon {
+  grid-column: 1;
+  grid-row: 1;
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  color: var(--role-accent);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid color-mix(in srgb, var(--role-accent), transparent 78%);
+  box-shadow: none;
+}
+
+.chooser-grid .start-art-role-icon .ui-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.chooser-grid .start-art-role-copy {
+  grid-column: 2;
+  display: grid;
+  min-width: 0;
+  max-width: none !important;
+  gap: 5px;
+  text-align: left;
+}
+
+.chooser-grid .start-art-role-copy > span {
+  max-width: none !important;
+}
+
+.chooser-grid .start-art-role-card strong,
+.chooser-grid .start-art-role-card > span:not(.start-art-role-icon):not(.start-art-role-arrow),
+.chooser-grid .start-art-role-demo {
+  grid-column: auto;
+}
+
+.chooser-grid .start-art-role-card strong {
+  color: #16375c;
+  font-size: 16px;
+  line-height: 1.16;
+  font-weight: 850;
+}
+
+.chooser-grid .start-art-role-copy > span {
+  color: #536f8e;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.chooser-grid .start-art-role-demo {
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 4px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--role-accent), #12345b 34%);
+  background: var(--role-accent-soft);
+  font-size: 10px;
+  line-height: 1.15;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.chooser-grid .start-art-role-arrow {
+  position: static;
+  grid-column: 3;
+  grid-row: 1;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  color: var(--role-accent);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  opacity: 0.78;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.chooser-grid .start-art-role-arrow .ui-icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.2;
+}
+
+.chooser-grid .start-art-role-card:hover .start-art-role-arrow,
+.chooser-grid .start-art-role-card.active .start-art-role-arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+@media (max-width: 680px) {
+  .chooser-grid .start-art-role-card,
+  .chooser-grid .start-art-role-card:nth-child(5) {
+    min-height: 104px;
+    grid-template-columns: 38px minmax(0, 1fr) 24px;
+    padding: 14px;
+  }
+
+  .chooser-grid .start-art-role-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .chooser-grid .start-art-role-copy > span {
+    font-size: 12px;
+  }
+}
+
+/* =========================
+   Access chooser refinement
+========================= */
+.start-art-overlay > .start-art-login-panel.chooser {
+  width: min(100%, 560px);
+  max-width: 560px;
+  max-height: none;
+  overflow: visible;
+  padding: 24px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 224, 142, 0.14), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 249, 255, 0.96));
+  box-shadow:
+    0 24px 48px rgba(18, 83, 139, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.start-art-login-panel.chooser h2 {
+  max-width: 14ch;
+  margin-top: 12px;
+  font-size: clamp(30px, 2.7vw, 38px);
+  line-height: 1.04;
+}
+
+.start-art-login-panel.chooser > p {
+  max-width: 46ch;
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chooser-grid.start-art-access-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.chooser-grid .start-art-role-card,
+.chooser-grid .start-art-role-card:nth-child(5) {
+  --role-accent: #2679c9;
+  --role-accent-soft: rgba(38, 121, 201, 0.08);
+  min-height: 122px;
+  grid-template-columns: 30px minmax(0, 1fr) 18px;
+  align-items: start;
+  gap: 10px;
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(95, 143, 184, 0.28);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 8px 18px rgba(27, 88, 143, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.chooser-grid .start-art-role-card[data-role-card] {
+  --role-accent: #2679c9;
+  --role-accent-soft: rgba(38, 121, 201, 0.08);
+}
+
+.chooser-grid .start-art-role-card::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(239, 248, 255, 0.96));
+}
+
+.chooser-grid .start-art-role-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(38, 121, 201, 0.42);
+  box-shadow:
+    0 14px 24px rgba(27, 88, 143, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.chooser-grid .start-art-role-card.active {
+  border-color: rgba(38, 121, 201, 0.66);
+  background:
+    linear-gradient(180deg, #ffffff, #eff8ff);
+  box-shadow:
+    0 12px 24px rgba(27, 88, 143, 0.11),
+    0 0 0 3px rgba(38, 121, 201, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98);
+}
+
+.chooser-grid .start-art-role-icon {
+  grid-column: 1;
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 0;
+  color: #2679c9;
+  background: transparent;
+  box-shadow: none;
+}
+
+.chooser-grid .start-art-role-icon svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chooser-grid .start-art-role-copy {
+  gap: 6px;
+}
+
+.chooser-grid .start-art-role-card strong {
+  color: #17385d;
+  font-size: 15px;
+  line-height: 1.18;
+}
+
+.chooser-grid .start-art-role-copy > span {
+  color: #587593;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.chooser-grid .start-art-role-demo {
+  width: auto;
+  margin-top: 3px;
+  padding: 0;
+  border-radius: 0;
+  color: #3974aa;
+  background: transparent;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 750;
+}
+
+.chooser-grid .start-art-role-arrow {
+  grid-column: 3;
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  color: #6c91b5;
+  opacity: 0.72;
+}
+
+.chooser-grid .start-art-role-arrow svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chooser-grid .start-art-role-card:hover .start-art-role-arrow,
+.chooser-grid .start-art-role-card.active .start-art-role-arrow {
+  color: #2679c9;
+}
+
+@media (max-width: 680px) {
+  .start-art-overlay > .start-art-login-panel.chooser {
+    padding: 20px;
+    overflow: visible;
+  }
+
+  .chooser-grid.start-art-access-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chooser-grid .start-art-role-card,
+  .chooser-grid .start-art-role-card:nth-child(5) {
+    min-height: 96px;
+    grid-template-columns: 30px minmax(0, 1fr) 18px;
+  }
+}
+
+/* Student-only game cursor. */
+body.student-game-cursor,
+body.student-game-cursor * {
+  cursor: url("./img/student-game-cursor.png") 5 3, auto !important;
+}
+
+/* Mission 4: visual lemonade routes. */
+.mission-screen-error-hunt::before {
+  background:
+    linear-gradient(180deg, rgba(0, 34, 58, 0.04), rgba(0, 38, 65, 0.16)),
+    url("./img/mission4-kitchen-bg.png") center center / cover no-repeat;
+}
+
+.mission-screen-error-hunt .mission-error-hunt-counter {
+  display: none;
+}
+
+.mission-screen-error-hunt .mission-error-hunt-workbench {
+  left: clamp(34px, 4vw, 68px);
+  right: clamp(320px, 28vw, 410px);
+  top: clamp(180px, 23vh, 214px);
+  bottom: clamp(48px, 8vh, 72px);
+  align-content: end;
+}
+
+.mission-screen-error-hunt .mission-error-hunt-options {
+  gap: clamp(10px, 1.2vw, 16px);
+}
+
+.mission-screen-error-hunt .mission-error-route {
+  min-height: clamp(300px, 45vh, 370px);
+  padding: 14px 12px 13px;
+  border-color: rgba(119, 73, 24, 0.42);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.88), transparent 42%),
+    linear-gradient(180deg, rgba(255, 249, 222, 0.97), rgba(244, 222, 165, 0.96));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.78),
+    inset 0 -6px 0 rgba(153, 92, 24, 0.16),
+    0 16px 24px rgba(61, 31, 8, 0.2);
+}
+
+.mission-screen-error-hunt .mission-error-route-tag {
+  background: linear-gradient(180deg, #4d8c39, #245522);
+}
+
+.mission-screen-error-hunt .mission-error-route-flow {
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.mission-screen-error-hunt .mission-error-step {
+  min-height: 64px;
+  grid-template-columns: 22px 68px minmax(0, 1fr);
+  gap: 6px;
+  padding: 4px 6px;
+  border: 1px solid rgba(138, 91, 34, 0.12);
+  background: rgba(255, 255, 255, 0.54);
+}
+
+.mission-screen-error-hunt .mission-error-step i {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+}
+
+.mission-screen-error-hunt .mission-error-step img {
+  width: 68px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 5px rgba(77, 42, 9, 0.16));
+}
+
+.mission-screen-error-hunt .mission-error-step strong {
+  font-size: clamp(10px, 0.82vw, 12px);
+  line-height: 1.1;
+}
+
+.mission-screen-error-hunt .mission-error-arrow {
+  height: 8px;
+}
+
+.mission-screen-error-hunt .mission-error-preview-steps span {
+  grid-template-columns: 22px 48px minmax(0, 1fr);
+  gap: 6px;
+}
+
+.mission-screen-error-hunt .mission-error-preview-steps i {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+}
+
+.mission-screen-error-hunt .mission-error-preview-steps img {
+  width: 48px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.18));
+}
+
+.mission-screen-error-hunt .mission-error-hunt-preview {
+  top: clamp(170px, 23vh, 205px) !important;
+  bottom: auto !important;
+}
+
+@media (max-width: 1120px) {
+  .mission-screen-error-hunt .mission-error-hunt-workbench {
+    position: relative;
+    inset: auto;
+    width: min(94vw, 920px);
+    margin: 180px auto 20px;
+  }
+
+  .mission-screen-error-hunt .mission-error-hunt-options {
+    grid-template-columns: 1fr;
+  }
+
+  .mission-screen-error-hunt .mission-error-route {
+    min-height: 0;
+  }
+}
+
+/* Mission 4: fit short desktop viewports without clipping the CTA. */
+.mission-screen-error-hunt,
+.mission-screen-error-hunt .mission-panel,
+.mission-screen-error-hunt .mission-error-hunt-stage {
+  min-height: 0 !important;
+}
+
+.mission-screen-error-hunt:has(.mission-assistant.open) .mission-error-hunt-preview {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mission-screen-error-hunt .mission-error-hunt-preview {
+  transition: opacity 0.18s ease;
+}
+
+.mission-screen-error-hunt .mission-error-hunt-actions .mission-first-steps-run:disabled {
+  opacity: 0.84;
+  filter: saturate(0.72) brightness(0.9);
+}
+
+@media (min-width: 1121px) and (max-height: 760px) {
+  .mission-screen-error-hunt,
+  .mission-screen-error-hunt .mission-panel,
+  .mission-screen-error-hunt .mission-error-hunt-stage {
+    height: 100vh !important;
+    min-height: 0 !important;
+  }
+
+  .mission-screen-error-hunt .mission-guided-top {
+    top: -8px !important;
+    width: min(34vw, 450px) !important;
+  }
+
+  .mission-screen-error-hunt .mission-guided-top-copy h1 {
+    font-size: clamp(24px, 2.35vw, 34px) !important;
+  }
+
+  .mission-screen-error-hunt .mission-guided-top-copy p {
+    margin-top: 2px !important;
+    margin-bottom: 5px !important;
+    font-size: clamp(10px, 0.82vw, 12px) !important;
+  }
+
+  .mission-screen-error-hunt .mission-guided-progress {
+    width: min(72%, 310px) !important;
+    font-size: 12px !important;
+  }
+
+  .mission-screen-error-hunt .mission-error-hunt-workbench {
+    left: clamp(30px, 3.8vw, 58px);
+    right: clamp(310px, 27vw, 390px);
+    top: clamp(190px, 29vh, 220px);
+    bottom: 50px;
+  }
+
+  .mission-screen-error-hunt .mission-error-route {
+    min-height: 0;
+    height: min(50vh, 340px);
+    padding: 11px 10px 10px;
+  }
+
+  .mission-screen-error-hunt .mission-error-route-tag {
+    min-height: 24px;
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .mission-screen-error-hunt .mission-error-route-flow {
+    margin-top: 8px;
+    gap: 3px;
+  }
+
+  .mission-screen-error-hunt .mission-error-step {
+    min-height: 52px;
+    grid-template-columns: 20px 54px minmax(0, 1fr);
+    padding: 3px 5px;
+  }
+
+  .mission-screen-error-hunt .mission-error-step i {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .mission-screen-error-hunt .mission-error-step img {
+    width: 54px;
+    height: 46px;
+  }
+
+  .mission-screen-error-hunt .mission-error-step strong {
+    font-size: 11px;
+  }
+
+  .mission-screen-error-hunt .mission-error-arrow {
+    height: 5px;
+  }
+
+  .mission-screen-error-hunt .mission-error-hunt-preview {
+    top: clamp(145px, 22vh, 170px) !important;
+    right: clamp(30px, 3vw, 48px);
+    width: min(285px, 23vw);
+  }
+
+  .mission-screen-error-hunt .mission-error-preview-card {
+    padding: 11px;
+  }
+
+  .mission-screen-error-hunt .mission-error-preview-steps {
+    gap: 4px;
+  }
+
+  .mission-screen-error-hunt .mission-error-preview-steps span {
+    grid-template-columns: 20px 40px minmax(0, 1fr);
+  }
+
+  .mission-screen-error-hunt .mission-error-preview-steps img {
+    width: 40px;
+    height: 34px;
+  }
+
+  .mission-screen-error-hunt .mission-error-hunt-actions {
+    right: clamp(42px, 4vw, 64px) !important;
+    bottom: 10px !important;
+    width: min(250px, 21vw) !important;
+  }
+
+  .mission-screen-error-hunt .mission-error-hunt-actions .mission-first-steps-run {
+    min-height: 50px;
+  }
+
+  .mission-screen-error-hunt .mission-assistant {
+    right: 14px !important;
+    bottom: 72px !important;
+  }
+
+  .mission-screen-error-hunt .mission-assistant-bubble {
+    width: min(270px, 25vw) !important;
+    top: auto !important;
+    right: 80px !important;
+    bottom: -58px !important;
+    max-height: calc(100vh - 20px);
+    overflow: auto;
+  }
+}
+
+/* Mission 5: visual obstacle-route expedition. */
+.mission-screen-obstacle-routes {
+  height: 100vh;
+  min-height: 620px;
+  background:
+    linear-gradient(180deg, rgba(0, 58, 112, 0.06), rgba(0, 38, 82, 0.22)),
+    url("./img/mission5-ocean-bg.png?v=1") center center / 100% 100% no-repeat,
+    #05a6e7;
+}
+
+.mission-screen-obstacle-routes::before {
+  background: transparent;
+}
+
+.mission-screen-obstacle-routes::after {
+  background:
+    radial-gradient(circle at 48% 18%, rgba(255, 242, 166, 0.18), transparent 13%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(4, 28, 68, 0.22));
+}
+
+.mission-screen-obstacle-routes,
+.mission-screen-obstacle-routes .mission-panel,
+.mission-screen-obstacle-routes .mission5-stage {
+  min-height: 0 !important;
+}
+
+.mission-screen-obstacle-routes .mission-panel,
+.mission-screen-obstacle-routes .mission5-stage {
+  height: 100% !important;
+}
+
+.mission-screen-obstacle-routes .mission-hero,
+.mission-screen-obstacle-routes .mission-assistant {
+  display: none !important;
+}
+
+.mission5-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.mission5-water-sheen {
+  position: absolute;
+  inset: 70px 0 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      -8deg,
+      rgba(255, 255, 255, 0) 0 42px,
+      rgba(255, 255, 255, 0.1) 44px 48px,
+      rgba(255, 255, 255, 0) 54px 96px
+    );
+  opacity: 0.32;
+  mix-blend-mode: screen;
+  animation: mission5WaterDrift 12s linear infinite;
+}
+
+.mission5-board {
+  position: absolute;
+  z-index: 2;
+  left: clamp(14px, 1.6vw, 26px);
+  right: clamp(330px, 29vw, 420px);
+  top: clamp(96px, 12vh, 116px);
+  bottom: clamp(22px, 3vh, 36px);
+}
+
+.mission5-route {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 28%;
+  --track-top: 50%;
+  border: 0;
+  border-radius: 22px;
+  color: #fff;
+  cursor: pointer;
+  background: transparent;
+  filter: drop-shadow(0 16px 16px rgba(1, 41, 79, 0.24));
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.mission5-route-a {
+  top: 0;
+  --track-top: 48%;
+}
+
+.mission5-route-b {
+  top: 33%;
+  --track-top: 48%;
+}
+
+.mission5-route-c {
+  top: 66%;
+  --track-top: 48%;
+}
+
+.mission5-route:hover,
+.mission5-route.selected {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 19px 22px rgba(1, 35, 78, 0.32));
+}
+
+.mission5-route::before {
+  content: none;
+}
+
+.mission5-trail-segment {
+  position: absolute;
+  z-index: 3;
+  left: var(--trail-x);
+  top: var(--trail-y);
+  width: var(--trail-w);
+  height: var(--trail-h);
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.55) 0 3px, transparent 4px) 0 50% / 32px 100% repeat,
+    linear-gradient(90deg, rgba(64, 225, 255, 0), rgba(108, 241, 255, 0.34), rgba(93, 255, 112, 0.26), rgba(64, 225, 255, 0));
+  box-shadow:
+    0 0 18px rgba(56, 222, 255, 0.34),
+    inset 0 0 18px rgba(255, 255, 255, 0.1);
+  opacity: 0.72;
+  animation: mission5TrailDrift 3.2s linear infinite;
+  animation-delay: calc(var(--trail-delay) * -0.3s);
+}
+
+.mission5-route-b .mission5-trail-segment {
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.62) 0 3px, transparent 4px) 0 50% / 32px 100% repeat,
+    linear-gradient(90deg, rgba(64, 225, 255, 0), rgba(118, 255, 88, 0.46), rgba(118, 255, 88, 0.28), rgba(64, 225, 255, 0));
+  box-shadow:
+    0 0 22px rgba(104, 255, 92, 0.35),
+    inset 0 0 18px rgba(255, 255, 255, 0.12);
+}
+
+.mission5-route-glow {
+  position: absolute;
+  inset: 18% 5% 12% 6%;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at center, rgba(26, 198, 255, 0.1), transparent 68%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mission5-route.selected .mission5-route-glow {
+  opacity: 1;
+}
+
+.mission5-route.is-correct .mission5-route-glow {
+  background: radial-gradient(ellipse at center, rgba(116, 255, 93, 0.42), transparent 72%);
+}
+
+.mission5-route.is-danger .mission5-route-glow {
+  background: radial-gradient(ellipse at center, rgba(255, 86, 58, 0.28), transparent 72%);
+}
+
+.mission5-route-label {
+  display: none;
+}
+
+.mission5-route-b .mission5-route-label {
+  background: linear-gradient(180deg, rgba(84, 218, 89, 0.96), rgba(35, 126, 44, 0.96));
+}
+
+.mission5-route-c .mission5-route-label {
+  background: linear-gradient(180deg, rgba(193, 103, 255, 0.96), rgba(119, 45, 189, 0.96));
+}
+
+.mission5-start-island,
+.mission5-goal-island,
+.mission5-hazard {
+  position: absolute;
+  z-index: 3;
+  left: var(--asset-x);
+  top: var(--asset-y);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.mission5-start-island {
+  width: clamp(116px, 13vw, 184px);
+}
+
+.mission5-goal-island {
+  width: clamp(126px, 14vw, 198px);
+}
+
+.mission5-hazard {
+  z-index: 8;
+  width: clamp(82px, 8.6vw, 118px);
+}
+
+.mission5-hazard img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 8px 8px rgba(0, 33, 60, 0.3));
+}
+
+.mission5-hazard-whirlpool {
+  width: clamp(104px, 10.4vw, 142px);
+  animation: none;
+}
+
+.mission5-tile {
+  position: absolute;
+  z-index: 6;
+  left: var(--tile-x);
+  top: var(--tile-y);
+  width: clamp(50px, 5.2vw, 70px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.mission5-tile::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: rgba(103, 242, 255, 0.42);
+  filter: blur(12px);
+  opacity: 0.42;
+  animation: mission5Pulse 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--tile-delay) * 0.13s);
+}
+
+.mission5-route-b .mission5-tile::before {
+  background: rgba(112, 255, 84, 0.34);
+}
+
+.mission5-hazard::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 128%;
+  height: 62%;
+  border: 2px dashed rgba(255, 236, 157, 0.7);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 16px rgba(255, 206, 72, 0.26);
+}
+
+.mission5-hazard-whirlpool::before {
+  width: 110%;
+  height: 74%;
+}
+
+.mission5-tile-base,
+.mission5-tile-arrow {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.mission5-tile-base {
+  filter: drop-shadow(0 7px 8px rgba(0, 39, 72, 0.32));
+}
+
+.mission5-tile-arrow {
+  inset: 18%;
+  width: 64%;
+  height: 64%;
+  transform: rotate(var(--arrow-rotation));
+  filter: drop-shadow(0 2px 2px rgba(0, 44, 82, 0.28));
+}
+
+.mission5-route-robot {
+  position: absolute;
+  z-index: 9;
+  left: var(--robot-start-x);
+  top: var(--robot-start-y);
+  width: clamp(42px, 4.4vw, 62px);
+  transform: translate(-50%, -78%);
+  pointer-events: none;
+  filter: drop-shadow(0 8px 8px rgba(0, 31, 63, 0.3));
+  display: none;
+  opacity: 0;
+}
+
+.mission5-route:hover .mission5-route-robot,
+.mission5-route.selected .mission5-route-robot {
+  opacity: 0;
+}
+
+.mission5-route.selected .mission5-route-robot {
+  animation: none;
+}
+
+.mission5-route-result {
+  position: absolute;
+  z-index: 10;
+  left: var(--robot-end-x);
+  top: var(--robot-end-y);
+  width: clamp(34px, 3.5vw, 48px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 3px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ff684f, #c72d23);
+  box-shadow: 0 9px 14px rgba(52, 12, 8, 0.24);
+  transform: translate(-50%, -50%) scale(0.72);
+  opacity: 0;
+}
+
+.mission5-route-result svg {
+  width: 68%;
+  height: 68%;
+  stroke-width: 4;
+}
+
+.mission5-route.is-correct .mission5-route-result {
+  background: linear-gradient(180deg, #75ea69, #289d38);
+  box-shadow: 0 0 0 8px rgba(120, 255, 92, 0.18), 0 10px 16px rgba(15, 88, 26, 0.22);
+}
+
+.mission5-route.selected .mission5-route-result {
+  animation: mission5ResultPop 0.32s 1.05s ease-out both;
+}
+
+.mission5-route-caption {
+  position: absolute;
+  z-index: 9;
+  left: clamp(96px, 7.8vw, 124px);
+  top: clamp(90px, 17vh, 122px);
+  bottom: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(8, 43, 87, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 14px rgba(0, 30, 70, 0.22);
+  backdrop-filter: blur(10px);
+  text-align: left;
+}
+
+.mission5-route-caption strong {
+  font-size: clamp(13px, 1.1vw, 16px);
+}
+
+.mission5-route-caption small {
+  max-width: 190px;
+  overflow: hidden;
+  color: rgba(224, 244, 255, 0.9);
+  font-size: clamp(10px, 0.9vw, 12px);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mission5-hud {
+  position: absolute;
+  z-index: 12;
+  right: clamp(14px, 1.8vw, 28px);
+  top: clamp(112px, 14vh, 132px);
+  bottom: clamp(24px, 3vh, 36px);
+  width: clamp(300px, 26vw, 382px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(18px, 2.1vh, 26px) clamp(18px, 2vw, 26px);
+  border: 3px solid rgba(235, 178, 72, 0.92);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 21%, rgba(0, 160, 255, 0.18), transparent 38%),
+    linear-gradient(180deg, rgba(7, 56, 111, 0.98), rgba(4, 32, 70, 0.98));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -7px 0 rgba(0, 13, 43, 0.28),
+    0 20px 34px rgba(0, 30, 72, 0.38);
+  color: #fff;
+  text-align: center;
+}
+
+.mission5-hud-eyebrow {
+  color: #ffd361;
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mission5-hud h1 {
+  max-width: 320px;
+  margin: 7px 0 9px;
+  font-size: clamp(28px, 2.7vw, 42px);
+  line-height: 0.96;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.mission5-hud-rule {
+  width: min(74%, 240px);
+  height: 2px;
+  margin: 0 0 12px;
+  background: linear-gradient(90deg, transparent, rgba(255, 211, 97, 0.86), transparent);
+}
+
+.mission5-hud-dialog {
+  position: relative;
+  width: 100%;
+  padding: 15px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 22px;
+  background: rgba(7, 40, 79, 0.82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  text-align: left;
+}
+
+.mission5-hud-dialog p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: clamp(14px, 1.15vw, 17px);
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.mission5-robot-wrap {
+  flex: 1 1 auto;
+  display: grid;
+  place-items: end center;
+  width: 100%;
+  min-height: 142px;
+  margin: 4px 0 0;
+}
+
+.mission5-robot-wrap img {
+  width: min(68%, 218px);
+  max-height: min(32vh, 260px);
+  object-fit: contain;
+  filter: drop-shadow(0 18px 16px rgba(0, 14, 42, 0.35));
+}
+
+.mission5-answer {
+  width: 100%;
+  margin-top: auto;
+}
+
+.mission5-answer p {
+  margin: 4px 0 12px;
+  color: #ffd361;
+  font-size: clamp(16px, 1.5vw, 23px);
+  font-weight: 950;
+}
+
+.mission5-answer-picks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.mission5-answer-picks span {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #5fc9ff, #1264c8);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 8px 12px rgba(0, 16, 48, 0.24);
+  font-size: clamp(27px, 3vw, 42px);
+  font-weight: 950;
+  opacity: 0.58;
+}
+
+.mission5-answer-picks span:nth-child(2) {
+  background: linear-gradient(180deg, #91ee65, #2a9e35);
+}
+
+.mission5-answer-picks span:nth-child(3) {
+  background: linear-gradient(180deg, #c47bff, #7630c5);
+}
+
+.mission5-answer-picks span.active {
+  opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.2), 0 10px 16px rgba(0, 16, 48, 0.28);
+}
+
+.mission5-submit {
+  width: 100%;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px 12px;
+  line-height: 1;
+  border-color: rgba(255, 209, 77, 0.9);
+  background: linear-gradient(180deg, #66db63, #168236);
+  box-shadow: 0 0 0 5px rgba(98, 255, 103, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.42), 0 12px 18px rgba(2, 33, 39, 0.34);
+}
+
+.mission5-submit:disabled {
+  opacity: 0.66;
+  filter: saturate(0.74);
+}
+
+.mission5-submit .ui-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.mission5-footer-hint {
+  display: none;
+}
+
+.mission5-scene-bit {
+  position: absolute;
+  z-index: 11;
+  left: min(66vw, 880px);
+  top: 56%;
+  width: clamp(100px, 8.5vw, 132px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  cursor: pointer;
+  animation: mission5BitFloat 3.4s ease-in-out infinite;
+}
+
+.mission5-scene-bit:hover img,
+.mission5-scene-bit:focus-visible img {
+  filter:
+    drop-shadow(0 0 18px rgba(76, 214, 255, 0.42))
+    drop-shadow(0 16px 14px rgba(0, 28, 62, 0.34));
+}
+
+.mission5-scene-bit:focus-visible {
+  outline: 3px solid rgba(255, 216, 92, 0.9);
+  outline-offset: 8px;
+  border-radius: 18px;
+}
+
+.mission5-scene-bit::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 80%;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(10, 194, 255, 0.38), transparent 68%);
+  transform: translateX(-50%);
+  filter: blur(4px);
+}
+
+.mission5-scene-bit img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 16px 14px rgba(0, 28, 62, 0.34));
+}
+
+.mission5-bit-bubble {
+  position: absolute;
+  z-index: 3;
+  right: calc(100% + 14px);
+  top: 4px;
+  width: min(270px, 23vw);
+  padding: 13px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(68, 184, 255, 0.2), transparent 42%),
+    linear-gradient(180deg, rgba(8, 55, 106, 0.95), rgba(4, 30, 68, 0.95));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 16px 22px rgba(0, 27, 62, 0.28);
+  color: #fff;
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(8px) translateY(4px) scale(0.96);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.mission5-bit-bubble::after {
+  content: "";
+  position: absolute;
+  right: -9px;
+  top: 28px;
+  width: 18px;
+  height: 18px;
+  background: rgba(5, 39, 83, 0.96);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+  transform: rotate(45deg);
+}
+
+.mission5-bit-bubble strong,
+.mission5-bit-bubble span {
+  display: block;
+}
+
+.mission5-bit-bubble strong {
+  margin-bottom: 5px;
+  color: #ffd361;
+  font-size: clamp(12px, 0.95vw, 14px);
+  text-transform: uppercase;
+}
+
+.mission5-bit-bubble span {
+  font-size: clamp(12px, 0.95vw, 14px);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.mission5-scene-bit:hover .mission5-bit-bubble,
+.mission5-scene-bit:focus-visible .mission5-bit-bubble {
+  opacity: 1;
+  transform: translateX(0) translateY(0) scale(1);
+}
+
+.mission5-footer-hint .ui-icon-wrap {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffdd75, #c77b17);
+}
+
+.mission5-footer-hint strong {
+  min-width: 0;
+  font-size: clamp(12px, 1vw, 16px);
+  line-height: 1.15;
+}
+
+@keyframes mission5WaterDrift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 220px 80px;
+  }
+}
+
+@keyframes mission5Pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.82;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes mission5TrailDrift {
+  from {
+    background-position: 0 50%, 0 0;
+  }
+  to {
+    background-position: 64px 50%, 0 0;
+  }
+}
+
+@keyframes mission5BitFloat {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-10px) rotate(1deg);
+  }
+}
+
+@keyframes mission5Whirlpool {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes mission5RobotTravel {
+  0% {
+    left: var(--robot-start-x);
+    top: var(--robot-start-y);
+    transform: translate(-50%, -78%) scale(0.92);
+  }
+  100% {
+    left: var(--robot-end-x);
+    top: var(--robot-end-y);
+    transform: translate(-50%, -78%) scale(1);
+  }
+}
+
+@keyframes mission5ResultPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (max-width: 1120px) {
+  .mission-screen-obstacle-routes {
+    min-height: 720px;
+  }
+
+  .mission5-board {
+    right: 18px;
+    top: 86px;
+    bottom: 250px;
+  }
+
+  .mission5-hud {
+    left: 18px;
+    right: 18px;
+    top: auto;
+    bottom: 16px;
+    width: auto;
+    min-height: 210px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px minmax(220px, 0.9fr);
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .mission5-hud h1 {
+    margin: 5px 0;
+    font-size: 28px;
+  }
+
+  .mission5-hud-rule {
+    display: none;
+  }
+
+  .mission5-hud-dialog {
+    grid-column: 1;
+  }
+
+  .mission5-robot-wrap {
+    grid-column: 2;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .mission5-robot-wrap img {
+    width: 126px;
+    max-height: 150px;
+  }
+
+  .mission5-answer {
+    grid-column: 3;
+  }
+}
+
+@media (min-width: 1121px) and (max-height: 760px) {
+  .mission-screen-obstacle-routes {
+    height: 100vh !important;
+    min-height: 0 !important;
+  }
+
+  .mission5-board {
+    top: 102px;
+    bottom: 20px;
+    right: clamp(315px, 28vw, 390px);
+  }
+
+  .mission5-hud {
+    top: 106px;
+    bottom: 14px;
+    width: clamp(292px, 25vw, 350px);
+    padding: 15px 18px;
+    border-radius: 24px;
+  }
+
+  .mission5-hud h1 {
+    font-size: clamp(26px, 2.35vw, 34px);
+  }
+
+  .mission5-hud-dialog {
+    padding: 12px 14px;
+  }
+
+  .mission5-hud-dialog p {
+    font-size: 13px;
+  }
+
+  .mission5-robot-wrap {
+    display: none;
+  }
+
+  .mission5-robot-wrap img {
+    width: 58px !important;
+    max-height: 60px !important;
+  }
+
+  .mission5-answer p {
+    margin-bottom: 8px;
+    font-size: 17px;
+  }
+
+  .mission5-answer-picks {
+    gap: 9px;
+    margin-bottom: 12px;
+  }
+
+  .mission5-submit {
+    min-height: 54px;
+    padding-top: 13px;
+    padding-bottom: 14px;
+  }
+
+  .mission5-scene-bit {
+    left: min(66vw, 880px);
+    top: 56%;
+    width: clamp(90px, 7.5vw, 108px);
+  }
+
+  .mission5-bit-bubble {
+    right: calc(100% + 12px);
+    width: min(245px, 22vw);
+    padding: 11px 13px;
+  }
+
+  .mission5-start-island {
+    width: clamp(104px, 11vw, 150px);
+  }
+
+  .mission5-goal-island {
+    width: clamp(112px, 12vw, 164px);
+  }
+
+  .mission5-tile {
+    width: clamp(42px, 4.6vw, 62px);
+  }
+
+  .mission5-hazard {
+    width: clamp(62px, 6.5vw, 88px);
+  }
+
+  .mission5-hazard-whirlpool {
+    width: clamp(72px, 7.5vw, 100px);
+  }
+
+  .mission5-footer-hint {
+    max-width: 300px;
+    padding: 8px 13px;
   }
 }

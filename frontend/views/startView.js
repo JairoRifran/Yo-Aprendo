@@ -75,26 +75,45 @@ const ROLE_META = {
   }
 };
 
+const PUBLIC_START_ROLES = ["student", "parent", "teacher", "institution"];
+
 function roleCard(role, selectedRole) {
   const meta = ROLE_META[role];
   const active = selectedRole === role;
   const iconByRole = {
-    student: "user",
-    parent: "heart",
-    teacher: "monitor",
+    student: "gamepad-2",
+    parent: "users-round",
+    teacher: "presentation",
     institution: "school",
-    owner: "bar-chart"
+    owner: "chart-no-axes-column"
   };
 
   return `
     <button class="start-art-role-card${active ? " active" : ""}" type="button" data-role-card="${role}">
-      <span class="start-art-role-icon ${role} ui-icon-wrap" aria-hidden="true">${uiIcon(iconByRole[role] || "sparkles")}</span>
-      <strong>${meta.title}</strong>
-      <span>${meta.subtitle}</span>
-      <em class="start-art-role-demo">${meta.demoName} &middot; ${meta.demoCode}</em>
-      <span class="start-art-role-arrow" aria-hidden="true">${uiIcon("arrow-right")}</span>
+      <span class="start-art-role-icon" aria-hidden="true"><i data-lucide="${iconByRole[role] || "sparkles"}"></i></span>
+      <span class="start-art-role-copy">
+        <strong>${meta.title}</strong>
+        <span>${meta.subtitle}</span>
+        <em class="start-art-role-demo">${meta.demoName} &middot; ${meta.demoCode}</em>
+      </span>
+      <span class="start-art-role-arrow" aria-hidden="true"><i data-lucide="arrow-right"></i></span>
     </button>
   `;
+}
+
+function renderImportedIcons(attempt = 0) {
+  if (window.lucide?.createIcons) {
+    window.lucide.createIcons({
+      attrs: {
+        "stroke-width": 1.8
+      }
+    });
+    return;
+  }
+
+  if (attempt < 25) {
+    window.setTimeout(() => renderImportedIcons(attempt + 1), 80);
+  }
 }
 
 function renderChooserPanel(selectedRole) {
@@ -102,13 +121,9 @@ function renderChooserPanel(selectedRole) {
     <section class="start-art-login-panel chooser">
       <div class="start-art-side-label">Acceso a Yo Aprendo</div>
       <h2>Elegí cómo querés entrar</h2>
-      <p>Cada perfil abre una experiencia distinta: juego, seguimiento, gestión o métricas.</p>
+      <p>Cada perfil abre una experiencia distinta: juego, seguimiento o gestión institucional.</p>
       <div class="start-art-access-grid chooser-grid">
-        ${roleCard("student", selectedRole)}
-        ${roleCard("parent", selectedRole)}
-        ${roleCard("teacher", selectedRole)}
-        ${roleCard("institution", selectedRole)}
-        ${roleCard("owner", selectedRole)}
+        ${PUBLIC_START_ROLES.map((role) => roleCard(role, selectedRole)).join("")}
       </div>
     </section>
   `;
@@ -333,6 +348,12 @@ export function renderStart() {
   const appShell = document.querySelector(".app-shell");
   if (!appShell) return;
 
+  if (appState.currentUserRole === "owner") {
+    appState.currentUserRole = "student";
+    appState.currentUserName = "";
+    appState.currentAccessCode = "";
+  }
+
   const selectedRole = appState.currentUserRole || "student";
   const meta = ROLE_META[selectedRole];
   const currentName = appState.currentUserName || "";
@@ -398,7 +419,7 @@ export function renderStart() {
               <span>Yo Aprendo</span>
               <span class="accent">Nivel 4</span>
             </h1>
-            <p>Pensamiento computacional para 4.º de primaria, con misiones cortas, seguimiento y evidencia para instituciones.</p>
+            <p>Pensamiento computacional para 4.º de primaria, con misiones cortas y seguimiento claro para acompañar mejor.</p>
 
             <div class="start-art-pill-row">
               <span class="start-art-pill green">4 islas</span>
@@ -424,6 +445,7 @@ export function renderStart() {
       </section>
     </main>
   `;
+  renderImportedIcons();
 
   const roleNote = document.getElementById("startRoleNote");
   const nameInput = document.getElementById("startNameInput");

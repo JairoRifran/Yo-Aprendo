@@ -2212,6 +2212,11 @@ function renderWorldMap() {
 window.renderApp = function renderApp() {
   destroyWorldMapRuntime();
   setupGlobalAudioUnlock();
+  const studentGameViews = new Set(["world-map", "submap", "mission", "result"]);
+  document.body.classList.toggle(
+    "student-game-cursor",
+    appState.currentUserRole === "student" && studentGameViews.has(appState.currentView)
+  );
 
   if (appState.currentView === "start") {
     setAmbientMode("world");

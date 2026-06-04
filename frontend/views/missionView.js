@@ -78,6 +78,185 @@ const PATH_GUIDED_COMMAND_ASSETS = {
   right: PATH_GUIDED_ART.rightButton
 };
 
+const MISSION4_STEP_ART = {
+  "buscar jarra": "./img/mission4-find-pitcher.png?v=2",
+  "exprimir limones": "./img/mission4-squeeze-lemon.png?v=2",
+  "poner azucar": "./img/mission4-sugar.png?v=2",
+  "poner agua": "./img/mission4-find-pitcher.png?v=2",
+  mezclar: "./img/mission4-mix.png?v=2"
+};
+
+function getMission4StepArt(step) {
+  return MISSION4_STEP_ART[String(step || "").toLowerCase()] || "";
+}
+
+const MISSION5_ART = {
+  bg: "./img/mission5-ocean-bg.png?v=1",
+  arrow: "./img/mission5-arrow.png?v=1",
+  start: "./img/mission5-start-island.png?v=1",
+  lighthouse: "./img/mission5-lighthouse-island.png?v=1",
+  rock: "./img/mission5-rock.png?v=1",
+  whirlpool: "./img/mission5-whirlpool.png?v=1",
+  tile: "./img/mission5-path-tile.png?v=1",
+  robot: REORDER_ART.robot
+};
+
+const MISSION5_ROUTES = [
+  {
+    id: "a",
+    label: "Ruta A",
+    result: "choca con la roca",
+    verdict: "danger",
+    steps: ["right", "up", "up", "right"],
+    trail: [
+      { x: 36, y: 48, w: 42, h: 8 }
+    ],
+    tiles: [
+      { x: 20, y: 48, dir: "right" },
+      { x: 27, y: 48, dir: "right" },
+      { x: 34, y: 48, dir: "right" },
+      { x: 41, y: 48, dir: "right" },
+      { x: 48, y: 48, dir: "right" },
+      { x: 55, y: 48, dir: "right", danger: "rock" }
+    ],
+    start: { x: 9, y: 48 },
+    goal: { x: 69, y: 48 },
+    hazard: { type: "rock", x: 56, y: 48 },
+    robotEnd: { x: 55, y: 48 }
+  },
+  {
+    id: "b",
+    label: "Ruta B",
+    result: "rodea el obstaculo",
+    verdict: "success",
+    steps: ["right", "up", "up", "right", "right"],
+    trail: [
+      { x: 27, y: 48, w: 22, h: 8 },
+      { x: 38, y: 27, w: 8, h: 38 },
+      { x: 52, y: 27, w: 28, h: 8 },
+      { x: 66, y: 40, w: 8, h: 30 }
+    ],
+    tiles: [
+      { x: 20, y: 48, dir: "right" },
+      { x: 28, y: 48, dir: "right" },
+      { x: 38, y: 48, dir: "up" },
+      { x: 38, y: 27, dir: "right" },
+      { x: 48, y: 27, dir: "right" },
+      { x: 58, y: 27, dir: "right" },
+      { x: 64, y: 48, dir: "right" }
+    ],
+    start: { x: 9, y: 48 },
+    goal: { x: 69, y: 48 },
+    hazard: { type: "rock", x: 50, y: 50 },
+    robotEnd: { x: 62, y: 48 }
+  },
+  {
+    id: "c",
+    label: "Ruta C",
+    result: "se pierde en el remolino",
+    verdict: "danger",
+    steps: ["up", "right", "right", "down"],
+    trail: [
+      { x: 31, y: 48, w: 30, h: 8 }
+    ],
+    start: { x: 9, y: 48 },
+    goal: { x: 69, y: 48 },
+    hazard: { type: "whirlpool", x: 58, y: 48 },
+    robotEnd: { x: 51, y: 48 },
+    tiles: [
+      { x: 20, y: 48, dir: "right" },
+      { x: 27, y: 48, dir: "right" },
+      { x: 34, y: 48, dir: "right" },
+      { x: 41, y: 48, dir: "right" },
+      { x: 48, y: 48, dir: "right", danger: "whirlpool" }
+    ]
+  }
+];
+
+function getMission5ArrowRotation(direction) {
+  if (direction === "up") return "-90deg";
+  if (direction === "down") return "90deg";
+  if (direction === "left") return "180deg";
+  return "0deg";
+}
+
+function renderMission5Route(route, localState) {
+  const selected = localState.selectedOptionId === route.id;
+  const isCorrect = route.verdict === "success";
+
+  return `
+    <button
+      class="mission5-route mission5-route-${route.id} ${selected ? "selected" : ""} ${selected && isCorrect ? "is-correct" : ""} ${selected && !isCorrect ? "is-danger" : ""}"
+      data-option-id="${route.id}"
+      type="button"
+      style="--robot-start-x:${route.start.x + 7}%; --robot-start-y:${route.start.y + 1}%; --robot-end-x:${route.robotEnd.x}%; --robot-end-y:${route.robotEnd.y}%;"
+      aria-label="${route.label}: ${route.result}"
+    >
+      <span class="mission5-route-label">${route.id.toUpperCase()}</span>
+      <img
+        class="mission5-start-island"
+        src="${MISSION5_ART.start}"
+        alt=""
+        aria-hidden="true"
+        style="--asset-x:${route.start.x}%; --asset-y:${route.start.y}%;"
+      />
+      <img
+        class="mission5-goal-island"
+        src="${MISSION5_ART.lighthouse}"
+        alt=""
+        aria-hidden="true"
+        style="--asset-x:${route.goal.x}%; --asset-y:${route.goal.y}%;"
+      />
+      <span
+        class="mission5-hazard mission5-hazard-${route.hazard.type}"
+        style="--asset-x:${route.hazard.x}%; --asset-y:${route.hazard.y}%;"
+        aria-hidden="true"
+      >
+        <img src="${route.hazard.type === "whirlpool" ? MISSION5_ART.whirlpool : MISSION5_ART.rock}" alt="" />
+      </span>
+      <span class="mission5-route-glow" aria-hidden="true"></span>
+      ${(route.trail || [])
+        .map(
+          (segment, segmentIndex) => `
+            <span
+              class="mission5-trail-segment"
+              style="--trail-x:${segment.x}%; --trail-y:${segment.y}%; --trail-w:${segment.w}%; --trail-h:${segment.h}%; --trail-delay:${segmentIndex};"
+              aria-hidden="true"
+            ></span>
+          `
+        )
+        .join("")}
+      ${route.tiles
+        .map(
+          (tile, tileIndex) => `
+            <span
+              class="mission5-tile ${tile.danger ? `mission5-tile-${tile.danger}` : ""}"
+              style="--tile-x:${tile.x}%; --tile-y:${tile.y}%; --tile-delay:${tileIndex};"
+              aria-hidden="true"
+            >
+              <img class="mission5-tile-base" src="${MISSION5_ART.tile}" alt="" />
+              <img
+                class="mission5-tile-arrow"
+                src="${MISSION5_ART.arrow}"
+                alt=""
+                style="--arrow-rotation:${getMission5ArrowRotation(tile.dir)};"
+              />
+            </span>
+          `
+        )
+        .join("")}
+      <img class="mission5-route-robot" src="${MISSION5_ART.robot}" alt="" aria-hidden="true" />
+      <span class="mission5-route-result" aria-hidden="true">
+        ${isCorrect ? uiIcon("check") : uiIcon("x")}
+      </span>
+      <span class="mission5-route-caption">
+        <strong>${route.label}</strong>
+        <small>${selected ? route.result : "Toca para simular"}</small>
+      </span>
+    </button>
+  `;
+}
+
 const PATH_GUIDED_BOARD_POINTS = [
   [
     { x: 24.2, y: 19.7 },
@@ -1208,6 +1387,89 @@ function renderChallengeBody(challenge, localState, mission) {
   }
 
   if (challenge.type === "multiple-choice") {
+    if (mission?.id === "4-1-5") {
+      const selectedRoute = MISSION5_ROUTES.find((route) => route.id === localState.selectedOptionId);
+
+      return `
+        <div class="mission5-stage">
+          <div class="mission5-water-sheen" aria-hidden="true"></div>
+          <div class="mission-guided-birds mission5-birds" aria-hidden="true">
+            <span class="bird-a"></span>
+            <span class="bird-b"></span>
+            <span class="bird-c"></span>
+            <span class="bird-d"></span>
+          </div>
+          <div class="mission-guided-fish-layer mission5-buoys" aria-hidden="true">
+            <span class="fish-a"></span>
+            <span class="fish-b"></span>
+            <span class="fish-c"></span>
+          </div>
+
+          <aside class="mission-guided-side-card mission-guided-side-card-left mission5-top-card" aria-label="Datos de la mision">
+            <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span>
+            <span class="mission-guided-side-copy">
+              <strong>Nivel 4</strong>
+              <small>${mission.title}</small>
+            </span>
+            <b><span class="mission-guided-coin-icon" aria-hidden="true"></span>${mission.coins || 0}</b>
+          </aside>
+          <aside class="mission-guided-side-card mission-guided-side-card-right mission5-top-card" aria-label="Premios acumulados y volver">
+            <span class="mission-guided-wallet">
+              <span><i class="mission-guided-coin-icon" aria-hidden="true"></i>${appState.coins}</span>
+              <span><i class="mission-guided-gem-icon" aria-hidden="true"></i>${appState.gems}</span>
+            </span>
+            <button id="guidedBackToSubmapBtn" type="button" aria-label="Volver a las islas de secuencias">
+              <span class="mission-guided-back-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span>
+              <small>Volver</small>
+            </button>
+          </aside>
+
+          <section class="mission5-board" aria-label="Rutas maritimas disponibles">
+            ${MISSION5_ROUTES.map((route) => renderMission5Route(route, localState)).join("")}
+          </section>
+
+          <button class="mission5-scene-bit" type="button" aria-label="Consejo de Bit">
+            <img src="${MISSION5_ART.robot}" alt="" aria-hidden="true" />
+            <span class="mission5-bit-bubble" role="tooltip">
+              <strong>Bit dice</strong>
+              <span>Mira la roca y sigue las piedras. La ruta correcta la rodea con giros rectos antes de llegar al faro.</span>
+            </span>
+          </button>
+
+          <aside class="mission5-hud" aria-label="Panel de la mision">
+            <span class="mission5-hud-eyebrow">Micro-mision</span>
+            <h1>${mission.title}</h1>
+            <div class="mission5-hud-rule" aria-hidden="true"></div>
+            <div class="mission5-hud-dialog">
+              <p>Una roca bloquea el camino. Elige la ruta que evita el obstaculo y llega hasta el faro.</p>
+            </div>
+            <div class="mission5-robot-wrap" aria-hidden="true">
+              <img src="${MISSION5_ART.robot}" alt="" />
+            </div>
+            <div class="mission5-answer">
+              <p>Cual ruta es correcta?</p>
+              <div class="mission5-answer-picks" aria-hidden="true">
+                ${MISSION5_ROUTES.map(
+                  (route) => `
+                    <span class="${localState.selectedOptionId === route.id ? "active" : ""}">${route.id.toUpperCase()}</span>
+                  `
+                ).join("")}
+              </div>
+              <button class="mission-first-steps-run mission5-submit" id="validateMissionBtn" type="button" ${!localState.selectedOptionId ? "disabled" : ""}>
+                Enviar respuesta
+                <span class="ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-right")}</span>
+              </button>
+            </div>
+          </aside>
+
+          <div class="mission5-footer-hint" aria-live="polite">
+            <span class="ui-icon-wrap" aria-hidden="true">${uiIcon("compass")}</span>
+            <strong>${selectedRoute ? `${selectedRoute.label}: ${selectedRoute.result}` : "Observa, piensa y elige la mejor ruta."}</strong>
+          </div>
+        </div>
+      `;
+    }
+
     if (mission?.id === "4-1-4") {
       const selectedOption = (challenge.options || []).find((option) => option.id === localState.selectedOptionId);
       const selectedSteps = selectedOption?.text?.split("->").map((step) => step.trim()) || [];
@@ -1286,6 +1548,7 @@ function renderChallengeBody(challenge, localState, mission) {
                             (step, stepIndex) => `
                               <span class="mission-error-step">
                                 <i>${stepIndex + 1}</i>
+                                <img src="${getMission4StepArt(step)}" alt="" aria-hidden="true" />
                                 <strong>${step}</strong>
                               </span>
                             `
@@ -1311,6 +1574,7 @@ function renderChallengeBody(challenge, localState, mission) {
                           (step, index) => `
                             <span style="--step-index:${index};">
                               <i>${index + 1}</i>
+                              <img src="${getMission4StepArt(step)}" alt="" aria-hidden="true" />
                               <b>${step}</b>
                             </span>
                           `
@@ -1525,7 +1789,7 @@ export function renderMission() {
     challenge.type === "reorder"
       ? `${getCorrectCount(missionModel.state.orderedItems || [], challenge.solution || [])}/${(challenge.solution || []).length || 0}`
       : world.short;
-  const isFullScreenMission = mission.id === "4-1-1" || mission.id === "4-1-2" || mission.id === "4-1-3" || mission.id === "4-1-4";
+  const isFullScreenMission = mission.id === "4-1-1" || mission.id === "4-1-2" || mission.id === "4-1-3" || mission.id === "4-1-4" || mission.id === "4-1-5";
   const missionScreenClass =
     mission.id === "4-1-1"
       ? " mission-screen-path-guided mission-screen-first-steps"
@@ -1535,6 +1799,8 @@ export function renderMission() {
         ? " mission-screen-path-guided"
         : mission.id === "4-1-4"
         ? " mission-screen-path-guided mission-screen-error-hunt"
+        : mission.id === "4-1-5"
+        ? " mission-screen-path-guided mission-screen-obstacle-routes"
         : "";
   let localState = missionModel.state;
   let animationTimer = null;
