@@ -464,8 +464,8 @@ export function renderStart() {
                     : renderLoginPanel(meta, currentName, currentCode)
           }
         </div>
+        ${renderStartFooter()}
       </section>
-      ${renderStartFooter()}
     </main>
   `;
   renderImportedIcons();

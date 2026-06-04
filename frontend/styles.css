@@ -18708,3 +18708,81 @@ body.student-game-cursor * {
     padding: 8px 13px;
   }
 }
+
+/* Institutional pages and start footer final overrides */
+.legal-page-root,
+.legal-page-root body,
+body.legal-page-body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.legal-page-root body::before,
+.legal-page-root body::after,
+body.legal-page-body::before,
+body.legal-page-body::after {
+  display: none;
+}
+
+body.legal-page-body {
+  color: #17314f;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(42, 166, 235, 0.18), transparent 34%),
+    linear-gradient(180deg, #f4fbff 0%, #e7f2fb 100%);
+}
+
+body.legal-page-body .legal-page {
+  padding-bottom: max(64px, env(safe-area-inset-bottom));
+}
+
+.start-art-board > .start-site-footer {
+  position: absolute;
+  left: clamp(18px, 3vw, 44px);
+  right: clamp(18px, 3vw, 44px);
+  bottom: clamp(12px, 2vw, 24px);
+  z-index: 8;
+  padding: 12px 16px;
+  color: #eaf6ff;
+  background: rgba(7, 24, 47, 0.56);
+  border: 1px solid rgba(202, 235, 255, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 16px 36px rgba(6, 22, 44, 0.24);
+  backdrop-filter: blur(12px);
+}
+
+.start-art-board > .start-site-footer .start-site-footer-inner {
+  max-width: none;
+}
+
+.start-art-board > .start-site-footer .start-site-footer-brand p {
+  max-width: 620px;
+}
+
+.start-art-board > .start-site-footer .start-site-footer-links a {
+  color: #f7fcff;
+  font-size: 0.82rem;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.22);
+}
+
+.start-art-board > .start-art-overlay {
+  padding-bottom: clamp(108px, 11vh, 140px);
+}
+
+@media (max-width: 920px) {
+  .start-art-board > .start-site-footer {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: 0;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .start-art-board > .start-art-overlay {
+    padding-bottom: clamp(24px, 6vw, 42px);
+  }
+}
