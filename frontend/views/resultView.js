@@ -5,7 +5,8 @@ import { unlockAudio, playUiClick, playSuccess, playError, playCoinCount } from 
 import { uiIcon } from "../utils/icons.js";
 
 const RESULT_ROBOT_ART = "./img/mission-robot-pirate.png";
-const RESULT_ROBOT_MODEL = "./img/bit-dance-result-v2.glb";
+const RESULT_ROBOT_MODEL = "./img/bit-dance-result-v3.glb";
+const RESULT_ROBOT_ANIMATION = "Armature|All_Night_Dance|baselayer";
 const RESULT_TOP_PANEL_ART = "./img/path-guided-top-panel.png";
 
 function getResultPlayerName() {
@@ -69,7 +70,7 @@ function renderVictoryScene(result) {
           src="${RESULT_ROBOT_MODEL}"
           alt="Bit festejando en 3D"
           autoplay
-          animation-name="Armature|Shake_It_Off_Dance|baselayer"
+          animation-name="${RESULT_ROBOT_ANIMATION}"
           interaction-prompt="none"
           shadow-intensity="0"
           exposure="1.16"

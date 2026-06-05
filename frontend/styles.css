@@ -6444,10 +6444,10 @@ body::before {
 
 .result-victory-reward {
   position: absolute;
-  z-index: 2;
-  min-width: 116px;
-  padding: 10px 13px;
-  border-radius: 14px;
+  z-index: 5;
+  min-width: 106px;
+  padding: 9px 12px;
+  border-radius: 13px;
   border: 1px solid rgba(255,255,255,0.14);
   background:
     linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)),
@@ -6477,7 +6477,7 @@ body::before {
 .result-victory-reward strong {
   margin-top: 3px;
   color: #ffffff;
-  font-size: 22px;
+  font-size: 21px;
 }
 
 .result-victory-reward strong span {
@@ -6501,13 +6501,15 @@ body::before {
 }
 
 .result-victory-reward-coins {
-  left: clamp(24px, 8vw, 92px);
-  bottom: clamp(120px, 24vh, 184px);
+  left: clamp(10px, 3vw, 34px);
+  top: clamp(36px, 8vh, 74px);
+  bottom: auto;
 }
 
 .result-victory-reward-gems {
-  right: clamp(24px, 8vw, 92px);
-  bottom: clamp(132px, 26vh, 198px);
+  right: clamp(10px, 3vw, 34px);
+  top: clamp(48px, 9vh, 86px);
+  bottom: auto;
   animation-delay: -1.1s;
 }
 
@@ -6922,18 +6924,20 @@ body::before {
   }
 
   .result-victory-reward {
-    min-width: 108px;
-    padding: 9px 12px;
+    min-width: 100px;
+    padding: 8px 11px;
   }
 
   .result-victory-reward-coins {
-    left: clamp(20px, 6vw, 74px);
-    bottom: clamp(116px, 23vh, 160px);
+    left: clamp(6px, 2vw, 22px);
+    top: clamp(26px, 6vh, 46px);
+    bottom: auto;
   }
 
   .result-victory-reward-gems {
-    right: clamp(20px, 6vw, 74px);
-    bottom: clamp(126px, 25vh, 174px);
+    right: clamp(6px, 2vw, 22px);
+    top: clamp(36px, 7vh, 56px);
+    bottom: auto;
   }
 }
 
