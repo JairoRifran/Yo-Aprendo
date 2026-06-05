@@ -69,17 +69,45 @@ function renderVictoryScene(result) {
           src="${RESULT_ROBOT_MODEL}"
           alt="Bit festejando en 3D"
           autoplay
+          animation-name="Armature|Shake_It_Off_Dance|baselayer"
           interaction-prompt="none"
           shadow-intensity="0"
-          exposure="1.08"
-          camera-orbit="0deg 78deg 2.35m"
-          field-of-view="26deg"
-        >
-          <img class="result-robot-model-fallback" src="${RESULT_ROBOT_ART}" alt="" />
-        </model-viewer>
+          exposure="1.16"
+          camera-target="0m 0.86m 0m"
+          camera-orbit="0deg 72deg auto"
+          field-of-view="34deg"
+          reveal="auto"
+        ></model-viewer>
+        <img class="result-robot-model-fallback" src="${RESULT_ROBOT_ART}" alt="" />
       </div>
     </div>
   `;
+}
+
+function initializeResultRobotModel() {
+  const model = document.querySelector(".result-robot-model");
+  const robotWrap = document.querySelector(".result-victory-robot");
+  if (!model || !robotWrap) return;
+
+  if (model.loaded) {
+    robotWrap.classList.add("is-model-ready");
+  }
+
+  model.addEventListener(
+    "load",
+    () => {
+      robotWrap.classList.add("is-model-ready");
+    },
+    { once: true }
+  );
+
+  model.addEventListener(
+    "error",
+    () => {
+      robotWrap.classList.remove("is-model-ready");
+    },
+    { once: true }
+  );
 }
 
 function renderFailScene() {
@@ -254,6 +282,7 @@ export function renderResult() {
   `;
 
   if (result.success) {
+    initializeResultRobotModel();
     animateResultCounters();
 
     document.getElementById("resultHudBackBtn")?.addEventListener("click", () => {
