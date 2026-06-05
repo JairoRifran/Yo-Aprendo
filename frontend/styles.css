@@ -5952,10 +5952,10 @@ body::before {
 .result-fail-robot {
   position: absolute;
   left: 52%;
-  bottom: 22px;
+  bottom: 54px;
   transform: translateX(-50%);
-  width: min(520px, 43vw);
-  height: min(620px, 78vh);
+  width: min(500px, 41vw);
+  height: min(680px, 86vh);
   z-index: 3;
 }
 
@@ -5992,7 +5992,7 @@ body::before {
 .result-fail-platform {
   position: absolute;
   left: 50%;
-  bottom: 4px;
+  bottom: -20px;
   width: min(300px, 24vw);
   height: 62px;
   transform: translateX(-50%);
@@ -6036,7 +6036,7 @@ body::before {
 .result-fail-robot-shadow {
   position: absolute;
   left: 50%;
-  bottom: 10px;
+  bottom: -8px;
   width: 154px;
   height: 32px;
   transform: translateX(-50%);
@@ -6937,9 +6937,9 @@ body::before {
 
   .result-fail-robot {
     left: 52%;
-    bottom: 14px;
-    width: min(540px, 43vw);
-    height: min(620px, 78vh);
+    bottom: 46px;
+    width: min(500px, 40vw);
+    height: min(680px, 86vh);
   }
 
   .result-victory-reward {
