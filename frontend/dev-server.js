@@ -14,6 +14,8 @@ const mimeTypes = {
   ".jpeg": "image/jpeg",
   ".svg": "image/svg+xml",
   ".json": "application/json; charset=utf-8",
+  ".glb": "model/gltf-binary",
+  ".gltf": "model/gltf+json",
   ".mp3": "audio/mpeg",
   ".wav": "audio/wav",
   ".ogg": "audio/ogg"

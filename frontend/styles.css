@@ -6279,9 +6279,10 @@ body::before {
 .result-victory-robot {
   position: absolute;
   left: 50%;
-  bottom: 28px;
+  bottom: 12px;
   transform: translateX(-50%);
-  width: 202px;
+  width: min(330px, 28vw);
+  height: min(420px, 58vh);
   z-index: 3;
 }
 
@@ -6302,13 +6303,31 @@ body::before {
   animation: resultPlatformPulse 2.8s ease-in-out infinite;
 }
 
-.result-victory-robot img {
+.result-victory-robot img,
+.result-robot-model-fallback {
   width: 100%;
   display: block;
   filter:
     drop-shadow(0 24px 30px rgba(0, 0, 0, 0.38))
     drop-shadow(0 0 36px rgba(100, 230, 255, 0.28));
   animation: resultRobotCelebrate 2.4s ease-in-out infinite;
+}
+
+.result-robot-model {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter:
+    drop-shadow(0 28px 34px rgba(0, 0, 0, 0.38))
+    drop-shadow(0 0 42px rgba(100, 230, 255, 0.3));
+}
+
+.result-robot-model::part(default-progress-bar) {
+  display: none;
+}
+
+.result-robot-model:defined .result-robot-model-fallback {
+  display: none;
 }
 
 .result-victory-robot::before {
