@@ -15968,7 +15968,7 @@ body::before {
 .mission-algorithm-stage .mission-reorder-track-image {
   left: clamp(112px, 11vw, 170px);
   right: clamp(112px, 11vw, 170px);
-  bottom: clamp(-46px, -5vh, -24px);
+  bottom: clamp(-118px, -14vh, -82px);
   opacity: 0.92;
 }
 
@@ -16151,7 +16151,7 @@ body::before {
   .mission-algorithm-stage .mission-reorder-track-image {
     left: clamp(92px, 10vw, 145px);
     right: clamp(92px, 10vw, 145px);
-    bottom: clamp(-50px, -5vh, -28px);
+    bottom: clamp(-128px, -15vh, -92px);
   }
 
   .mission-algorithm-stage .mission-reorder-lane-art {
