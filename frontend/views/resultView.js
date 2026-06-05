@@ -5,7 +5,7 @@ import { unlockAudio, playUiClick, playSuccess, playError, playCoinCount } from 
 import { uiIcon } from "../utils/icons.js";
 
 const RESULT_ROBOT_ART = "./img/mission-robot-pirate.png";
-const RESULT_ROBOT_MODEL = "./img/bit-dance-result.glb";
+const RESULT_ROBOT_MODEL = "./img/bit-dance-result-v2.glb";
 const RESULT_TOP_PANEL_ART = "./img/path-guided-top-panel.png";
 
 function getResultPlayerName() {
