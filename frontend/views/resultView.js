@@ -4,9 +4,10 @@ import { goToDashboard, goToMission, goToStart, goToSubmap } from "../utils/navi
 import { unlockAudio, playUiClick, playSuccess, playError, playCoinCount } from "../utils/audio.js";
 import { uiIcon } from "../utils/icons.js";
 
-const RESULT_ROBOT_ART = "./img/mission-robot-pirate.png";
 const RESULT_ROBOT_MODEL = "./img/bit-dance-result-v3.glb";
 const RESULT_ROBOT_ANIMATION = "Armature|All_Night_Dance|baselayer";
+const RESULT_FAIL_ROBOT_MODEL = "./img/bit-fail-result-v1.glb";
+const RESULT_FAIL_ROBOT_ANIMATION = "Armature|Sit_Hands_on_Head_Lean_Back|baselayer";
 
 function getResultPlayerName() {
   return appState.session?.display_name?.trim() || appState.currentUserName?.trim() || "explorador";
@@ -85,7 +86,7 @@ function renderVictoryScene(result) {
 
 function initializeResultRobotModel() {
   const model = document.querySelector(".result-robot-model");
-  const robotWrap = document.querySelector(".result-victory-robot");
+  const robotWrap = document.querySelector(".result-victory-robot, .result-fail-robot");
   if (!model || !robotWrap) return;
 
   if (model.loaded) {
@@ -140,7 +141,20 @@ function renderFailScene() {
         <span class="result-fail-robot-aura aura-a"></span>
         <span class="result-fail-robot-aura aura-b"></span>
         <span class="result-fail-robot-aura aura-c"></span>
-        <img src="${RESULT_ROBOT_ART}" alt="" />
+        <model-viewer
+          class="result-robot-model result-fail-robot-model"
+          src="${RESULT_FAIL_ROBOT_MODEL}"
+          alt="Bit esperando para volver a intentar en 3D"
+          autoplay
+          animation-name="${RESULT_FAIL_ROBOT_ANIMATION}"
+          interaction-prompt="none"
+          shadow-intensity="0"
+          exposure="1.12"
+          camera-target="0m 0.82m 0m"
+          camera-orbit="0deg 72deg auto"
+          field-of-view="35deg"
+          reveal="auto"
+        ></model-viewer>
       </div>
     </div>
   `;
@@ -291,6 +305,8 @@ export function renderResult() {
       window.renderApp();
     });
   } else {
+    initializeResultRobotModel();
+
     document.getElementById("resultHudBackBtn")?.addEventListener("click", () => {
       playUiClick();
       goToSubmap(appState.selectedWorldId);
