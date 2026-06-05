@@ -6444,10 +6444,10 @@ body::before {
 
 .result-victory-reward {
   position: absolute;
-  z-index: 4;
-  min-width: 124px;
-  padding: 12px 14px;
-  border-radius: 18px;
+  z-index: 2;
+  min-width: 116px;
+  padding: 10px 13px;
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.14);
   background:
     linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)),
@@ -6475,9 +6475,9 @@ body::before {
 }
 
 .result-victory-reward strong {
-  margin-top: 4px;
+  margin-top: 3px;
   color: #ffffff;
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .result-victory-reward strong span {
@@ -6495,19 +6495,19 @@ body::before {
 }
 
 .result-victory-reward .currency-icon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   animation: resultCurrencySpin 2.2s ease-in-out infinite;
 }
 
 .result-victory-reward-coins {
-  left: 35%;
-  bottom: 126px;
+  left: clamp(24px, 8vw, 92px);
+  bottom: clamp(120px, 24vh, 184px);
 }
 
 .result-victory-reward-gems {
-  right: 35%;
-  bottom: 136px;
+  right: clamp(24px, 8vw, 92px);
+  bottom: clamp(132px, 26vh, 198px);
   animation-delay: -1.1s;
 }
 
@@ -6643,8 +6643,8 @@ body::before {
 .result-screen-guided .mission-guided-side-card {
   z-index: 7;
   top: 14px;
-  min-height: 78px;
-  padding: 11px 17px;
+  min-height: 76px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -6687,12 +6687,12 @@ body::before {
 
 .result-screen-guided .mission-guided-side-card-left {
   left: 28px;
-  min-width: 238px;
+  min-width: 250px;
 }
 
 .result-screen-guided .mission-guided-side-card-right {
   right: 28px;
-  min-width: 190px;
+  min-width: 196px;
   padding: 9px 13px;
 }
 
@@ -6708,8 +6708,9 @@ body::before {
 }
 
 .result-screen-guided .mission-guided-side-card small {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 950;
+  line-height: 1.05;
   color: #bfeeff;
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.36);
 }
@@ -6744,33 +6745,35 @@ body::before {
   z-index: 6;
   top: 4px;
   left: 50%;
-  width: min(34vw, 460px);
+  width: min(44vw, 620px);
   min-width: 0;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
 .result-screen-guided .result-guided-top .mission-guided-top-copy {
-  inset: 17% 12% 18% !important;
+  inset: 16% 12% 17% !important;
 }
 
 .result-screen-guided .result-guided-top h1 {
-  font-size: clamp(22px, 2vw, 30px) !important;
+  font-size: clamp(21px, 1.75vw, 28px) !important;
   line-height: 1.04 !important;
 }
 
 .result-screen-guided .result-guided-top p {
-  max-width: 34ch;
-  margin: 6px 0 8px !important;
-  font-size: clamp(9px, 0.78vw, 11px) !important;
+  max-width: 48ch;
+  margin: 4px 0 7px !important;
+  font-size: clamp(9px, 0.7vw, 10px) !important;
   line-height: 1.12 !important;
 }
 
 .result-screen-guided .result-guided-progress {
-  grid-template-columns: auto auto minmax(76px, 120px) auto !important;
-  width: min(78%, 330px) !important;
+  grid-template-columns: auto max-content minmax(140px, 1fr) max-content !important;
+  width: min(86%, 430px) !important;
+  gap: 8px !important;
 }
 
+.result-screen-guided .result-guided-progress strong,
 .result-screen-guided .result-guided-progress b {
   white-space: nowrap;
 }
@@ -6893,6 +6896,45 @@ body::before {
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02)),
     linear-gradient(180deg, rgba(24, 76, 132, 0.94), rgba(8, 37, 82, 0.98));
   border: 2px solid rgba(79, 198, 255, 0.26);
+}
+
+@media (min-width: 1121px) and (max-height: 760px) {
+  .result-screen-guided {
+    min-height: 0;
+  }
+
+  .result-screen-guided .result-guided-top {
+    width: min(45vw, 620px);
+  }
+
+  .result-screen-guided .result-guided-top h1 {
+    font-size: clamp(21px, 1.65vw, 27px) !important;
+  }
+
+  .result-screen-guided .result-guided-top p {
+    margin: 3px 0 6px !important;
+    font-size: clamp(8px, 0.68vw, 9px) !important;
+  }
+
+  .result-screen-guided .result-guided-progress {
+    width: min(86%, 420px) !important;
+    grid-template-columns: auto max-content minmax(132px, 1fr) max-content !important;
+  }
+
+  .result-victory-reward {
+    min-width: 108px;
+    padding: 9px 12px;
+  }
+
+  .result-victory-reward-coins {
+    left: clamp(20px, 6vw, 74px);
+    bottom: clamp(116px, 23vh, 160px);
+  }
+
+  .result-victory-reward-gems {
+    right: clamp(20px, 6vw, 74px);
+    bottom: clamp(126px, 25vh, 174px);
+  }
 }
 
 @keyframes resultSmokeDrift {
