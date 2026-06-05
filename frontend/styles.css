@@ -15928,6 +15928,83 @@ body::before {
   bottom: clamp(46px, 9vh, 70px) !important;
 }
 
+.mission-algorithm-stage .mission-guided-top {
+  width: min(36vw, 500px) !important;
+}
+
+.mission-algorithm-stage .mission-guided-top-copy {
+  inset: 17% 12% 18% !important;
+}
+
+.mission-algorithm-stage .mission-guided-top-copy h1 {
+  font-size: clamp(22px, 1.85vw, 28px) !important;
+}
+
+.mission-algorithm-stage .mission-guided-top-copy p {
+  max-width: 40ch;
+  font-size: clamp(9px, 0.74vw, 10px) !important;
+  line-height: 1.14 !important;
+}
+
+.mission-algorithm-stage .mission-reorder-track-image {
+  left: clamp(118px, 12vw, 178px);
+  right: clamp(120px, 12vw, 178px);
+  bottom: clamp(28px, 5vh, 48px);
+  opacity: 0.92;
+}
+
+.mission-algorithm-stage .mission-reorder-lane-art {
+  left: clamp(58px, 5vw, 84px) !important;
+  right: clamp(172px, 14vw, 230px) !important;
+  bottom: clamp(160px, 23vh, 188px) !important;
+  grid-template-columns: repeat(5, minmax(116px, 1fr)) !important;
+  gap: clamp(8px, 1vw, 13px) !important;
+}
+
+.mission-algorithm-stage .mission-sequence-card-art,
+.mission-algorithm-stage .mission-sequence-card-frame {
+  min-height: clamp(128px, 17vh, 152px) !important;
+}
+
+.mission-algorithm-stage .mission-sequence-card-frame {
+  padding: clamp(9px, 1vw, 12px);
+  background:
+    radial-gradient(circle at 50% 10%, rgba(255, 248, 198, 0.52), transparent 48%),
+    linear-gradient(180deg, rgba(255, 251, 222, 0.94), rgba(255, 232, 174, 0.9));
+}
+
+.mission-algorithm-stage .mission-sequence-art-wrap {
+  width: clamp(66px, 6.8vw, 96px);
+  height: clamp(54px, 5.9vw, 84px);
+}
+
+.mission-algorithm-stage .mission-sequence-art-wrap img {
+  transform: scale(1.08);
+}
+
+.mission-algorithm-stage .mission-sequence-card-art:hover .mission-sequence-art-wrap img {
+  transform: scale(1.18) rotate(-1deg);
+}
+
+.mission-algorithm-stage .mission-sequence-card-art strong {
+  max-width: 16ch;
+  font-size: clamp(9px, 0.74vw, 11px);
+  line-height: 1.05;
+}
+
+.mission-algorithm-stage .mission-sequence-label {
+  font-size: 8px;
+}
+
+.mission-algorithm-stage .mission-reorder-popover {
+  bottom: clamp(315px, 47vh, 365px);
+}
+
+.mission-algorithm-stage .mission-reorder-full-actions {
+  right: clamp(315px, 25vw, 395px) !important;
+  bottom: clamp(42px, 8vh, 66px) !important;
+}
+
 .mission-screen-order-full .mission-guided-side-card {
   position: absolute;
   z-index: 7;
@@ -16027,6 +16104,51 @@ body::before {
   color: #fff7d8;
   background: transparent;
   cursor: pointer;
+}
+
+@media (min-width: 1121px) and (max-height: 760px) {
+  .mission-screen-create-algorithm,
+  .mission-screen-create-algorithm .mission-panel,
+  .mission-screen-create-algorithm .mission-guided-stage {
+    height: 100vh !important;
+    min-height: 0 !important;
+  }
+
+  .mission-algorithm-stage .mission-guided-top {
+    top: -6px !important;
+    width: min(34vw, 468px) !important;
+  }
+
+  .mission-algorithm-stage .mission-guided-progress {
+    width: min(78%, 320px) !important;
+  }
+
+  .mission-algorithm-stage .mission-reorder-track-image {
+    left: clamp(92px, 10vw, 145px);
+    right: clamp(92px, 10vw, 145px);
+    bottom: clamp(18px, 4vh, 34px);
+  }
+
+  .mission-algorithm-stage .mission-reorder-lane-art {
+    left: clamp(54px, 5vw, 76px) !important;
+    right: clamp(156px, 13vw, 205px) !important;
+    bottom: clamp(116px, 18vh, 138px) !important;
+    gap: 8px !important;
+  }
+
+  .mission-algorithm-stage .mission-sequence-card-art,
+  .mission-algorithm-stage .mission-sequence-card-frame {
+    min-height: clamp(112px, 15vh, 126px) !important;
+  }
+
+  .mission-algorithm-stage .mission-sequence-art-wrap {
+    width: clamp(54px, 5.5vw, 76px);
+    height: clamp(46px, 5vw, 68px);
+  }
+
+  .mission-algorithm-stage .mission-reorder-full-actions {
+    bottom: clamp(18px, 4vh, 34px) !important;
+  }
 }
 
 .mission-screen-error-hunt::before {

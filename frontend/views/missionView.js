@@ -54,6 +54,13 @@ const REORDER_ART = {
   canteen: "./img/mission-canteen.png",
   backpackOpen: "./img/mission-backpack-open.png",
   backpackClosed: "./img/mission-backpack-closed.png",
+  algorithm: {
+    map: "./img/mission-algorithm-map.png",
+    batteries: "./img/mission-algorithm-batteries.png",
+    openFlashlight: "./img/mission-algorithm-open-flashlight.png",
+    closeFlashlight: "./img/mission-algorithm-close-flashlight.png",
+    lightOn: "./img/mission-algorithm-light-on.png"
+  },
   orderCorrect: {
     soap: "./img/order-correct-paso1.png",
     towel: "./img/order-correct-paso2.png",
@@ -729,6 +736,51 @@ function renderAmbientParticles() {
 function getReorderStepVisual(step, index) {
   const normalized = String(step || "").toLowerCase();
 
+  if (normalized.includes("abrir") && normalized.includes("linterna")) {
+    return {
+      tone: "blue",
+      label: "Abrir",
+      art: REORDER_ART.algorithm.openFlashlight,
+      badge: "1"
+    };
+  }
+
+  if (normalized.includes("poner") && normalized.includes("pilas")) {
+    return {
+      tone: "teal",
+      label: "Pilas",
+      art: REORDER_ART.algorithm.batteries,
+      badge: "2"
+    };
+  }
+
+  if (normalized.includes("cerrar") && normalized.includes("tapa")) {
+    return {
+      tone: "gold",
+      label: "Cerrar",
+      art: REORDER_ART.algorithm.closeFlashlight,
+      badge: "3"
+    };
+  }
+
+  if (normalized.includes("encender") && normalized.includes("linterna")) {
+    return {
+      tone: "gold",
+      label: "Encender",
+      art: REORDER_ART.algorithm.lightOn,
+      badge: "4"
+    };
+  }
+
+  if (normalized.includes("mirar") && normalized.includes("camino")) {
+    return {
+      tone: "green",
+      label: "Mapa",
+      art: REORDER_ART.algorithm.map,
+      badge: "5"
+    };
+  }
+
   if (normalized.includes("jabon")) {
     return {
       tone: "gold",
@@ -1201,7 +1253,18 @@ function renderChallengeBody(challenge, localState, mission) {
   if (challenge.type === "reorder") {
     const isFirstStepsMission = mission?.id === "4-1-1";
     const isOrderCorrectMission = mission?.id === "4-1-2";
-    const isFullScreenReorderMission = isFirstStepsMission || isOrderCorrectMission;
+    const isAlgorithmMission = mission?.id === "4-1-6";
+    const isFullScreenReorderMission = isFirstStepsMission || isOrderCorrectMission || isAlgorithmMission;
+    const reorderStageClass = isFirstStepsMission
+      ? "mission-first-steps-stage"
+      : isAlgorithmMission
+      ? "mission-algorithm-stage"
+      : "mission-order-steps-stage";
+    const reorderBannerTitle = isAlgorithmMission ? "Algoritmo de exploracion" : "Tablero del robot";
+    const reorderBannerCopy = isAlgorithmMission
+      ? "Ordena la linterna paso a paso para que el robot pueda revisar la cueva."
+      : "Ordena los pasos para que el robot pueda preparar su mochila antes de salir.";
+    const sideIconName = isAlgorithmMission ? "lightbulb" : "book";
     const solution = challenge.solution || [];
     const correctCount = getCorrectCount(localState.orderedItems, solution);
     const progressPercent = solution.length ? (correctCount / solution.length) * 100 : 0;
@@ -1219,8 +1282,8 @@ function renderChallengeBody(challenge, localState, mission) {
       <div class="mission-reorder-shell mission-reorder-shell-art">
         <div class="mission-stage-banner mission-stage-banner-reorder mission-stage-banner-quest mission-stage-banner-arcade">
           <div class="mission-stage-copy">
-            <strong>Tablero del robot</strong>
-            <span>Ordena los pasos para que el robot pueda preparar su mochila antes de salir.</span>
+            <strong>${reorderBannerTitle}</strong>
+            <span>${reorderBannerCopy}</span>
           </div>
 	          <div class="mission-stage-score mission-stage-score-arcade">
 	            <b>${correctCount}/${solution.length}</b>
@@ -1338,7 +1401,7 @@ function renderChallengeBody(challenge, localState, mission) {
     if (!isFullScreenReorderMission) return reorderBoard;
 
     return `
-      <div class="mission-guided-stage mission-reorder-full-stage ${isFirstStepsMission ? "mission-first-steps-stage" : "mission-order-steps-stage"}">
+      <div class="mission-guided-stage mission-reorder-full-stage ${reorderStageClass}">
         <div class="mission-guided-birds" aria-hidden="true">
           <span class="bird-a"></span>
           <span class="bird-b"></span>
@@ -1351,7 +1414,7 @@ function renderChallengeBody(challenge, localState, mission) {
           <span class="fish-c"></span>
         </div>
         <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la mision">
-          <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("book")}</span>
+          <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon(sideIconName)}</span>
           <span class="mission-guided-side-copy">
             <strong>Mision ${mission.number}</strong>
             <small>${mission.title}</small>
@@ -1796,7 +1859,7 @@ export function renderMission() {
     challenge.type === "reorder"
       ? `${getCorrectCount(missionModel.state.orderedItems || [], challenge.solution || [])}/${(challenge.solution || []).length || 0}`
       : world.short;
-  const isFullScreenMission = mission.id === "4-1-1" || mission.id === "4-1-2" || mission.id === "4-1-3" || mission.id === "4-1-4" || mission.id === "4-1-5";
+  const isFullScreenMission = mission.id === "4-1-1" || mission.id === "4-1-2" || mission.id === "4-1-3" || mission.id === "4-1-4" || mission.id === "4-1-5" || mission.id === "4-1-6";
   const missionScreenClass =
     mission.id === "4-1-1"
       ? " mission-screen-path-guided mission-screen-first-steps"
@@ -1806,8 +1869,10 @@ export function renderMission() {
         ? " mission-screen-path-guided"
         : mission.id === "4-1-4"
         ? " mission-screen-path-guided mission-screen-error-hunt"
-        : mission.id === "4-1-5"
+      : mission.id === "4-1-5"
         ? " mission-screen-path-guided mission-screen-obstacle-routes"
+        : mission.id === "4-1-6"
+        ? " mission-screen-order-correct mission-screen-order-full mission-screen-create-algorithm"
         : "";
   let localState = missionModel.state;
   let animationTimer = null;
