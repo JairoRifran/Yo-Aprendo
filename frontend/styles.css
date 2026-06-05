@@ -18809,19 +18809,22 @@ body.legal-page-body .legal-page {
 }
 
 .start-art-screen > .start-site-footer .start-site-footer-brand strong {
-  color: rgba(5, 44, 80, 0.92);
+  color: rgba(248, 253, 255, 0.96);
   font-size: 0.98rem;
+  text-shadow: 0 1px 8px rgba(5, 36, 69, 0.32);
 }
 
 .start-art-screen > .start-site-footer .start-site-footer-brand p {
   max-width: 620px;
-  color: rgba(12, 52, 86, 0.82);
+  color: rgba(230, 246, 255, 0.92);
   font-weight: 650;
+  text-shadow: 0 1px 8px rgba(5, 36, 69, 0.26);
 }
 
 .start-art-screen > .start-site-footer .start-site-footer-brand small {
-  color: rgba(16, 53, 84, 0.58);
+  color: rgba(217, 238, 250, 0.72);
   font-weight: 600;
+  text-shadow: 0 1px 7px rgba(5, 36, 69, 0.22);
 }
 
 .start-art-screen > .start-site-footer .start-site-footer-links a {
@@ -18829,19 +18832,19 @@ body.legal-page-body .legal-page {
   min-height: auto;
   align-items: center;
   padding: 0;
-  color: rgba(5, 55, 96, 0.82);
+  color: rgba(245, 252, 255, 0.92);
   background: transparent;
   border: 0;
-  border-bottom: 1px solid rgba(5, 55, 96, 0.24);
+  border-bottom: 1px solid rgba(245, 252, 255, 0.36);
   border-radius: 0;
-  text-shadow: none;
+  text-shadow: 0 1px 8px rgba(5, 36, 69, 0.28);
   box-shadow: none;
 }
 
 .start-art-screen > .start-site-footer .start-site-footer-links a:hover {
-  color: #064e86;
+  color: #ffffff;
   background: transparent;
-  border-color: rgba(6, 78, 134, 0.5);
+  border-color: rgba(255, 255, 255, 0.72);
 }
 
 .legal-page-wide {
