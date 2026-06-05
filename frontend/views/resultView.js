@@ -23,6 +23,18 @@ function getNextMission() {
   return world.missions[missionIndex + 1] || null;
 }
 
+function preloadResultRobotModel(src) {
+  if (!src || document.querySelector(`link[rel="preload"][href="${src}"]`)) return;
+
+  const link = document.createElement("link");
+  link.rel = "preload";
+  link.href = src;
+  link.as = "fetch";
+  link.type = "model/gltf-binary";
+  link.crossOrigin = "anonymous";
+  document.head.appendChild(link);
+}
+
 function renderCelebrationParticles() {
   return `
     <div class="result-confetti" aria-hidden="true">
@@ -198,6 +210,7 @@ export function renderResult() {
   const playerName = getResultPlayerName();
   const nextMission = result.success ? getNextMission() : null;
   const continueLabel = nextMission ? `Seguir con ${nextMission.title}` : "Volver al submapa";
+  preloadResultRobotModel(result.success ? RESULT_ROBOT_MODEL : RESULT_FAIL_ROBOT_MODEL);
 
   unlockAudio();
   if (result.success) {
