@@ -164,7 +164,7 @@ function renderFailScene() {
           exposure="1.12"
           camera-target="0m 0.66m 0m"
           camera-orbit="0deg 72deg auto"
-          field-of-view="46deg"
+          field-of-view="52deg"
           reveal="auto"
         ></model-viewer>
       </div>

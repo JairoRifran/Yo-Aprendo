@@ -5954,8 +5954,8 @@ body::before {
   left: 52%;
   bottom: 54px;
   transform: translateX(-50%);
-  width: min(500px, 41vw);
-  height: min(680px, 86vh);
+  width: min(410px, 34vw);
+  height: min(580px, 74vh);
   z-index: 3;
 }
 
@@ -6938,8 +6938,8 @@ body::before {
   .result-fail-robot {
     left: 52%;
     bottom: 46px;
-    width: min(500px, 40vw);
-    height: min(680px, 86vh);
+    width: min(420px, 34vw);
+    height: min(580px, 74vh);
   }
 
   .result-victory-reward {
