@@ -15754,6 +15754,13 @@ body::before {
     url("./img/mission-order-correct-bg.png") center center / cover no-repeat !important;
 }
 
+.mission-screen-create-algorithm::before {
+  background:
+    linear-gradient(180deg, rgba(3, 13, 27, 0.16), rgba(2, 12, 24, 0.3)),
+    radial-gradient(circle at 50% 24%, rgba(54, 206, 255, 0.12), transparent 36%),
+    url("./img/mission-algorithm-cave-bg.png") center center / cover no-repeat !important;
+}
+
 .mission-screen-order-full .mission-panel {
   width: 100%;
   max-width: none;
@@ -15947,16 +15954,16 @@ body::before {
 }
 
 .mission-algorithm-stage .mission-reorder-track-image {
-  left: clamp(118px, 12vw, 178px);
-  right: clamp(120px, 12vw, 178px);
-  bottom: clamp(28px, 5vh, 48px);
+  left: clamp(112px, 11vw, 170px);
+  right: clamp(112px, 11vw, 170px);
+  bottom: clamp(74px, 12vh, 104px);
   opacity: 0.92;
 }
 
 .mission-algorithm-stage .mission-reorder-lane-art {
   left: clamp(58px, 5vw, 84px) !important;
   right: clamp(172px, 14vw, 230px) !important;
-  bottom: clamp(160px, 23vh, 188px) !important;
+  bottom: clamp(234px, 37vh, 268px) !important;
   grid-template-columns: repeat(5, minmax(116px, 1fr)) !important;
   gap: clamp(8px, 1vw, 13px) !important;
 }
@@ -16002,7 +16009,7 @@ body::before {
 
 .mission-algorithm-stage .mission-reorder-full-actions {
   right: clamp(315px, 25vw, 395px) !important;
-  bottom: clamp(42px, 8vh, 66px) !important;
+  bottom: clamp(28px, 6vh, 46px) !important;
 }
 
 .mission-screen-order-full .mission-guided-side-card {
@@ -16116,7 +16123,7 @@ body::before {
 
   .mission-algorithm-stage .mission-guided-top {
     top: -6px !important;
-    width: min(34vw, 468px) !important;
+    width: min(36vw, 500px) !important;
   }
 
   .mission-algorithm-stage .mission-guided-progress {
@@ -16126,13 +16133,13 @@ body::before {
   .mission-algorithm-stage .mission-reorder-track-image {
     left: clamp(92px, 10vw, 145px);
     right: clamp(92px, 10vw, 145px);
-    bottom: clamp(18px, 4vh, 34px);
+    bottom: clamp(74px, 12vh, 96px);
   }
 
   .mission-algorithm-stage .mission-reorder-lane-art {
     left: clamp(54px, 5vw, 76px) !important;
     right: clamp(156px, 13vw, 205px) !important;
-    bottom: clamp(116px, 18vh, 138px) !important;
+    bottom: clamp(216px, 35vh, 238px) !important;
     gap: 8px !important;
   }
 
@@ -16147,7 +16154,7 @@ body::before {
   }
 
   .mission-algorithm-stage .mission-reorder-full-actions {
-    bottom: clamp(18px, 4vh, 34px) !important;
+    bottom: clamp(18px, 4vh, 30px) !important;
   }
 }
 
