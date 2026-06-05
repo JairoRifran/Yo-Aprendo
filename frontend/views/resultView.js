@@ -7,7 +7,6 @@ import { uiIcon } from "../utils/icons.js";
 const RESULT_ROBOT_ART = "./img/mission-robot-pirate.png";
 const RESULT_ROBOT_MODEL = "./img/bit-dance-result-v3.glb";
 const RESULT_ROBOT_ANIMATION = "Armature|All_Night_Dance|baselayer";
-const RESULT_TOP_PANEL_ART = "./img/path-guided-top-panel.png";
 
 function getResultPlayerName() {
   return appState.session?.display_name?.trim() || appState.currentUserName?.trim() || "explorador";
@@ -79,7 +78,6 @@ function renderVictoryScene(result) {
           field-of-view="34deg"
           reveal="auto"
         ></model-viewer>
-        <img class="result-robot-model-fallback" src="${RESULT_ROBOT_ART}" alt="" />
       </div>
     </div>
   `;
@@ -214,21 +212,6 @@ export function renderResult() {
           <small>Volver</small>
         </button>
       </aside>
-      <section class="mission-guided-top result-guided-top" aria-label="Estado del resultado">
-        <img src="${RESULT_TOP_PANEL_ART}" alt="" aria-hidden="true" />
-        <div class="mission-guided-top-copy">
-          <h1>${result.title}</h1>
-          <p>${result.message}</p>
-          <div class="mission-guided-progress result-guided-progress">
-            <span class="mission-guided-star" aria-hidden="true"></span>
-            <strong>${result.success ? "Recompensa" : "Intento"}</strong>
-            <div class="mission-guided-progress-track">
-              <span style="width:${result.success ? 100 : 35}%;"></span>
-            </div>
-            <b>${result.success ? `${result.coins || 0} / ${result.gems || 0}` : "0 / 1"}</b>
-          </div>
-        </div>
-      </section>
       <section class="result-panel ${result.success ? "result-panel-success" : "result-panel-fail"}">
         ${result.success ? renderCelebrationParticles() : ""}
 
