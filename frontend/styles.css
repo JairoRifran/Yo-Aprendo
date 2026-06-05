@@ -15936,27 +15936,39 @@ body::before {
 }
 
 .mission-algorithm-stage .mission-guided-top {
-  width: min(36vw, 500px) !important;
+  width: min(45vw, 620px) !important;
 }
 
 .mission-algorithm-stage .mission-guided-top-copy {
-  inset: 17% 12% 18% !important;
+  inset: 16% 13% 17% !important;
 }
 
 .mission-algorithm-stage .mission-guided-top-copy h1 {
-  font-size: clamp(22px, 1.85vw, 28px) !important;
+  font-size: clamp(21px, 1.7vw, 26px) !important;
 }
 
 .mission-algorithm-stage .mission-guided-top-copy p {
-  max-width: 40ch;
-  font-size: clamp(9px, 0.74vw, 10px) !important;
+  max-width: 46ch;
+  margin: 3px 0 7px !important;
+  font-size: clamp(9px, 0.7vw, 10px) !important;
   line-height: 1.14 !important;
+}
+
+.mission-algorithm-stage .mission-guided-progress {
+  width: min(86%, 430px) !important;
+  grid-template-columns: auto max-content minmax(150px, 1fr) max-content !important;
+  gap: 8px !important;
+}
+
+.mission-algorithm-stage .mission-guided-progress strong,
+.mission-algorithm-stage .mission-guided-progress b {
+  white-space: nowrap !important;
 }
 
 .mission-algorithm-stage .mission-reorder-track-image {
   left: clamp(112px, 11vw, 170px);
   right: clamp(112px, 11vw, 170px);
-  bottom: clamp(74px, 12vh, 104px);
+  bottom: clamp(-46px, -5vh, -24px);
   opacity: 0.92;
 }
 
@@ -16123,17 +16135,23 @@ body::before {
 
   .mission-algorithm-stage .mission-guided-top {
     top: -6px !important;
-    width: min(36vw, 500px) !important;
+    width: min(45vw, 620px) !important;
   }
 
   .mission-algorithm-stage .mission-guided-progress {
-    width: min(78%, 320px) !important;
+    width: min(86%, 430px) !important;
+    grid-template-columns: auto max-content minmax(150px, 1fr) max-content !important;
+  }
+
+  .mission-algorithm-stage .mission-guided-progress strong,
+  .mission-algorithm-stage .mission-guided-progress b {
+    white-space: nowrap !important;
   }
 
   .mission-algorithm-stage .mission-reorder-track-image {
     left: clamp(92px, 10vw, 145px);
     right: clamp(92px, 10vw, 145px);
-    bottom: clamp(74px, 12vh, 96px);
+    bottom: clamp(-50px, -5vh, -28px);
   }
 
   .mission-algorithm-stage .mission-reorder-lane-art {
