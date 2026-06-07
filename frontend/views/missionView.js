@@ -574,7 +574,13 @@ function getMissionAssistantContent(mission, challenge, topic = "task") {
 function renderMissionAssistant(mission, challenge, localState) {
   const topic = localState.assistantTopic || "task";
   let copy = getMissionAssistantContent(mission, challenge, topic);
-  if (topic === "task") {
+  if (mission?.id === "4-1-final" && topic === "task") {
+    copy = {
+      title: `Vamos, ${getMissionPlayerName()}`,
+      body: "Arma una ruta corta: avanza, gira y ejecuta para que Bit llegue al faro sin tocar la roca.",
+      hint: "Cuenta las islas antes de tocar Ejecutar."
+    };
+  } else if (topic === "task") {
     copy = {
       ...copy,
       body: `${getMissionStoryBeat(mission, challenge)} ${getChallengeTheory(challenge)}`
@@ -939,6 +945,7 @@ function getMissionViewModel(mission) {
   if (challenge.type === "path-program") {
     return {
       state: withAssistantState({
+        assistantPinned: mission.id === "4-1-final",
         assistantTopic: "task",
         program: [],
         previewFrameIndex: 0,

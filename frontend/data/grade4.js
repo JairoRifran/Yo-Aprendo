@@ -187,16 +187,17 @@ export const grade4Data = {
           challenge: {
             type: "path-program",
             prompt: "Programa al robot para salir del taller, esquivar el muro y llegar a la caja brillante.",
-            maxSteps: 7,
+            maxSteps: 6,
+            turnMoves: true,
             palette: ["forward", "right", "left"],
             board: {
-              rows: 5,
-              cols: 5,
-              start: { row: 4, col: 0, facing: "right" },
-              goal: { row: 2, col: 3 },
+              rows: 4,
+              cols: 4,
+              start: { row: 3, col: 0, facing: "right" },
+              goal: { row: 0, col: 3 },
               obstacles: [
-                { row: 4, col: 2 },
-                { row: 3, col: 2 }
+                { row: 1, col: 2 },
+                { row: 2, col: 2 }
               ]
             },
             successMessage: "El robot cumplio la mision final."
