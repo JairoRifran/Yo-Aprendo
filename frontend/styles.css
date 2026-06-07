@@ -5952,10 +5952,10 @@ body::before {
 .result-fail-robot {
   position: absolute;
   left: 52%;
-  bottom: 70px;
+  bottom: 64px;
   transform: translateX(-50%);
-  width: min(300px, 25vw);
-  height: min(430px, 56vh);
+  width: min(190px, 16vw);
+  height: min(285px, 39vh);
   z-index: 3;
 }
 
@@ -6937,9 +6937,9 @@ body::before {
 
   .result-fail-robot {
     left: 52%;
-    bottom: 60px;
-    width: min(310px, 25vw);
-    height: min(430px, 56vh);
+    bottom: 58px;
+    width: min(185px, 16vw);
+    height: min(275px, 38vh);
   }
 
   .result-victory-reward {

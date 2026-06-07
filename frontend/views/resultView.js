@@ -162,9 +162,11 @@ function renderFailScene() {
           interaction-prompt="none"
           shadow-intensity="0"
           exposure="1.12"
-          camera-target="0m 0.72m 0m"
-          camera-orbit="0deg 72deg auto"
-          field-of-view="62deg"
+          camera-target="0m 1.12m 0m"
+          camera-orbit="0deg 72deg 6.4m"
+          field-of-view="58deg"
+          min-camera-orbit="auto auto 6.4m"
+          max-camera-orbit="auto auto 6.4m"
           reveal="auto"
         ></model-viewer>
       </div>
