@@ -17090,6 +17090,128 @@ body::before {
   align-items: center !important;
 }
 
+.mission-screen-final-path .mission-guided-stage {
+  min-height: 680px;
+}
+
+.mission-screen-final-path .mission-guided-top {
+  top: 8px !important;
+  width: min(38vw, 520px) !important;
+}
+
+.mission-screen-final-path .mission-guided-top-copy h1 {
+  font-size: clamp(21px, 2vw, 31px) !important;
+  line-height: 1 !important;
+}
+
+.mission-screen-final-path .mission-guided-top-copy p {
+  width: min(92%, 410px);
+  font-size: clamp(9px, 0.82vw, 12px) !important;
+  line-height: 1.18 !important;
+}
+
+.mission-screen-final-path .mission-guided-progress {
+  grid-template-columns: auto auto minmax(76px, 132px) auto !important;
+}
+
+.mission-screen-final-path .mission-guided-board-wrap {
+  left: clamp(34px, 4vw, 62px) !important;
+  bottom: clamp(26px, 4vh, 48px) !important;
+  width: min(58vw, 790px) !important;
+  overflow: visible;
+}
+
+.mission-screen-final-path .mission-guided-board-img {
+  position: relative;
+  z-index: 2;
+}
+
+.mission-screen-final-path .mission-guided-board-img-echo {
+  position: absolute;
+  z-index: 1;
+  right: -38%;
+  top: 12%;
+  width: 70%;
+  opacity: 0.72;
+  filter: saturate(1.02) brightness(0.98);
+}
+
+.mission-screen-final-path .mission-guided-player {
+  width: 8.6% !important;
+}
+
+.mission-screen-final-path .mission-guided-current-arrow {
+  left: calc(var(--tile-x) + 4.6%) !important;
+  width: 44px !important;
+  height: 26px !important;
+}
+
+.mission-screen-final-path .mission-guided-lighthouse-beam {
+  width: 34%;
+  height: 12%;
+  opacity: 0.52;
+}
+
+.mission-screen-final-path .mission-guided-command-shell {
+  right: clamp(36px, 5vw, 78px) !important;
+  top: clamp(166px, 24vh, 190px) !important;
+  width: min(30vw, 405px) !important;
+}
+
+.mission-screen-final-path .mission-guided-route-shell {
+  right: clamp(38px, 5.2vw, 82px) !important;
+  top: clamp(344px, 51vh, 374px) !important;
+  width: min(31vw, 425px) !important;
+}
+
+.mission-screen-final-path .mission-guided-route-list {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  gap: 1% !important;
+}
+
+.mission-screen-final-path .mission-guided-route-slot {
+  border-width: 2px;
+}
+
+.mission-screen-final-path .mission-guided-route-slot > span {
+  top: -12px !important;
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 11px !important;
+}
+
+.mission-screen-final-path .mission-guided-actions-panel {
+  right: clamp(42px, 5.5vw, 86px) !important;
+  bottom: clamp(26px, 4vh, 42px) !important;
+  width: min(31vw, 425px) !important;
+  grid-template-columns: minmax(150px, 1fr) 54px 54px !important;
+}
+
+.mission-screen-final-path .mission-assistant {
+  display: none !important;
+}
+
+.mission-screen-final-path .mission-guided-side-card-left .mission-guided-side-copy strong {
+  font-size: clamp(16px, 1.45vw, 21px);
+}
+
+@media (max-width: 1120px) {
+  .mission-screen-final-path .mission-guided-board-wrap {
+    width: min(92vw, 760px) !important;
+    margin-top: 128px;
+  }
+
+  .mission-screen-final-path .mission-guided-board-img-echo {
+    display: none;
+  }
+
+  .mission-screen-final-path .mission-guided-command-shell,
+  .mission-screen-final-path .mission-guided-route-shell,
+  .mission-screen-final-path .mission-guided-actions-panel {
+    width: min(92vw, 520px) !important;
+  }
+}
+
 @keyframes guidedRobotStride {
   0%,
   100% {

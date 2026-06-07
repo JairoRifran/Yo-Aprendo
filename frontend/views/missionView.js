@@ -307,6 +307,18 @@ function getPathBoardStyle(row = 0, col = 0) {
   return `--tile-x:${point.x}%; --tile-y:${point.y}%;`;
 }
 
+function getPathBoardStyleForBoard(board = {}, row = 0, col = 0) {
+  if ((board.rows || 0) <= 4 && (board.cols || 0) <= 4) {
+    return getPathBoardStyle(row, col);
+  }
+
+  const rows = Math.max(board.rows || 1, 1);
+  const cols = Math.max(board.cols || 1, 1);
+  const x = 15.5 + (cols <= 1 ? 0 : (col * 69) / (cols - 1));
+  const y = 16.5 + (rows <= 1 ? 0 : (row * 68) / (rows - 1));
+  return `--tile-x:${x}%; --tile-y:${y}%;`;
+}
+
 function withAssistantState(state) {
   return {
     assistantPinned: false,
@@ -1087,6 +1099,7 @@ function renderPathBoardGame(challenge, pathState) {
 }
 
 function renderPathGuidedMission(challenge, localState, mission) {
+  const isFinalPathMission = mission?.id === "4-1-final";
   const board = challenge.board || {};
   const simulation = simulatePathFrames(challenge, localState.program);
   const maxSteps = challenge.maxSteps || 5;
@@ -1094,8 +1107,6 @@ function renderPathGuidedMission(challenge, localState, mission) {
   const activeFrame = simulation.frames[frameIndex] || simulation.frames[0] || board.start || { row: 0, col: 0, facing: "right" };
   const progress = Math.min(localState.program.length, maxSteps);
   const progressPercent = maxSteps ? (progress / maxSteps) * 100 : 0;
-  const activePointStyle = getPathBoardStyle(activeFrame.row || 0, activeFrame.col || 0);
-  const goalPointStyle = getPathBoardStyle(board.goal?.row || 0, board.goal?.col || 0);
   const routeSlots = Array.from({ length: maxSteps }, (_, index) => localState.program[index] || null);
   const commandPalette = mission?.id === "4-1-3" ? ["left", "forward", "right"] : challenge.palette || ["forward", "left", "right"];
   const trailFrames = simulation.frames
@@ -1104,9 +1115,21 @@ function renderPathGuidedMission(challenge, localState, mission) {
     .map((frame, index) => ({ ...frame, index }));
   const showGoalBurst = simulation.success && !localState.isRunning && frameIndex >= simulation.frames.length - 1;
   const blockedFrame = activeFrame.reason === "obstacle" ? activeFrame : null;
+  const getBoardPointStyle = (row = 0, col = 0) =>
+    isFinalPathMission ? getPathBoardStyleForBoard(board, row, col) : getPathBoardStyle(row, col);
+  const boardDuplicate = isFinalPathMission
+    ? `<img class="mission-guided-board-img mission-guided-board-img-echo" src="${PATH_GUIDED_ART.board}" alt="" aria-hidden="true" />`
+    : "";
+  const sideTitle = isFinalPathMission ? "Desafio final" : `Mision ${mission.number}`;
+  const sideSubtitle = isFinalPathMission ? "Mision del robot" : "Ruta al faro";
+  const topPrompt = isFinalPathMission
+    ? "Programa al robot para salir del taller, esquivar el muro y llegar a la caja brillante."
+    : "Lleva al robot pirata hasta el faro evitando la roca.";
+  const activePointStyleFinal = getBoardPointStyle(activeFrame.row || 0, activeFrame.col || 0);
+  const goalPointStyleFinal = getBoardPointStyle(board.goal?.row || 0, board.goal?.col || 0);
 
   return `
-    <div class="mission-guided-stage ${showGoalBurst ? "mission-guided-stage-complete" : ""}">
+    <div class="mission-guided-stage ${isFinalPathMission ? "mission-guided-stage-final" : ""} ${showGoalBurst ? "mission-guided-stage-complete" : ""}">
       <div class="mission-guided-birds" aria-hidden="true">
         <span class="bird-a"></span>
         <span class="bird-b"></span>
@@ -1126,8 +1149,8 @@ function renderPathGuidedMission(challenge, localState, mission) {
       <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la mision">
         <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("route")}</span>
         <span class="mission-guided-side-copy">
-          <strong>Mision ${mission.number}</strong>
-          <small>Ruta al faro</small>
+          <strong>${sideTitle}</strong>
+          <small>${sideSubtitle}</small>
         </span>
         <b><span class="mission-guided-coin-icon" aria-hidden="true"></span>${mission.coins || 0}</b>
       </aside>
@@ -1145,7 +1168,7 @@ function renderPathGuidedMission(challenge, localState, mission) {
         <img src="${PATH_GUIDED_ART.topPanel}" alt="" aria-hidden="true" />
         <div class="mission-guided-top-copy">
           <h1>${mission.title}</h1>
-          <p>Lleva al robot pirata hasta el faro evitando la roca.</p>
+          <p>${topPrompt}</p>
           <div class="mission-guided-progress">
             <span class="mission-guided-star" aria-hidden="true"></span>
             <strong>Progreso</strong>
@@ -1158,19 +1181,20 @@ function renderPathGuidedMission(challenge, localState, mission) {
       </section>
 
       <section class="mission-guided-board-wrap" aria-label="Mapa de Camino guiado">
+        ${boardDuplicate}
         <img class="mission-guided-board-img" src="${PATH_GUIDED_ART.board}" alt="Tablero de islas con inicio, roca y faro" />
-        <span class="mission-guided-lighthouse-beam" style="${goalPointStyle}" aria-hidden="true"></span>
+        <span class="mission-guided-lighthouse-beam" style="${goalPointStyleFinal}" aria-hidden="true"></span>
         ${trailFrames
           .map(
             (frame) => `
               <span
                 class="mission-guided-skate-trail trail-${frame.index % 4}"
-                style="${getPathBoardStyle(frame.row || 0, frame.col || 0)}"
+                style="${getBoardPointStyle(frame.row || 0, frame.col || 0)}"
                 aria-hidden="true"
               ></span>
               <span
                 class="mission-guided-tile-pulse pulse-${frame.index % 4}"
-                style="${getPathBoardStyle(frame.row || 0, frame.col || 0)}"
+                style="${getBoardPointStyle(frame.row || 0, frame.col || 0)}"
                 aria-hidden="true"
               ></span>
             `
@@ -1178,24 +1202,24 @@ function renderPathGuidedMission(challenge, localState, mission) {
           .join("")}
         <span
           class="mission-guided-player facing-${activeFrame.facing || "right"} ${localState.isRunning ? "is-running" : ""}"
-          style="${activePointStyle}"
+          style="${activePointStyleFinal}"
           aria-hidden="true"
         >
           <img src="${PATH_GUIDED_ART.robot}" alt="" />
         </span>
-        <span class="mission-guided-current-arrow" style="${activePointStyle}" aria-hidden="true"></span>
+        <span class="mission-guided-current-arrow" style="${activePointStyleFinal}" aria-hidden="true"></span>
         ${
           blockedFrame
             ? `
               <span
                 class="mission-guided-blocked-burst"
-                style="${getPathBoardStyle(blockedFrame.blockedRow || 0, blockedFrame.blockedCol || 0)}"
+                style="${getBoardPointStyle(blockedFrame.blockedRow || 0, blockedFrame.blockedCol || 0)}"
                 aria-hidden="true"
               ></span>
             `
             : ""
         }
-        ${showGoalBurst ? `<span class="mission-guided-goal-burst" style="${goalPointStyle}" aria-hidden="true"></span>` : ""}
+        ${showGoalBurst ? `<span class="mission-guided-goal-burst" style="${goalPointStyleFinal}" aria-hidden="true"></span>` : ""}
       </section>
 
       <section class="mission-guided-command-shell" aria-label="Comandos">
@@ -1711,7 +1735,7 @@ function renderChallengeBody(challenge, localState, mission) {
     `;
   }
 
-  if (challenge.type === "path-program" && mission?.id === "4-1-3") {
+  if (challenge.type === "path-program" && (mission?.id === "4-1-3" || mission?.id === "4-1-final")) {
     return renderPathGuidedMission(challenge, localState, mission);
   }
 
@@ -1859,7 +1883,7 @@ export function renderMission() {
     challenge.type === "reorder"
       ? `${getCorrectCount(missionModel.state.orderedItems || [], challenge.solution || [])}/${(challenge.solution || []).length || 0}`
       : world.short;
-  const isFullScreenMission = mission.id === "4-1-1" || mission.id === "4-1-2" || mission.id === "4-1-3" || mission.id === "4-1-4" || mission.id === "4-1-5" || mission.id === "4-1-6";
+  const isFullScreenMission = mission.id === "4-1-1" || mission.id === "4-1-2" || mission.id === "4-1-3" || mission.id === "4-1-4" || mission.id === "4-1-5" || mission.id === "4-1-6" || mission.id === "4-1-final";
   const missionScreenClass =
     mission.id === "4-1-1"
       ? " mission-screen-path-guided mission-screen-first-steps"
@@ -1873,6 +1897,8 @@ export function renderMission() {
         ? " mission-screen-path-guided mission-screen-obstacle-routes"
         : mission.id === "4-1-6"
         ? " mission-screen-order-correct mission-screen-order-full mission-screen-create-algorithm"
+        : mission.id === "4-1-final"
+        ? " mission-screen-path-guided mission-screen-final-path"
         : "";
   let localState = missionModel.state;
   let animationTimer = null;
@@ -2246,7 +2272,7 @@ export function renderMission() {
       unlockAudio();
       if (!localState.program.length || localState.isRunning) return;
       playProgramRun();
-      const shouldCompleteAfterRun = mission.id === "4-1-3" && missionModel.validate(localState);
+      const shouldCompleteAfterRun = (mission.id === "4-1-3" || mission.id === "4-1-final") && missionModel.validate(localState);
       scheduleProgramPlayback();
 
       if (shouldCompleteAfterRun) {
