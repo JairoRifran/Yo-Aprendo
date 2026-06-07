@@ -86,9 +86,11 @@ function renderVictoryScene(result) {
           interaction-prompt="none"
           shadow-intensity="0"
           exposure="1.16"
-          camera-target="0m 0.86m 0m"
-          camera-orbit="0deg 72deg auto"
-          field-of-view="34deg"
+          camera-target="0m 1.02m 0m"
+          camera-orbit="0deg 72deg 5.2m"
+          field-of-view="58deg"
+          min-camera-orbit="auto auto 5.2m"
+          max-camera-orbit="auto auto 5.2m"
           reveal="auto"
         ></model-viewer>
       </div>
