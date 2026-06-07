@@ -1117,9 +1117,6 @@ function renderPathGuidedMission(challenge, localState, mission) {
   const blockedFrame = activeFrame.reason === "obstacle" ? activeFrame : null;
   const getBoardPointStyle = (row = 0, col = 0) =>
     isFinalPathMission ? getPathBoardStyleForBoard(board, row, col) : getPathBoardStyle(row, col);
-  const boardDuplicate = isFinalPathMission
-    ? `<img class="mission-guided-board-img mission-guided-board-img-echo" src="${PATH_GUIDED_ART.board}" alt="" aria-hidden="true" />`
-    : "";
   const sideTitle = isFinalPathMission ? "Desafio final" : `Mision ${mission.number}`;
   const sideSubtitle = isFinalPathMission ? "Mision del robot" : "Ruta al faro";
   const topPrompt = isFinalPathMission
@@ -1181,7 +1178,6 @@ function renderPathGuidedMission(challenge, localState, mission) {
       </section>
 
       <section class="mission-guided-board-wrap" aria-label="Mapa de Camino guiado">
-        ${boardDuplicate}
         <img class="mission-guided-board-img" src="${PATH_GUIDED_ART.board}" alt="Tablero de islas con inicio, roca y faro" />
         <span class="mission-guided-lighthouse-beam" style="${goalPointStyleFinal}" aria-hidden="true"></span>
         ${trailFrames

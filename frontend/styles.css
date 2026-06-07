@@ -17091,12 +17091,12 @@ body::before {
 }
 
 .mission-screen-final-path .mission-guided-stage {
-  min-height: 680px;
+  min-height: 0;
 }
 
 .mission-screen-final-path .mission-guided-top {
-  top: 8px !important;
-  width: min(38vw, 520px) !important;
+  top: 10px !important;
+  width: min(36vw, 490px) !important;
 }
 
 .mission-screen-final-path .mission-guided-top-copy h1 {
@@ -17115,25 +17115,15 @@ body::before {
 }
 
 .mission-screen-final-path .mission-guided-board-wrap {
-  left: clamp(34px, 4vw, 62px) !important;
-  bottom: clamp(26px, 4vh, 48px) !important;
-  width: min(58vw, 790px) !important;
+  left: clamp(34px, 4vw, 58px) !important;
+  bottom: clamp(8px, 2vh, 18px) !important;
+  width: min(47vw, 645px) !important;
   overflow: visible;
 }
 
 .mission-screen-final-path .mission-guided-board-img {
   position: relative;
   z-index: 2;
-}
-
-.mission-screen-final-path .mission-guided-board-img-echo {
-  position: absolute;
-  z-index: 1;
-  right: -38%;
-  top: 12%;
-  width: 70%;
-  opacity: 0.72;
-  filter: saturate(1.02) brightness(0.98);
 }
 
 .mission-screen-final-path .mission-guided-player {
@@ -17154,14 +17144,14 @@ body::before {
 
 .mission-screen-final-path .mission-guided-command-shell {
   right: clamp(36px, 5vw, 78px) !important;
-  top: clamp(166px, 24vh, 190px) !important;
-  width: min(30vw, 405px) !important;
+  top: clamp(150px, 22vh, 168px) !important;
+  width: min(29vw, 390px) !important;
 }
 
 .mission-screen-final-path .mission-guided-route-shell {
   right: clamp(38px, 5.2vw, 82px) !important;
-  top: clamp(344px, 51vh, 374px) !important;
-  width: min(31vw, 425px) !important;
+  top: clamp(320px, 47vh, 344px) !important;
+  width: min(30vw, 410px) !important;
 }
 
 .mission-screen-final-path .mission-guided-route-list {
@@ -17182,9 +17172,9 @@ body::before {
 
 .mission-screen-final-path .mission-guided-actions-panel {
   right: clamp(42px, 5.5vw, 86px) !important;
-  bottom: clamp(26px, 4vh, 42px) !important;
-  width: min(31vw, 425px) !important;
-  grid-template-columns: minmax(150px, 1fr) 54px 54px !important;
+  bottom: clamp(64px, 10vh, 86px) !important;
+  width: min(30vw, 410px) !important;
+  grid-template-columns: minmax(145px, 1fr) 50px 50px !important;
 }
 
 .mission-screen-final-path .mission-assistant {
