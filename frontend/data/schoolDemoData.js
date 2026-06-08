@@ -44,7 +44,7 @@ const db = {
       name: "Sofi",
       display_name: "Sofi",
       classroom_id: "class-4a",
-      student_code: "Nivel 4",
+      student_code: "APRENDO",
       streak_days: 3,
       energy: 82,
       weekly_minutes: 42,
@@ -260,7 +260,7 @@ function classroomSummary(classroom) {
 
 export function demoAccess() {
   return {
-    student: { name: "Sofi", code: "Nivel 4" },
+    student: { name: "Sofi", code: "APRENDO" },
     parent: { name: "Familia de Sofi", code: "FAM-404" },
     teacher: { name: "Profe Lucia", code: "DOC-4A" },
     institution: { name: "Escuela Demo Uruguay", code: "INST-4A" }

@@ -15,19 +15,19 @@ const ROLE_META = {
   student: {
     title: "Soy estudiante",
     subtitle: "Jugar misiones y avanzar en el mapa.",
-    helper: "Entra a tus islas, resuelve retos y gana progreso paso a paso.",
+    helper: "Entrá a tus islas, resuelve retos y gana progreso paso a paso.",
     namePlaceholder: "Nombre del explorador",
     codeLabel: "Isla o grupo",
-    codePlaceholder: "Nivel 4",
+    codePlaceholder: "Código de clase",
     cta: "Entrar a jugar",
     loginNote: "Vas a entrar directo al mundo de juego.",
     demoName: "Sofi",
-    demoCode: "Nivel 4"
+    demoCode: "APRENDO"
   },
   parent: {
     title: "Soy familia",
-    subtitle: "Ver avances y acompanar desde casa.",
-    helper: "Consulta progreso, fortalezas y sugerencias simples para acompanar.",
+    subtitle: "Ver avances y acompañar desde casa.",
+    helper: "Consulta progreso, fortalezas y sugerencias simples para acompañar.",
     namePlaceholder: "Familia de...",
     codeLabel: "Codigo familiar",
     codePlaceholder: "FAM-404",
@@ -38,8 +38,8 @@ const ROLE_META = {
   },
   teacher: {
     title: "Soy docente",
-    subtitle: "Gestionar aulas y acompanamiento.",
-    helper: "Revisa grupos asignados, registra alumnos y detecta quienes necesitan apoyo.",
+    subtitle: "Gestionar aulas y acompañamiento.",
+    helper: "Revisa grupos asignados, registra alumnos y detecta quiénes necesitan apoyo.",
     namePlaceholder: "Nombre docente",
     codeLabel: "Codigo docente",
     codePlaceholder: "DOC-4A",
@@ -62,13 +62,13 @@ const ROLE_META = {
   },
   owner: {
     title: "Soy producto",
-    subtitle: "Medir adopcion, uso y evidencia comercial.",
-    helper: "Panel de metricas para venta, seguimiento y expansion institucional.",
+    subtitle: "Medir adopción, uso y evidencia comercial.",
+    helper: "Panel de métricas para venta, seguimiento y expansion institucional.",
     namePlaceholder: "rifranjairo@gmail.com",
     codeLabel: "Contrasena",
-    codePlaceholder: "Tu contrasena",
+    codePlaceholder: "Tu contraseña",
     codeType: "password",
-    cta: "Abrir metricas",
+    cta: "Abrir métricas",
     loginNote: "Vas a entrar al panel del producto.",
     demoName: "rifranjairo@gmail.com",
     demoCode: "clave privada"
@@ -140,7 +140,7 @@ function renderLoginPanel(meta, currentName, currentCode) {
       <p id="startAccessHelper">${meta.helper}</p>
 
       <div class="start-art-login-row">
-        <button class="start-art-login-link" type="button">Iniciar sesion</button>
+        <button class="start-art-login-link" type="button">Iniciar sesión</button>
         <button class="start-art-login-link secondary" type="button">Continuar</button>
       </div>
 
@@ -208,7 +208,7 @@ function renderInstitutionRegisterPanel() {
         <input id="departmentInput" class="start-input" name="department" type="text" maxlength="80" placeholder="Montevideo, Canelones..." />
 
         <button id="institutionRegisterBtn" class="btn btn-primary start-art-submit" type="submit">Crear piloto institucional</button>
-        <div class="start-role-note start-art-role-note">Piloto inicial: 90 dias, hasta 50 alumnos y 2 docentes.</div>
+        <div class="start-role-note start-art-role-note">Piloto inicial: 90 días, hasta 50 alumnos y 2 docentes.</div>
         <div class="start-art-form-error" id="institutionRegisterError"></div>
       </form>
     </section>
@@ -230,7 +230,7 @@ function renderInstitutionLandingPanel() {
 
         <div class="institution-modal-body">
           <section class="institution-modal-intro">
-            <p>Yo Aprendo convierte el aprendizaje en una aventura guiada: los ninos juegan, las docentes acompanan y la institucion obtiene una lectura clara del avance real.</p>
+            <p>Yo Aprendo convierte el aprendizaje en una aventura guiada: los niños juegan, las docentes acompañan y la institucion obtiene una lectura clara del avance real.</p>
             <div class="institution-modal-proof">
               <span>4 mundos</span>
               <span>28 micro misiones</span>
@@ -240,7 +240,7 @@ function renderInstitutionLandingPanel() {
 
           <div class="institution-value-grid">
             <div class="institution-value-item">
-              <strong>Mas valor pedagogico</strong>
+              <strong>Más valor pedagógico</strong>
               <span>Misiones cortas, visuales y progresivas para trabajar secuencias, bucles, decisiones y datos.</span>
             </div>
             <div class="institution-value-item">
@@ -255,7 +255,7 @@ function renderInstitutionLandingPanel() {
 
           <div class="institution-modal-grid">
             <div class="institution-flow">
-              <strong>Como empieza una institucion</strong>
+              <strong>Cómo empieza una institucion</strong>
               <span>1. Crea el centro</span>
               <span>2. Activa el piloto</span>
               <span>3. Carga docentes y aulas</span>
@@ -265,7 +265,7 @@ function renderInstitutionLandingPanel() {
             <div class="institution-plan-list">
               <button class="institution-plan-card featured" type="button" data-institution-plan="trial">
                 <div class="start-art-side-label small">Piloto</div>
-                <h3>90 dias gratis</h3>
+                <h3>90 días gratis</h3>
                 <p>Para validar el uso en una escuela o grupo inicial.</p>
                 <strong>50 alumnos · 2 docentes</strong>
                 <em>Crear piloto</em>
@@ -275,7 +275,7 @@ function renderInstitutionLandingPanel() {
                 <h3>Plan mensual</h3>
                 <p>Para centros que ya quieren operar con varios grupos.</p>
                 <strong>Hasta 300 alumnos</strong>
-                <em>Solicitar incorporacion</em>
+                <em>Solicitar incorporación</em>
               </button>
               <button class="institution-plan-card" type="button" data-institution-plan="enterprise">
                 <div class="start-art-side-label small">Red educativa</div>
@@ -308,8 +308,8 @@ function renderInstitutionPlanRequestPanel(planKey = "school") {
     enterprise: {
       eyebrow: "Red educativa",
       title: "Despliegue para redes, convenios o Ceibal",
-      text: "Armamos una conversacion institucional para evaluar volumen, integraciones, SSO, auditoria y condiciones de despliegue.",
-      cta: "Solicitar reunion"
+      text: "Armamos una conversación institucional para evaluar volumen, integraciones, SSO, auditoría y condiciones de despliegue.",
+      cta: "Solicitar reunión"
     }
   };
   const copy = planCopy[planKey] || planCopy.school;
@@ -358,7 +358,7 @@ function renderStartFooter() {
           <a href="/pensamiento-computacional-primaria">Pensamiento computacional</a>
           <a href="/alineacion-curricular">Alineacion curricular</a>
           <a href="/privacidad">Privacidad</a>
-          <a href="/terminos">Terminos</a>
+          <a href="/terminos">Términos</a>
           <a href="/contacto">Contacto</a>
         </nav>
       </div>
@@ -439,9 +439,9 @@ export function renderStart() {
           <div class="start-art-hero">
             <h1>
               <span>Yo Aprendo</span>
-              <span class="accent">Nivel 4</span>
+              <span class="accent">Primaria</span>
             </h1>
-            <p>Pensamiento computacional para 4.º de primaria, con misiones cortas y seguimiento claro para acompañar mejor.</p>
+            <p>Pensamiento computacional para 4.º, 5.º y 6.º de primaria, con misiones cortas y seguimiento claro para acompañar mejor.</p>
 
             <div class="start-art-pill-row">
               <span class="start-art-pill green">4 islas</span>

@@ -997,7 +997,7 @@ def register_institution(payload: InstitutionRegisterRequest):
 @app.get("/api/access/demo")
 def access_demo():
     return {
-        "student": {"name": "Sofi", "code": "Nivel 4"},
+        "student": {"name": "Sofi", "code": "APRENDO"},
         "parent": {"name": "Familia de Sofi", "code": "FAM-404"},
         "teacher": {"name": "Profe Lucia", "code": "DOC-4A"},
         "institution": {"name": "Escuela Demo Uruguay", "code": "INST-4A"},

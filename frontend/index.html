@@ -10,10 +10,10 @@
     gtag("js", new Date());
     gtag("config", "G-HSJJRQZZ3L");
   </script>
-  <title>YoAprendo | Juego educativo de pensamiento computacional para 4.º</title>
+  <title>YoAprendo | Juego educativo de pensamiento computacional para Primaria</title>
   <meta
     name="description"
-    content="YoAprendo es una aventura educativa para niños de 4.º que enseña pensamiento computacional con mundos, misiones, secuencias, bucles, decisiones y datos."
+    content="YoAprendo es una aventura educativa que enseña pensamiento computacional para Primaria (4.º, 5.º y 6.º de escuela) con mundos, misiones, secuencias, bucles, decisiones y datos."
   />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0b74d1" />
@@ -26,10 +26,10 @@
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="es_UY" />
   <meta property="og:site_name" content="YoAprendo" />
-  <meta property="og:title" content="YoAprendo | Aventura educativa de programación para niños" />
+  <meta property="og:title" content="YoAprendo | Aventura educativa de programación para primaria" />
   <meta
     property="og:description"
-    content="Explorá mundos, resolvé misiones y aprendé pensamiento computacional con una experiencia interactiva para 4.º."
+    content="Explorá mundos, resolvé misiones y aprendé pensamiento computacional con una experiencia interactiva para Primaria."
   />
   <meta property="og:url" content="https://yoaprendo.org/" />
   <meta property="og:image" content="https://yoaprendo.org/img/worlds-ocean-story-bg.png" />
@@ -38,13 +38,12 @@
   <meta name="twitter:title" content="YoAprendo | Juego educativo de pensamiento computacional" />
   <meta
     name="twitter:description"
-    content="Una aventura interactiva para aprender secuencias, bucles, decisiones y datos en 4.º."
+    content="Una aventura interactiva para aprender secuencias, bucles, decisiones y datos en Primaria."
   />
   <meta name="twitter:image" content="https://yoaprendo.org/img/worlds-ocean-story-bg.png" />
-  <link rel="preconnect" href="https://unpkg.com" crossorigin />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="preload" href="./img/bit-dance-result-v3.glb" as="fetch" type="model/gltf-binary" crossorigin />
-  <link rel="preload" href="./img/bit-fail-result-v1.glb" as="fetch" type="model/gltf-binary" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js" defer></script>
   <script>
@@ -67,7 +66,7 @@
         "@type": "EducationalAudience",
         "educationalRole": "student"
       },
-      "educationalLevel": "4.º primaria",
+      "educationalLevel": "Primaria (4.º, 5.º, 6.º)",
       "learningResourceType": "interactive game",
       "teaches": [
         "Pensamiento computacional",
@@ -76,7 +75,7 @@
         "Decisiones",
         "Datos"
       ],
-      "description": "Juego educativo interactivo para niños de 4.º que enseña pensamiento computacional mediante mundos, misiones y recompensas."
+      "description": "Juego educativo interactivo para Primaria que enseña pensamiento computacional mediante mundos, misiones y recompensas."
     }
   </script>
 
@@ -85,76 +84,17 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
-      <div class="topbar-left">
-        <div class="pill level-pill">Nivel 4</div>
-        <div class="pill title-pill">Mundos de 4.º</div>
-      </div>
-
-      <div class="topbar-right">
-        <div class="pill currency-pill">
-          <span class="currency-icon gold"></span>
-          <span id="coinsValue">350</span>
-        </div>
-        <div class="pill currency-pill">
-          <span class="currency-icon gems"></span>
-          <span id="gemsValue">25</span>
-        </div>
-      </div>
-    </header>
-
-    <main class="layout">
-      <section class="scene-panel">
-        <div id="sceneWrap">
-          <canvas id="scene"></canvas>
-          <div class="scene-vignette"></div>
-          <div class="scene-glow"></div>
-          <div class="scene-label">
-            Explorá los mundos de 4.º y elegí tu próxima aventura
-          </div>
-        </div>
-      </section>
-
-      <aside class="sidebar">
-        <div class="sidebar-card mission-card">
-          <div class="eyebrow">Mundo actual</div>
-          <h1 id="missionTitle">Seleccioná un mundo</h1>
-          <p id="missionDescription">
-            Hacé click en una isla del mapa para ver sus micro-misiones, su progreso y entrar a su aventura.
-          </p>
-
-          <div class="action-row">
-            <button id="playBtn" class="btn btn-primary" disabled>Entrar</button>
-            <button class="btn btn-secondary" type="button">Asignar</button>
-          </div>
-        </div>
-
-        <div class="sidebar-card progress-card">
-          <div class="eyebrow">Progreso general</div>
-          <div class="progress-stats">
-            <div class="stat-box">
-              <span class="stat-label">Micro-misiones</span>
-              <strong id="completedValue">0 / 28</strong>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">Racha</span>
-              <strong>3 días</strong>
-            </div>
-          </div>
-
-          <div class="progress-bar">
-            <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
-          </div>
-        </div>
-
-        <div class="sidebar-card tips-card">
-          <div class="eyebrow">Consejo</div>
-          <p>
-            Cada isla representa un mundo de aprendizaje. Entrá a una isla para descubrir sus micro-misiones y avanzar paso a paso.
-          </p>
-        </div>
-      </aside>
-    </main>
+    <!-- Cargador limpio inicial para evitar parpadeos visuales -->
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; background: #0c1a30; font-family: 'Fredoka', sans-serif; color: #fff; gap: 16px;">
+      <div style="width: 48px; height: 48px; border: 5px solid rgba(255, 255, 255, 0.1); border-top: 5px solid #3b82f6; border-radius: 50%; animation: spin-loader 1s linear infinite;"></div>
+      <span style="font-size: 16px; letter-spacing: 0.5px; opacity: 0.8;">Cargando YoAprendo...</span>
+      <style>
+        @keyframes spin-loader {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    </div>
   </div>
 
   <!-- Imagen disponible para usar desde JS -->

@@ -53,30 +53,30 @@ function getSubmapGuideCopy(world, selectedMission, worldProgress) {
     "world-sequences": {
       title: "Bit te explica",
       body:
-        "Esta isla ensena secuencias: ordenar pasos para cumplir una meta. Un algoritmo claro dice que accion va primero, cual viene despues y como llegar al resultado.",
+        "Esta isla enseña secuencias: ordenar pasos para cumplir una meta. Un algoritmo claro dice qué acción va primero, cuál viene después y cómo llegar al resultado.",
       now:
-        "Elige una mini isla disponible y entra a la mision para recuperar energia del faro."
+        "Elige una mini isla disponible y entrá a la misión para recuperar energía del faro."
     },
     "world-loops": {
       title: "Bit te explica",
       body:
-        "Esta isla ensena bucles: cuando una accion se repite, puedes convertir muchos pasos en una instruccion mas corta.",
+        "Esta isla enseña bucles: cuando una acción se repite, puedes convertir muchos pasos en una instruccion más corta.",
       now:
-        "Elige una mision, detecta la repeticion y arma el bucle."
+        "Elige una misión, detecta la repetición y arma el bucle."
     },
     "world-decisions": {
       title: "Bit te explica",
       body:
-        "Esta isla ensena decisiones: si una condicion se cumple, eliges una accion; si no, eliges otra.",
+        "Esta isla enseña decisiones: si una condición se cumple, eliges una acción; si no, eliges otra.",
       now:
-        "Elige una mision y compara las opciones antes de decidir."
+        "Elige una misión y compará las opciones antes de decidir."
     },
     "world-data": {
       title: "Bit te explica",
       body:
-        "Esta isla ensena datos: ordenar, clasificar y comparar informacion para crear una solucion.",
+        "Esta isla enseña datos: ordenar, clasificar y comparar información para crear una solución.",
       now:
-        "Elige una mision, organiza las pistas y usa la informacion para avanzar."
+        "Elige una misión, organizá las pistas y usa la información para avanzar."
     }
   };
 
@@ -86,7 +86,7 @@ function getSubmapGuideCopy(world, selectedMission, worldProgress) {
     reward: `Ruta: ${worldProgress.completed}/${worldProgress.total}. Hasta ${world.reward.coins} monedas y ${world.reward.gems} gemas.`,
     selected: selectedMission
       ? `Siguiente reto sugerido: ${selectedMission.title}.`
-      : "Selecciona una mision para ver su reto."
+      : "Selecciona una misión para ver su reto."
   };
 }
 
@@ -147,7 +147,7 @@ export function renderSubmap() {
       <div class="topbar-left submap-v2-topbar-left">
         <div class="pill level-pill submap-v2-level-pill">
           <span class="mission-header-badge ui-icon-wrap">${uiIcon("trophy")}</span>
-          <span>Nivel 4</span>
+          <span>Yo Aprendo</span>
         </div>
         <span class="mission-header-chevron" aria-hidden="true">${uiIcon("arrow-right")}</span>
         <div class="pill title-pill mission-header-pill mission-header-pill-title submap-v2-title-pill">
@@ -180,7 +180,7 @@ export function renderSubmap() {
       <aside class="mission-guided-side-card mission-guided-side-card-left submap-v2-hud-card submap-v2-hud-card-left" aria-label="Mundo actual">
         <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span>
         <span class="mission-guided-side-copy">
-          <strong>Nivel 4</strong>
+          <strong>Yo Aprendo</strong>
           <small>${world.title}</small>
         </span>
       </aside>
@@ -268,7 +268,7 @@ export function renderSubmap() {
               <div class="submap-v2-guide-head">
                 <div>
                   <div class="eyebrow">${guideCopy.title}</div>
-                  <h2 id="submapGuideTitle">Que hago ahora?</h2>
+                  <h2 id="submapGuideTitle">¿Qué hago ahora?</h2>
                 </div>
                 <span class="submap-v2-guide-step" id="submapGuideStep">1/4</span>
               </div>
@@ -277,9 +277,9 @@ export function renderSubmap() {
               <div class="submap-v2-dialog-mission" id="submapGuideMission">
                 <div class="submap-v2-selected-number">${selectedNode?.number || 1}</div>
                 <div class="submap-v2-selected-copy">
-                  <h3 id="submapDialogMissionTitle">${selectedNode?.title || "Elegi una mision"}</h3>
+                  <h3 id="submapDialogMissionTitle">${selectedNode?.title || "Elegí una misión"}</h3>
                   <p id="submapDialogMissionDescription">
-                    ${selectedNode?.challenge?.prompt || "Haz click en una mision para viajar a su isla."}
+                    ${selectedNode?.challenge?.prompt || "Haz click en una misión para viajar a su isla."}
                   </p>
                   <p class="submap-v2-selected-status" id="submapDialogMissionStatus">
                     Estado: <strong>${selectedNode ? getMissionStatusLabel(selectedNode.missionState) : "-"}</strong>
@@ -305,7 +305,7 @@ export function renderSubmap() {
                     type="button"
                     ${!selectedNode || selectedNode.missionState === "locked" ? "disabled" : ""}
                   >
-                    Entrar mision
+                    Entrar a la misión
                   </button>
                   <button id="dialogBackToWorldMapBtn" class="btn btn-secondary submap-v2-back-btn" type="button">
                     Volver
@@ -342,7 +342,7 @@ export function renderSubmap() {
                 type="button"
                 ${!selectedNode || selectedNode.missionState === "locked" ? "disabled" : ""}
               >
-                Entrar misión
+                Entrar a la misión
               </button>
               <button id="backToWorldMapBtn" class="btn btn-secondary submap-v2-back-btn" type="button">
                 Volver
@@ -410,9 +410,9 @@ export function renderSubmap() {
 
   function createGuidePages(node) {
     const status = node ? getMissionStatusLabel(node.missionState).toLowerCase() : "sin elegir";
-    const missionText = node?.challenge?.prompt || "Haz click en una mini isla para elegir el proximo reto.";
+    const missionText = node?.challenge?.prompt || "Haz click en una mini isla para elegir el próximo reto.";
     const rewardText = node
-      ? `Si completas esta mision puedes ganar ${node.coins || 0} monedas y ${node.gems || 0} gemas.`
+      ? `Si completas esta misión puedes ganar ${node.coins || 0} monedas y ${node.gems || 0} gemas.`
       : guideCopy.reward;
 
     return [
@@ -421,16 +421,16 @@ export function renderSubmap() {
         body: guideCopy.body
       },
       {
-        title: "Que hago ahora?",
+        title: "¿Qué hago ahora?",
         body: guideCopy.now
       },
       {
-        title: node ? node.title : "Elige una mision",
+        title: node ? node.title : "Elige una misión",
         body: `${missionText} Estado actual: ${status}.`
       },
       {
         title: "Premios y viaje",
-        body: `${rewardText} Cuando estes listo, entra a la mision para seguir reparando el faro.`,
+        body: `${rewardText} Cuando estés listo, entrá a la misión para seguir reparando el faro.`,
         final: true
       }
     ];
@@ -466,8 +466,8 @@ export function renderSubmap() {
       missionTitleEl.textContent = "Elegí una misión";
       missionDescriptionEl.textContent = "Hacé click en una misión para viajar a su isla.";
       missionStatusEl.innerHTML = "Estado: <strong>-</strong>";
-      if (dialogMissionTitleEl) dialogMissionTitleEl.textContent = "Elegi una mision";
-      if (dialogMissionDescriptionEl) dialogMissionDescriptionEl.textContent = "Haz click en una mision para viajar a su isla.";
+      if (dialogMissionTitleEl) dialogMissionTitleEl.textContent = "Elegí una misión";
+      if (dialogMissionDescriptionEl) dialogMissionDescriptionEl.textContent = "Haz click en una misión para viajar a su isla.";
       if (dialogMissionStatusEl) dialogMissionStatusEl.innerHTML = "Estado: <strong>-</strong>";
       rewardLineEl.innerHTML = `
         <div class="submap-v2-reward-pill"><span class="currency-icon gold"></span><strong>0</strong></div>

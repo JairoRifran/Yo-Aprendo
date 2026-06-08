@@ -68,7 +68,7 @@ html,
 body {
   margin: 0;
   height: 100%;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Fredoka', 'Quicksand', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   background:
     radial-gradient(circle at 14% 8%, rgba(255, 244, 182, 0.24), transparent 18%),
@@ -94,6 +94,14 @@ body::before {
   display: flex;
   flex-direction: column;
   z-index: 1;
+  transition: opacity 0.16s ease-in-out, transform 0.16s ease-in-out;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.app-shell.view-transitioning {
+  opacity: 0;
+  transform: scale(0.995);
 }
 
 .start-site-footer {
@@ -1186,8 +1194,9 @@ body::before {
   padding: 34px 36px;
   border-radius: 28px;
   background:
-    linear-gradient(180deg, rgba(13, 106, 160, 0.42), rgba(8, 69, 122, 0.44));
-  backdrop-filter: blur(12px);
+    linear-gradient(180deg, rgba(8, 48, 82, 0.82), rgba(4, 28, 54, 0.86));
+  backdrop-filter: blur(20px);
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
 }
 
 .start-art-hero h1 {
@@ -1203,11 +1212,13 @@ body::before {
   max-width: 470px;
   font-size: 20px;
   line-height: 1.42;
+  font-weight: 500;
 }
 
 .start-art-note {
   max-width: 440px;
   font-size: 15px;
+  opacity: 0.95;
 }
 
 .start-art-login-panel.chooser {
@@ -17369,13 +17380,14 @@ textarea {
 .start-art-overlay > .start-art-hero {
   max-width: 470px;
   padding: clamp(22px, 2.3vw, 32px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   background:
-    radial-gradient(circle at 14% 8%, rgba(255, 236, 156, 0.18), transparent 30%),
-    linear-gradient(180deg, rgba(11, 93, 151, 0.48), rgba(7, 58, 112, 0.58));
+    radial-gradient(circle at 14% 8%, rgba(255, 236, 156, 0.25), transparent 30%),
+    linear-gradient(180deg, rgba(8, 48, 82, 0.86), rgba(4, 28, 54, 0.92));
+  backdrop-filter: blur(24px) saturate(1.2);
   box-shadow:
-    0 20px 44px rgba(4, 57, 108, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    0 24px 48px rgba(4, 57, 108, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .start-art-overlay > .start-art-hero h1 {
@@ -19413,4 +19425,223 @@ body.legal-page-body .legal-page {
     align-items: flex-start;
     flex-direction: column;
   }
+}
+
+/* ==========================================================================
+   CLEAN LIGHT THEME REDESIGN FOR ROLE WORKSPACES (TEACHER, PARENT, INSTITUTION)
+   ========================================================================== */
+
+.role-teacher-workspace .owner-sidebar,
+.role-parent-workspace .owner-sidebar,
+.role-institution-workspace .owner-sidebar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 255, 0.95)) !important;
+  border: 1px solid rgba(147, 214, 255, 0.4) !important;
+  box-shadow: 0 16px 32px rgba(27, 102, 163, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.role-teacher-workspace .owner-sidebar-brand,
+.role-parent-workspace .owner-sidebar-brand,
+.role-institution-workspace .owner-sidebar-brand {
+  border-bottom: 1px solid rgba(147, 214, 255, 0.4) !important;
+}
+
+.role-teacher-workspace .owner-sidebar-brand strong,
+.role-parent-workspace .owner-sidebar-brand strong,
+.role-institution-workspace .owner-sidebar-brand strong {
+  color: #163c67 !important;
+}
+
+.role-teacher-workspace .owner-sidebar-brand span:last-child,
+.role-parent-workspace .owner-sidebar-brand span:last-child,
+.role-institution-workspace .owner-sidebar-brand span:last-child {
+  color: #547697 !important;
+}
+
+.role-teacher-workspace .owner-nav-item,
+.role-parent-workspace .owner-nav-item,
+.role-institution-workspace .owner-nav-item {
+  color: #406283 !important;
+}
+
+.role-teacher-workspace .owner-nav-item strong,
+.role-parent-workspace .owner-nav-item strong,
+.role-institution-workspace .owner-nav-item strong {
+  color: #23476c !important;
+}
+
+.role-teacher-workspace .owner-nav-item small,
+.role-parent-workspace .owner-nav-item small,
+.role-institution-workspace .owner-nav-item small {
+  color: #6082a5 !important;
+}
+
+.role-teacher-workspace .owner-nav-icon,
+.role-parent-workspace .owner-nav-icon,
+.role-institution-workspace .owner-nav-icon {
+  background: rgba(147, 214, 255, 0.16) !important;
+  color: #1d79c8 !important;
+}
+
+.role-teacher-workspace .owner-nav-icon .dashboard-svg-icon,
+.role-parent-workspace .owner-nav-icon .dashboard-svg-icon,
+.role-institution-workspace .owner-nav-icon .dashboard-svg-icon {
+  color: #1d79c8 !important;
+  fill: #1d79c8 !important;
+}
+
+.role-teacher-workspace .owner-nav-item:hover,
+.role-parent-workspace .owner-nav-item:hover,
+.role-institution-workspace .owner-nav-item:hover {
+  background: rgba(147, 214, 255, 0.12) !important;
+  border-color: rgba(147, 214, 255, 0.36) !important;
+  transform: translateX(3px) !important;
+}
+
+.role-teacher-workspace .owner-nav-item.active,
+.role-parent-workspace .owner-nav-item.active,
+.role-institution-workspace .owner-nav-item.active {
+  color: #ffffff !important;
+  border-color: #1d79c8 !important;
+  background: linear-gradient(180deg, #1d79c8, #1868ae) !important;
+  box-shadow: 0 8px 18px rgba(27, 102, 163, 0.22) !important;
+}
+
+.role-teacher-workspace .owner-nav-item.active strong,
+.role-parent-workspace .owner-nav-item.active strong,
+.role-institution-workspace .owner-nav-item.active strong {
+  color: #ffffff !important;
+}
+
+.role-teacher-workspace .owner-nav-item.active small,
+.role-parent-workspace .owner-nav-item.active small,
+.role-institution-workspace .owner-nav-item.active small {
+  color: #dceeff !important;
+}
+
+.role-teacher-workspace .owner-nav-item.active .owner-nav-icon,
+.role-parent-workspace .owner-nav-item.active .owner-nav-icon,
+.role-institution-workspace .owner-nav-item.active .owner-nav-icon {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+/* Light background overrides for inputs, table rows, and list items in light dashboards */
+.dashboard-screen .dashboard-table-row {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid rgba(147, 214, 255, 0.36) !important;
+  box-shadow: 0 4px 12px rgba(27, 102, 163, 0.04) !important;
+  color: #1d4062 !important;
+}
+
+.dashboard-screen .dashboard-mini-item {
+  background: rgba(255, 255, 255, 0.64) !important;
+  border: 1px solid rgba(147, 214, 255, 0.3) !important;
+  color: #173e69 !important;
+}
+
+.dashboard-screen .dashboard-mini-item.warn {
+  background: rgba(255, 238, 220, 0.82) !important;
+  border: 1px solid rgba(230, 154, 82, 0.36) !important;
+}
+
+.dashboard-screen .dashboard-input {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(147, 214, 255, 0.45) !important;
+  color: #173e69 !important;
+}
+
+.dashboard-screen .dashboard-input:focus {
+  border-color: #1d79c8 !important;
+  box-shadow: 0 0 0 4px rgba(29, 121, 200, 0.12) !important;
+}
+
+.dashboard-screen select.dashboard-input {
+  color: #173e69 !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173e69' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 36px;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.dashboard-screen select.dashboard-input option {
+  background: #ffffff;
+  color: #173e69;
+}
+
+/* ==========================================================================
+   MOBILE UX IMPROVEMENTS (COMPACT GUIDE CARD WHEN CLOSED)
+   ========================================================================== */
+
+@media (max-width: 760px) {
+  .submap-v2-guide-card {
+    min-height: 84px !important;
+    transition: min-height 0.22s ease-in-out;
+    margin-top: 14px;
+  }
+  .submap-v2-guide-card.is-open {
+    min-height: 320px !important;
+  }
+}
+
+/* ==========================================================================
+   MICRO-INTERACTIONS (NODE PULSING & CURRENCY BOUNCE)
+   ========================================================================== */
+
+.submap-v2-node.is-available .submap-v2-node-aura {
+  animation: nodePulse 2.2s infinite ease-in-out !important;
+}
+
+@keyframes nodePulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.92;
+    border-color: rgba(114, 246, 177, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 0 18px rgba(114, 246, 177, 0.28);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 1;
+    border-color: rgba(114, 246, 177, 1);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 0 34px rgba(114, 246, 177, 0.64);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.92;
+    border-color: rgba(114, 246, 177, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 0 18px rgba(114, 246, 177, 0.28);
+  }
+}
+
+/* Currency Pill micro-scale animation */
+.currency-pill {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.currency-pill:hover {
+  transform: scale(1.06) translateY(-1px) !important;
+}
+
+/* ==========================================================================
+   MISSION ASSISTANT (BIT DIALOGUE OVERLAY) UX/UI CORRECTIONS
+   ========================================================================== */
+
+.mission-assistant {
+  position: fixed !important;
+  z-index: 99999 !important;
+}
+
+.mission-assistant-bubble {
+  z-index: 100000 !important;
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.38),
+    0 0 32px rgba(92, 232, 255, 0.22),
+    0 0 18px rgba(255, 212, 95, 0.16) !important;
+}
+
+.mission-screen-path-guided .mission-assistant {
+  position: fixed !important;
+  z-index: 99999 !important;
 }

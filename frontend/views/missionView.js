@@ -141,7 +141,7 @@ const MISSION5_ROUTES = [
   {
     id: "b",
     label: "Ruta B",
-    result: "rodea el obstaculo",
+    result: "rodea el obstáculo",
     verdict: "success",
     steps: ["right", "up", "up", "right", "right"],
     trail: [
@@ -341,10 +341,10 @@ function getCurrentWorld() {
 function getMissionStoryBeat(mission, challenge) {
   const world = getCurrentWorld();
   const worldName = world?.short || "esta isla";
-  const missionName = mission?.title || "esta mision";
+  const missionName = mission?.title || "esta misión";
 
   if (challenge.type === "reorder") {
-    return `En ${worldName}, ${missionName} ayuda a encender una pista del faro: cuando ordenas pasos, conviertes una idea grande en instrucciones pequenas y claras.`;
+    return `En ${worldName}, ${missionName} ayuda a encender una pista del faro: cuando ordenas pasos, conviertes una idea grande en instrucciones pequeñas y claras.`;
   }
 
   if (challenge.type === "path-program") {
@@ -352,18 +352,18 @@ function getMissionStoryBeat(mission, challenge) {
   }
 
   if (challenge.type === "loop-builder") {
-    return `En ${worldName}, ${missionName} revela un patron repetido. Si el mismo paso vuelve muchas veces, el robot puede usar un bucle para ahorrar energia.`;
+    return `En ${worldName}, ${missionName} revela un patrón repetido. Si el mismo paso vuelve muchas veces, el robot puede usar un bucle para ahorrar energía.`;
   }
 
   if (challenge.type === "multiple-choice") {
-    return `En ${worldName}, ${missionName} abre una decision del camino. Comparar opciones te ayuda a elegir la regla que mejor resuelve el problema.`;
+    return `En ${worldName}, ${missionName} abre una decisión del camino. Comparar opciones te ayuda a elegir la regla que mejor resuelve el problema.`;
   }
 
   if (challenge.type === "categorize") {
-    return `En ${worldName}, ${missionName} ordena pistas del archipielago. Clasificar datos permite entenderlos antes de decidir que hacer.`;
+    return `En ${worldName}, ${missionName} ordena pistas del archipiélago. Clasificar datos permite entenderlos antes de decidir que hacer.`;
   }
 
-  return `En ${worldName}, ${missionName} suma una pieza a la historia del faro y al mapa del codigo.`;
+  return `En ${worldName}, ${missionName} suma una pieza a la historia del faro y al mapa del código.`;
 }
 
 function getChallengeTheory(challenge) {
@@ -376,11 +376,11 @@ function getChallengeTheory(challenge) {
   }
 
   if (challenge.type === "loop-builder") {
-    return "Idea clave: un bucle repite una accion. Sirve cuando detectas un patron y quieres escribir menos instrucciones.";
+    return "Idea clave: un bucle repite una acción. Sirve cuando detectas un patrón y quieres escribir menos instrucciones.";
   }
 
   if (challenge.type === "multiple-choice") {
-    return "Idea clave: una condicion ayuda a decidir. Lee cada caso y busca que regla se cumple.";
+    return "Idea clave: una condición ayuda a decidir. Lee cada caso y busca que regla se cumple.";
   }
 
   if (challenge.type === "categorize") {
@@ -420,8 +420,8 @@ function getMissionAssistantLines(mission, challenge) {
 
   if (challenge.type === "categorize") {
     return {
-      title: `${playerName}, organiza las tarjetas`,
-      body: "Haz click en cada una hasta dejarla en la categoria correcta.",
+      title: `${playerName}, organizá las tarjetas`,
+      body: "Haz click en cada una hasta dejarla en la categoría correcta.",
       hint: prompt
     };
   }
@@ -436,7 +436,7 @@ function getMissionAssistantLines(mission, challenge) {
 
   return {
     title: `Hola, ${playerName}`,
-    body: "Estoy aqui para guiarte en esta mision.",
+    body: "Estoy aquí para guiarte en esta misión.",
     hint: prompt
   };
 }
@@ -444,7 +444,7 @@ function getMissionAssistantLines(mission, challenge) {
 function getMissionAssistantContent(mission, challenge, topic = "task") {
   const playerName = getMissionPlayerName();
   const prompt = challenge.prompt || "Vamos paso a paso y resolvamos este reto.";
-  const missionName = mission.title || "esta mision";
+  const missionName = mission.title || "esta misión";
   const storyBeat = getMissionStoryBeat(mission, challenge);
   const theory = getChallengeTheory(challenge);
 
@@ -452,7 +452,7 @@ function getMissionAssistantContent(mission, challenge, topic = "task") {
     if (topic === "hint") {
       return {
         title: `${playerName}, piensa primero`,
-        body: "Busca la accion que debe pasar antes que todas y luego acomoda las demas sin apurarte.",
+        body: "Busca la acción que debe pasar antes que todas y luego acomoda las demas sin apurarte.",
         hint: "No hace falta adivinar: toca una tarjeta y muévela de a un paso."
       };
     }
@@ -499,16 +499,16 @@ function getMissionAssistantContent(mission, challenge, topic = "task") {
   if (challenge.type === "multiple-choice") {
     if (topic === "hint") {
       return {
-        title: `${playerName}, compara opciones`,
+        title: `${playerName}, compará opciones`,
         body: "Lee cada opcion completa. Descarta primero las que tengan un paso fuera de lugar.",
-        hint: "Cuando dudes, piensa qué accion necesariamente tiene que ocurrir primero."
+        hint: "Cuando dudes, piensa qué acción necesariamente tiene que ocurrir primero."
       };
     }
 
     if (topic === "chat") {
       return {
         title: `Cuenta conmigo, ${playerName}`,
-        body: "Si quieres, vuelve a tocarme y repasamos la consigna cuantas veces necesites.",
+        body: "Si quieres, vuelve a tocarme y repasamos la consigna cuántas veces necesites.",
         hint: `En ${missionName}, hay que elegir la alternativa que mejor resuelve el reto.`
       };
     }
@@ -532,14 +532,14 @@ function getMissionAssistantContent(mission, challenge, topic = "task") {
     if (topic === "chat") {
       return {
         title: `Hablemos, ${playerName}`,
-        body: "Estoy aqui para recordarte la regla del reto cuando la necesites.",
-        hint: `En ${missionName}, organiza cada elemento en su categoria correcta.`
+        body: "Estoy aquí para recordarte la regla del reto cuando la necesites.",
+        hint: `En ${missionName}, organizá cada elemento en su categoría correcta.`
       };
     }
 
     return {
-      title: `${playerName}, organiza las tarjetas`,
-      body: "Haz click en cada una hasta dejarla en la categoria correcta.",
+      title: `${playerName}, organizá las tarjetas`,
+      body: "Haz click en cada una hasta dejarla en la categoría correcta.",
       hint: prompt
     };
   }
@@ -547,8 +547,8 @@ function getMissionAssistantContent(mission, challenge, topic = "task") {
   if (challenge.type === "loop-builder") {
     if (topic === "hint") {
       return {
-        title: `${playerName}, busca la repeticion`,
-        body: "Piensa qué accion se repite igual varias veces y luego decide cuántas veces ocurre.",
+        title: `${playerName}, busca la repetición`,
+        body: "Piensa qué acción se repite igual varias veces y luego decide cuántas veces ocurre.",
         hint: "Si el patrón es siempre el mismo, seguramente conviene usar un bucle."
       };
     }
@@ -591,10 +591,10 @@ function renderMissionAssistant(mission, challenge, localState) {
   const bodyLength = Math.max(copy.body.length, 24);
 
   return `
-    <aside class="mission-assistant${openClass}" aria-label="Guia de mision">
+    <aside class="mission-assistant${openClass}" aria-label="Guía de misión">
       <div class="mission-assistant-bubble" role="status" aria-live="polite">
         <div class="mission-assistant-bubble-top">
-          <span class="mission-assistant-kicker">Guia del robot</span>
+          <span class="mission-assistant-kicker">Guía del robot</span>
           <button
             class="mission-assistant-close"
             type="button"
@@ -623,7 +623,7 @@ function renderMissionAssistant(mission, challenge, localState) {
             type="button"
             data-assistant-topic="task"
           >
-            Que hago
+            Qué hago
           </button>
           <button
             class="mission-assistant-chip ${topic === "hint" ? "active" : ""}"
@@ -651,7 +651,7 @@ function renderMissionAssistant(mission, challenge, localState) {
       >
         <span class="mission-assistant-ring" aria-hidden="true"></span>
         <span class="mission-assistant-spark" aria-hidden="true"></span>
-        <img src="${REORDER_ART.robot}" alt="Robot guia" />
+        <img src="${REORDER_ART.robot}" alt="Robot guía" />
       </button>
     </aside>
   `;
@@ -1150,7 +1150,7 @@ function renderPathGuidedMission(challenge, localState, mission) {
         <span class="mission-guided-boat-wake wake-b"></span>
         <img class="mission-guided-boat" src="./img/barco.png" alt="" />
       </div>
-      <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la mision">
+      <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la misión">
         <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("route")}</span>
         <span class="mission-guided-side-copy">
           <strong>${sideTitle}</strong>
@@ -1168,7 +1168,7 @@ function renderPathGuidedMission(challenge, localState, mission) {
           <small>Volver</small>
         </button>
       </aside>
-      <section class="mission-guided-top" aria-label="Estado de la mision">
+      <section class="mission-guided-top" aria-label="Estado de la misión">
         <img src="${PATH_GUIDED_ART.topPanel}" alt="" aria-hidden="true" />
         <div class="mission-guided-top-copy">
           <h1>${mission.title}</h1>
@@ -1378,7 +1378,7 @@ function renderChallengeBody(challenge, localState, mission) {
                         </span>
                         <div class="mission-reorder-popover-copy">
                           <strong>${activeStep}</strong>
-                          <span>Mueve esta carta desde aqui.</span>
+                          <span>Mueve esta carta desde aquí.</span>
                         </div>
                       </div>
                       <div class="mission-reorder-popover-actions">
@@ -1440,7 +1440,7 @@ function renderChallengeBody(challenge, localState, mission) {
           <span class="fish-b"></span>
           <span class="fish-c"></span>
         </div>
-        <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la mision">
+        <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la misión">
           <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon(sideIconName)}</span>
           <span class="mission-guided-side-copy">
             <strong>Mision ${mission.number}</strong>
@@ -1458,7 +1458,7 @@ function renderChallengeBody(challenge, localState, mission) {
             <small>Volver</small>
           </button>
         </aside>
-        <section class="mission-guided-top mission-first-steps-top" aria-label="Estado de la mision">
+        <section class="mission-guided-top mission-first-steps-top" aria-label="Estado de la misión">
           <img src="${PATH_GUIDED_ART.topPanel}" alt="" aria-hidden="true" />
           <div class="mission-guided-top-copy">
             <h1>${mission.title}</h1>
@@ -1502,10 +1502,10 @@ function renderChallengeBody(challenge, localState, mission) {
             <span class="fish-c"></span>
           </div>
 
-          <aside class="mission-guided-side-card mission-guided-side-card-left mission5-top-card" aria-label="Datos de la mision">
+          <aside class="mission-guided-side-card mission-guided-side-card-left mission5-top-card" aria-label="Datos de la misión">
             <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span>
             <span class="mission-guided-side-copy">
-              <strong>Nivel 4</strong>
+              <strong>Yo Aprendo</strong>
               <small>${mission.title}</small>
             </span>
             <b><span class="mission-guided-coin-icon" aria-hidden="true"></span>${mission.coins || 0}</b>
@@ -1533,12 +1533,12 @@ function renderChallengeBody(challenge, localState, mission) {
             </span>
           </button>
 
-          <aside class="mission5-hud" aria-label="Panel de la mision">
-            <span class="mission5-hud-eyebrow">Micro-mision</span>
+          <aside class="mission5-hud" aria-label="Panel de la misión">
+            <span class="mission5-hud-eyebrow">Micro-misión</span>
             <h1>${mission.title}</h1>
             <div class="mission5-hud-rule" aria-hidden="true"></div>
             <div class="mission5-hud-dialog">
-              <p>Una roca bloquea el camino. Elige la ruta que evita el obstaculo y llega hasta el faro.</p>
+              <p>Una roca bloquea el camino. Elige la ruta que evita el obstáculo y llega hasta el faro.</p>
             </div>
             <div class="mission5-robot-wrap" aria-hidden="true">
               <img src="${MISSION5_ART.robot}" alt="" />
@@ -1585,7 +1585,7 @@ function renderChallengeBody(challenge, localState, mission) {
             <span class="fish-b"></span>
             <span class="fish-c"></span>
           </div>
-          <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la mision">
+          <aside class="mission-guided-side-card mission-guided-side-card-left" aria-label="Datos de la misión">
             <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("book")}</span>
             <span class="mission-guided-side-copy">
               <strong>Mision ${mission.number}</strong>
@@ -1603,7 +1603,7 @@ function renderChallengeBody(challenge, localState, mission) {
               <small>Volver</small>
             </button>
           </aside>
-          <section class="mission-guided-top mission-error-hunt-top" aria-label="Estado de la mision">
+          <section class="mission-guided-top mission-error-hunt-top" aria-label="Estado de la misión">
             <img src="${PATH_GUIDED_ART.topPanel}" alt="" aria-hidden="true" />
             <div class="mission-guided-top-copy">
               <h1>${mission.title}</h1>
@@ -1717,7 +1717,7 @@ function renderChallengeBody(challenge, localState, mission) {
 
   if (challenge.type === "categorize") {
     return `
-      <p class="mission-helper">Haz click en cada tarjeta para cambiarla de categoria hasta que todo quede bien organizado.</p>
+      <p class="mission-helper">Haz click en cada tarjeta para cambiarla de categoría hasta que todo quede bien organizado.</p>
       <div class="mission-categories">
         ${(challenge.items || [])
           .map((item, index) => `
@@ -1815,7 +1815,7 @@ function renderChallengeBody(challenge, localState, mission) {
 
   if (challenge.type === "loop-builder") {
     return `
-      <p class="mission-helper">Arma un bucle eligiendo cuantas veces se repite la accion y que bloque se repite.</p>
+      <p class="mission-helper">Arma un bucle eligiendo cuántas veces se repite la acción y qué bloque se repite.</p>
       <div class="mission-loop-layout">
         <div class="mission-loop-card">
           <div class="eyebrow">Repetir</div>
@@ -1870,7 +1870,7 @@ function renderChallengeBody(challenge, localState, mission) {
     `;
   }
 
-  return `<p>No hay un reto configurado para esta mision.</p>`;
+  return `<p>No hay un reto configurado para esta misión.</p>`;
 }
 
 export function renderMission() {
@@ -1911,7 +1911,7 @@ export function renderMission() {
     if (challenge.type === "reorder") return "Enviar al robot";
     if (challenge.type === "path-program") return mission.id === "4-1-3" ? "Completar" : "Confirmar ruta";
     if (challenge.type === "loop-builder") return "Activar bucle";
-    return "Probar solucion";
+    return "Probar solución";
   }
 
   function stopAnimation() {
@@ -1981,7 +1981,7 @@ export function renderMission() {
         <div class="topbar-left">
           <div class="pill level-pill mission-header-pill">
           <span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span>
-            <span>Nivel 4</span>
+            <span>Yo Aprendo</span>
           </div>
           <div class="mission-header-chevron" aria-hidden="true">${uiIcon("arrow-right")}</div>
           <div class="pill title-pill mission-header-pill mission-header-pill-title"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("flag")}</span><span>${mission.title}</span></div>
@@ -2023,7 +2023,7 @@ export function renderMission() {
                 }
               </div>
               <div>
-                <div class="eyebrow">Micro-mision</div>
+                <div class="eyebrow">Micro-misión</div>
                 <h1>${mission.title}</h1>
                 <p class="mission-prompt">${challenge.prompt || "Resuelve el reto para seguir avanzando."}</p>
                 <div class="mission-meta-row mission-meta-row-hero">
@@ -2104,8 +2104,8 @@ export function renderMission() {
           success: true,
           title: reward.awarded ? "Muy bien" : "Mision repasada",
           message: reward.awarded
-            ? challenge.successMessage || "Superaste la mision."
-            : "Ya habias cobrado esta recompensa. El repaso mantiene tu progreso sin duplicar premios.",
+            ? challenge.successMessage || "Superaste la misión."
+            : "Ya habías cobrado esta recompensa. El repaso mantiene tu progreso sin duplicar premios.",
           coins: reward.coins,
           gems: reward.gems
         });
@@ -2114,7 +2114,7 @@ export function renderMission() {
         goToResult({
           success: false,
           title: "Casi",
-          message: "Todavia no es la mejor solucion. Revisa el reto y prueba otra vez.",
+          message: "Todavía no es la mejor solución. Revisá el reto y probá otra vez.",
           coins: 0,
           gems: 0
         });
@@ -2289,8 +2289,8 @@ export function renderMission() {
             success: true,
             title: reward.awarded ? "Muy bien" : "Mision repasada",
             message: reward.awarded
-              ? challenge.successMessage || "Superaste la mision."
-              : "Ya habias cobrado esta recompensa. El repaso mantiene tu progreso sin duplicar premios.",
+              ? challenge.successMessage || "Superaste la misión."
+              : "Ya habías cobrado esta recompensa. El repaso mantiene tu progreso sin duplicar premios.",
             coins: reward.coins,
             gems: reward.gems
           });

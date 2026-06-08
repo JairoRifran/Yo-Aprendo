@@ -91,7 +91,7 @@ const WORLD_STORY_COPY = {
   "world-sequences": {
     chapter: "Capitulo 1: La ruta despierta",
     story:
-      "El Archipielago del Codigo perdio la energia de sus faros. Para encender el primero, {playerName} y Bit deben descubrir que toda aventura empieza con una secuencia: pasos claros, en el orden correcto.",
+      "El Archipiélago del Codigo perdió la energía de sus faros. Para encender el primero, {playerName} y Bit deben descubrir que toda aventura empieza con una secuencia: pasos claros, en el orden correcto.",
     theory:
       "Una secuencia es un algoritmo simple: una lista de instrucciones que se ejecutan una tras otra. Si cambiamos el orden, cambia el resultado.",
     objective:
@@ -100,29 +100,29 @@ const WORLD_STORY_COPY = {
   "world-loops": {
     chapter: "Capitulo 2: El molino de los patrones",
     story:
-      "En esta isla, las olas, las aspas y las huellas repiten movimientos. El robot aprende a no dar la misma orden una y otra vez: puede usar bucles para ahorrar energia.",
+      "En esta isla, las olas, las aspas y las huellas repiten movimientos. El robot aprende a no dar la misma orden una y otra vez: puede usar bucles para ahorrar energía.",
     theory:
-      "Un bucle repite una instruccion o grupo de instrucciones varias veces. Sirve cuando aparece un patron y queremos escribir menos pasos.",
+      "Un bucle repite una instruccion o grupo de instrucciones varias veces. Sirve cuando aparece un patrón y queremos escribir menos pasos.",
     objective:
-      "Detecta repeticiones y conviertelas en instrucciones mas cortas."
+      "Detecta repeticiones y conviertelas en instrucciones más cortas."
   },
   "world-decisions": {
     chapter: "Capitulo 3: Las puertas que piensan",
     story:
       "Los caminos se dividen y cada puerta pide una regla. Sofi debe leer las pistas del entorno para decidir: si pasa algo, toma un camino; si no, toma otro.",
     theory:
-      "Una decision usa condiciones. En programacion se parece a decir: si se cumple esta regla, hago una accion; si no, hago otra.",
+      "Una decisión usa condiciones. En programacion se parece a decir: si se cumple esta regla, hago una acción; si no, hago otra.",
     objective:
-      "Elige reglas, compara casos y resuelve caminos alternativos."
+      "Elige reglas, compará casos y resuelve caminos alternativos."
   },
   "world-data": {
-    chapter: "Capitulo 4: El mapa de la creacion",
+    chapter: "Capitulo 4: El mapa de la creación",
     story:
-      "Para reparar el gran faro final, la tripulacion necesita ordenar objetos, contar pistas y transformar informacion en una solucion propia.",
+      "Para reparar el gran faro final, la tripulacion necesita ordenar objetos, contar pistas y transformar información en una solución propia.",
     theory:
-      "Los datos son informacion que podemos clasificar, contar y comparar. Cuando los organizamos bien, nos ayudan a tomar mejores decisiones.",
+      "Los datos son información que podemos clasificar, contar y comparar. Cuando los organizamos bien, nos ayudan a tomar mejores decisiones.",
     objective:
-      "Clasifica, cuenta, compara y crea una respuesta para toda la isla."
+      "Clasifica, cuenta, compará y crea una respuesta para toda la isla."
   }
 };
 
@@ -132,8 +132,8 @@ function getWorldStoryCopy(world) {
     story:
       "Cada isla guarda una parte del pensamiento computacional. Explorarla ayuda al robot a recuperar el mapa completo.",
     theory:
-      "Pensar como programador significa dividir un problema en partes, probar ideas y mejorar la solucion paso a paso.",
-    objective: "Explora misiones y desbloquea el siguiente aprendizaje."
+      "Pensar como programador significa dividir un problema en partes, probar ideas y mejorar la solución paso a paso.",
+    objective: "Explorá misiones y desbloquea el siguiente aprendizaje."
   };
 }
 
@@ -291,8 +291,8 @@ function renderWorldMapShell() {
   appShell.innerHTML = `
     <header class="topbar world-map-hidden-topbar">
       <div class="topbar-left">
-        <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Nivel 4</span></div>
-        <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span><span>Mundos de 4.º</span></div>
+        <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Yo Aprendo</span></div>
+        <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span><span>Mapa de Aventuras</span></div>
       </div>
 
       <div class="topbar-right">
@@ -316,8 +316,8 @@ function renderWorldMapShell() {
           <aside class="mission-guided-side-card mission-guided-side-card-left world-map-hud-card world-map-hud-card-left" aria-label="Nivel actual">
             <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span>
             <span class="mission-guided-side-copy">
-              <strong>Nivel 4</strong>
-              <small>Mundos de 4.º</small>
+              <strong>Yo Aprendo</strong>
+              <small>Mapa de Aventuras</small>
             </span>
           </aside>
           <aside class="mission-guided-side-card mission-guided-side-card-right world-map-hud-card world-map-hud-card-right" aria-label="Navegacion y premios">
@@ -359,18 +359,18 @@ function renderWorldMapShell() {
           </div>
           <div class="scene-guide" aria-live="polite">
             <div class="scene-guide-bubble">
-              <div class="scene-guide-kicker">Tu guia de aventura</div>
+              <div class="scene-guide-kicker">Tu guía de aventura</div>
               <strong>Hola, ${playerName}</strong>
-              <p id="sceneGuideText">Soy Bit, tu robot explorador. El gran faro del Archipielago del Codigo se apago, y cada isla guarda una idea para repararlo: ordenar, repetir, decidir y crear con datos.</p>
-              <button class="scene-guide-help-btn" id="sceneGuideHelpBtn" type="button">Que hago ahora?</button>
+              <p id="sceneGuideText">Soy Bit, tu robot explorador. El gran faro del Archipiélago del Codigo se apagó, y cada isla guarda una idea para repararlo: ordenar, repetir, decidir y crear con datos.</p>
+              <button class="scene-guide-help-btn" id="sceneGuideHelpBtn" type="button">¿Qué hago ahora?</button>
             </div>
             <div class="scene-guide-avatar">
-              <img src="./img/mission-robot-pirate.png" alt="Robot guia" />
+              <img src="./img/mission-robot-pirate.png" alt="Robot guía" />
             </div>
           </div>
           <div class="scene-vignette"></div>
           <div class="scene-glow"></div>
-          <div class="scene-label">Explorá los mundos de 4.º y elegí tu próxima aventura ✨</div>
+          <div class="scene-label">Explorá los mundos y elegí tu próxima aventura ✨</div>
         </div>
       </section>
 
@@ -462,21 +462,21 @@ function bootstrapWorldMap() {
 
   if (playBtn) playBtn.textContent = "Entrar";
   if (eyebrow) eyebrow.textContent = "Mundo actual";
-  if (sceneLabel) sceneLabel.textContent = "Recupera el mapa del codigo: cada isla enseÃ±a una pieza de la aventura";
+  if (sceneLabel) sceneLabel.textContent = "Recupera el mapa del código: cada isla enseña una pieza de la aventura";
   if (titlePill) {
     titlePill.innerHTML =
-      `<span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span><span>Mundos de 4.º</span>`;
+      `<span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span><span>Mapa de Aventuras</span>`;
   }
-  if (sceneLabel) sceneLabel.textContent = "Explorá los mundos de 4.º y elegí tu próxima aventura ✨";
+  if (sceneLabel) sceneLabel.textContent = "Explorá los mundos y elegí tu próxima aventura ✨";
   if (tipsCard) {
     tipsCard.textContent =
       "Cada isla representa un mundo de aprendizaje. Entrá a una isla para ver sus micro-misiones y avanzar paso a paso.";
   }
 
-  if (sceneLabel) sceneLabel.textContent = "Recupera el mapa del codigo: cada isla ensena una pieza de la aventura";
+  if (sceneLabel) sceneLabel.textContent = "Recupera el mapa del código: cada isla enseña una pieza de la aventura";
   if (tipsCard) {
     tipsCard.textContent =
-      "La historia avanza con cada mision: primero ordenas pasos, despues reconoces patrones, luego tomas decisiones y finalmente usas datos para crear soluciones.";
+      "La historia avanza con cada misión: primero ordenas pasos, después reconoces patrones, luego tomas decisiones y finalmente usas datos para crear soluciones.";
   }
 
   let selectedWorld = null;
@@ -1322,7 +1322,7 @@ function bootstrapWorldMap() {
     ctx.fill();
 
     ctx.fillStyle = palette.ribbonText;
-    ctx.font = "800 8px Inter, sans-serif";
+    ctx.font = "800 8px Fredoka, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("ACTUAL", 0, 0.5);
@@ -1446,7 +1446,7 @@ function bootstrapWorldMap() {
     ctx.shadowColor = "rgba(0, 0, 0, 0.26)";
     ctx.shadowBlur = 2;
     ctx.shadowOffsetY = 1;
-    ctx.font = `${selected || status === "current" ? 900 : 800} 13px Inter, sans-serif`;
+    ctx.font = `${selected || status === "current" ? 900 : 800} 13px Fredoka, sans-serif`;
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     ctx.fillText(title, left + 13, top + 20);
@@ -1456,7 +1456,7 @@ function bootstrapWorldMap() {
     ctx.fillStyle = palette.subtext;
     ctx.shadowColor = "rgba(255, 255, 255, 0.16)";
     ctx.shadowBlur = 1;
-    ctx.font = "900 9px Inter, sans-serif";
+    ctx.font = "900 9px Fredoka, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     ctx.fillText(markerStateText(world).toUpperCase(), left + 13, top + 35);
@@ -1492,7 +1492,7 @@ function bootstrapWorldMap() {
     ctx.stroke();
 
     ctx.fillStyle = palette.badgeText;
-    ctx.font = "900 13px Inter, sans-serif";
+    ctx.font = "900 13px Fredoka, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(String(world.number), safeX, by + badgeH / 2 + 0.5);
@@ -2083,7 +2083,7 @@ function bootstrapWorldMap() {
       playLocked();
       if (sceneGuideText) {
         sceneGuideText.textContent =
-          "Esa isla todavia esta bloqueada. Primero completa la isla disponible para reunir energia del faro; cuando avances, Bit abrira nuevos caminos del mapa.";
+          "Esa isla todavía esta bloqueada. Primero completa la isla disponible para reunir energía del faro; cuando avances, Bit abrira nuevos caminos del mapa.";
         sceneGuideText.classList.remove("is-helping");
         void sceneGuideText.offsetWidth;
         sceneGuideText.classList.add("is-helping");
@@ -2140,7 +2140,7 @@ function bootstrapWorldMap() {
 
     if (sceneGuideText) {
       sceneGuideText.textContent =
-        "Ahora toca la isla de Secuencias. Alli aprenderas a ordenar pasos como un algoritmo. Al entrar, te explicare la historia, que tienes que hacer y que premios puedes ganar.";
+        "Ahora toca la isla de Secuencias. Alli aprenderás a ordenar pasos como un algoritmo. Al entrar, te explicare la historia, que tienes que hacer y que premios puedes ganar.";
       sceneGuideText.classList.remove("is-helping");
       void sceneGuideText.offsetWidth;
       sceneGuideText.classList.add("is-helping");
@@ -2213,7 +2213,7 @@ function renderWorldMap() {
   bootstrapWorldMap();
 }
 
-window.renderApp = function renderApp() {
+function executeRender() {
   destroyWorldMapRuntime();
   setupGlobalAudioUnlock();
   const studentGameViews = new Set(["world-map", "submap", "mission", "result"]);
@@ -2259,6 +2259,33 @@ window.renderApp = function renderApp() {
   }
 
   renderWorldMap();
+}
+
+let isTransitioningView = false;
+window.renderApp = function renderApp() {
+  const appShell = document.querySelector(".app-shell");
+
+  if (appShell && !isTransitioningView) {
+    isTransitioningView = true;
+    appShell.classList.add("view-transitioning");
+
+    setTimeout(() => {
+      executeRender();
+
+      requestAnimationFrame(() => {
+        const newAppShell = document.querySelector(".app-shell");
+        if (newAppShell) {
+          newAppShell.classList.add("view-transitioning");
+          void newAppShell.offsetWidth;
+          newAppShell.classList.remove("view-transitioning");
+        }
+        isTransitioningView = false;
+      });
+    }, 160);
+    return;
+  }
+
+  executeRender();
 };
 
 window.renderApp();

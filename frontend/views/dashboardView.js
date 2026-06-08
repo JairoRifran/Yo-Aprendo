@@ -142,13 +142,13 @@ function renderLoadingShell(backLabel) {
   return `
     <header class="topbar">
       <div class="topbar-left">
-        <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Nivel 4</span></div>
+        <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Yo Aprendo</span></div>
         <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span><span>Paneles de seguimiento</span></div>
       </div>
 
       <div class="topbar-right">
         <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span><span>${backLabel}</span></button>
-        <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesion</span></button>
+        <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesión</span></button>
       </div>
     </header>
 
@@ -156,7 +156,7 @@ function renderLoadingShell(backLabel) {
       <section class="dashboard-panel">
         <div class="dashboard-loading-card">
           <strong>Cargando panel...</strong>
-          <p>Estamos preparando la informacion del rol seleccionado.</p>
+          <p>Estamos preparando la información del rol seleccionado.</p>
         </div>
       </section>
     </main>
@@ -339,7 +339,7 @@ function renderGuideCard(roleClass, title, text, bullets = []) {
       <div class="dashboard-guide-head">
         <span class="dashboard-guide-icon ${roleClass}" aria-hidden="true">${renderDashboardIcon(roleClass)}</span>
         <div>
-          <div class="eyebrow">Guia rapida</div>
+          <div class="eyebrow">Guía rapida</div>
           <h2>${title}</h2>
         </div>
       </div>
@@ -391,7 +391,7 @@ function ownerModules() {
     { id: "progress", icon: "progress", label: "Aprendizajes", hint: "Avance por concepto" },
     { id: "teachers", icon: "teacher", label: "Docentes", hint: "Equipos vinculados" },
     { id: "families", icon: "family", label: "Familias", hint: "Acompanamiento familiar" },
-    { id: "minutes", icon: "timer", label: "Uso semanal", hint: "Minutos y adopcion" },
+    { id: "minutes", icon: "timer", label: "Uso semanal", hint: "Minutos y adopción" },
     { id: "alerts", icon: "support", label: "Alertas", hint: "Riesgos de seguimiento" }
   ];
 }
@@ -399,7 +399,7 @@ function ownerModules() {
 function roleModules(role) {
   const configs = {
     student: [
-      { id: "student-overview", icon: "compass", label: "Resumen", hint: "Progreso y proxima mision" },
+      { id: "student-overview", icon: "compass", label: "Resumen", hint: "Progreso y próxima misión" },
       { id: "student-progress-map", icon: "trending-up", label: "Mapa de avance", hint: "Conceptos por isla" },
       { id: "student-showcase", icon: "badge", label: "Logros", hint: "Vitrina y foco" }
     ],
@@ -410,10 +410,10 @@ function roleModules(role) {
     ],
     teacher: [
       { id: "teacher-overview", icon: "monitor", label: "Resumen docente", hint: "Aula, actividad y alertas" },
-      { id: "teacher-groups", icon: "users", label: "Grupos", hint: "Aulas y codigos" },
+      { id: "teacher-groups", icon: "users", label: "Grupos", hint: "Aulas y códigos" },
       { id: "teacher-student-register", icon: "user", label: "Alumnos", hint: "Registro en aula" },
       { id: "teacher-guardian-access", icon: "heart", label: "Familias", hint: "Accesos observadores" },
-      { id: "teacher-alerts", icon: "check", label: "Alertas", hint: "A quien acompanar" }
+      { id: "teacher-alerts", icon: "check", label: "Alertas", hint: "A quién acompañar" }
     ],
     institution: [
       { id: "institution-overview", icon: "school", label: "Resumen institucional", hint: "Centro, plan y uso" },
@@ -545,7 +545,7 @@ function ownerMetricConfig(metric) {
     },
     progress: {
       title: "Avance promedio",
-      subtitle: "Progreso agregado por concepto para evidencia pedagogica.",
+      subtitle: "Progreso agregado por concepto para evidencia pedagógica.",
       columns: ["Concepto", "Avance"],
       rows: (data) => (data.details?.progress || data.concept_overview || []).map((item) => [
         item.title,
@@ -576,7 +576,7 @@ function ownerMetricConfig(metric) {
     },
     minutes: {
       title: "Minutos semanales",
-      subtitle: "Ranking de uso para detectar adopcion y recurrencia.",
+      subtitle: "Ranking de uso para detectar adopción y recurrencia.",
       columns: ["Alumno", "Institucion", "Minutos", "Avance"],
       rows: (data) => (data.details?.minutes || []).map((item) => [
         item.name,
@@ -587,7 +587,7 @@ function ownerMetricConfig(metric) {
     },
     alerts: {
       title: "Alertas",
-      subtitle: "Alumnos que requieren seguimiento pedagogico o de adopcion.",
+      subtitle: "Alumnos que requieren seguimiento pedagogico o de adopción.",
       columns: ["Alumno", "Institucion", "Aula", "Estado", "Necesita apoyo", "Mensaje"],
       rows: (data) => (data.details?.alerts || []).map((item) => [
         item.name,
@@ -659,7 +659,7 @@ function renderOwnerTable(data, metric) {
                     `
                   )
                   .join("")
-              : `<div class="dashboard-mini-item"><span>Todavia no hay datos para esta metrica.</span></div>`
+              : `<div class="dashboard-mini-item"><span>Todavia no hay datos para esta métrica.</span></div>`
           }
         </div>
       </article>
@@ -689,17 +689,17 @@ function renderTeacherPanel(data) {
           [
             "Empieza por activos hoy para medir presencia real.",
             "Suma alumnos desde el grupo correcto para evitar desorden.",
-            "Abre acceso a familias cuando quieras extender el acompanamiento."
+            "Abre acceso a familias cuando quieras extender el acompañamiento."
           ]
         )}
 
         <article class="dashboard-card dashboard-action-card">
           <div class="eyebrow">Que conviene hacer ahora</div>
-          <h2>Pasos del dia</h2>
+          <h2>Pasos del día</h2>
           <div class="dashboard-action-list">
-            ${renderActionItem("roster", "Revisar grupos y codigos", "Confirma que cada aula tenga sus alumnos y acceso listos.", "teacher-groups")}
+            ${renderActionItem("roster", "Revisar grupos y códigos", "Confirma que cada aula tenga sus alumnos y acceso listos.", "teacher-groups")}
             ${renderActionItem("play", "Mirar alertas primero", "Empieza por quienes no entraron o muestran menor avance.", "teacher-alerts")}
-            ${renderActionItem("family", "Abrir acompanamiento familiar", "Vincula familias para que observen y acompanen desde casa.", "teacher-guardian-access")}
+            ${renderActionItem("family", "Abrir acompañamiento familiar", "Vincula familias para que observen y acompanen desde casa.", "teacher-guardian-access")}
           </div>
         </article>
       </div>
@@ -707,7 +707,7 @@ function renderTeacherPanel(data) {
       <div class="dashboard-grid dashboard-grid-4">
         ${renderStatCard("groups", "Grupos a cargo", data.summary.classroom_count, "Asignados a esta docente.", "teacher-groups")}
         ${renderStatCard("students", "Alumnos", data.summary.student_count, "Total del aula bajo seguimiento.", "teacher-student-register")}
-        ${renderStatCard("today", "Activos hoy", data.summary.active_today, "Entraron al menos una vez en el dia.", "teacher-alerts")}
+        ${renderStatCard("today", "Activos hoy", data.summary.active_today, "Entraron al menos una vez en el día.", "teacher-alerts")}
         ${renderStatCard("progress", "Avance promedio", `${data.summary.avg_completion}%`, "Lectura rapida del ritmo del grupo.", "teacher-groups")}
       </div>
 
@@ -721,7 +721,7 @@ function renderTeacherPanel(data) {
                 (classroom) => `
                   <div class="dashboard-mini-item">
                     <strong>${classroom.name}</strong>
-                    <span>${classroom.student_count} alumnos - codigo ${classroom.group_code}</span>
+                    <span>${classroom.student_count} alumnos - código ${classroom.group_code}</span>
                   </div>
                 `
               )
@@ -734,7 +734,7 @@ function renderTeacherPanel(data) {
           <h2>Registro en el aula</h2>
           <div class="dashboard-highlight">
             <strong>Aulas asignadas</strong>
-            <p>El docente puede registrar alumnos dentro de sus grupos asignados. La creacion de nuevos grupos queda en el panel institucional para mantener la estructura del centro ordenada.</p>
+            <p>El docente puede registrar alumnos dentro de sus grupos asignados. La creación de nuevos grupos queda en el panel institucional para mantener la estructura del centro ordenada.</p>
           </div>
           <form id="createStudentForm" class="dashboard-form-grid dashboard-form-grid-compact">
             <select class="dashboard-input" name="classroom_id" required>
@@ -765,7 +765,7 @@ function renderTeacherPanel(data) {
 
         <article class="dashboard-card" id="teacher-alerts">
           <div class="eyebrow">Alertas docentes</div>
-          <h2>A quien acompanar</h2>
+          <h2>A quién acompañar</h2>
           <div class="dashboard-mini-list">
             ${data.alerts
               .map(
@@ -800,7 +800,7 @@ function renderStudentPanel(data) {
           <p>${student.grade_label}. Este panel muestra tu progreso, tus logros y que aventura conviene jugar ahora.</p>
         </div>
         <div class="dashboard-hero-badge">
-          <strong>${data.streak_days} dias</strong>
+          <strong>${data.streak_days} días</strong>
           <span>de racha</span>
         </div>
       </div>
@@ -809,7 +809,7 @@ function renderStudentPanel(data) {
         ${renderGuideCard(
           "student",
           "Tu mapa de avance",
-          "Aqui ves tu progreso, lo que mejor te sale y cual es la siguiente aventura que mas te conviene jugar.",
+          "Aqui ves tu progreso, lo que mejor te sale y cual es la siguiente aventura que más te conviene jugar.",
           [
             "Mira progreso total para saber cuanto te falta.",
             "Sigue la siguiente aventura sugerida para avanzar mejor.",
@@ -821,8 +821,8 @@ function renderStudentPanel(data) {
           <div class="eyebrow">Que puedes hacer ahora</div>
           <h2>Listo para seguir</h2>
           <div class="dashboard-action-list">
-            ${renderActionItem("compass", "Ir a la siguiente mision", `${data.next_mission.world} - ${data.next_mission.title}`, "student-progress-map")}
-            ${renderActionItem("badge", "Cuidar tu racha", `Llevas ${data.streak_days} dias. Una mision corta ya suma.`, "student-showcase")}
+            ${renderActionItem("compass", "Ir a la siguiente misión", `${data.next_mission.world} - ${data.next_mission.title}`, "student-progress-map")}
+            ${renderActionItem("badge", "Cuidar tu racha", `Llevas ${data.streak_days} días. Una misión corta ya suma.`, "student-showcase")}
             ${renderActionItem("lightbulb", "Usar tu superpoder", `${strongest?.title || "Explorar"} es donde vienes resolviendo mejor.`, "student-showcase")}
           </div>
         </article>
@@ -833,7 +833,7 @@ function renderStudentPanel(data) {
         ${renderStatCard("coins", "Monedas", data.wallet.coins, `${data.wallet.earnedCoins} ganadas en misiones completadas.`, "student-showcase")}
         ${renderStatCard("gems", "Gemas", data.wallet.gems, `${data.wallet.earnedGems} ganadas en misiones completadas.`, "student-showcase")}
         ${renderStatCard("energy", "Energia de juego", `${data.energy}%`, "Buen nivel para sesiones cortas y con reto.", "student-showcase")}
-        ${renderStatCard("spark", "Superpoder actual", strongest?.title || "Explorar", "Es el concepto donde viene mostrando mas seguridad.", "student-showcase")}
+        ${renderStatCard("spark", "Superpoder actual", strongest?.title || "Explorar", "Es el concepto donde viene mostrando más seguridad.", "student-showcase")}
         ${renderStatCard("mission", "Siguiente aventura", data.next_mission.number, `${data.next_mission.world} - ${data.next_mission.title}`, "student-progress-map")}
       </div>
 
@@ -867,7 +867,7 @@ function renderStudentPanel(data) {
             ${data.badges.map((badge) => `<span class="dashboard-badge-chip">${badge}</span>`).join("")}
           </div>
           <div class="dashboard-highlight">
-            <strong>Consejo del dia</strong>
+            <strong>Consejo del día</strong>
             <p>${data.focus_tip}</p>
           </div>
           <div class="dashboard-highlight secondary">
@@ -894,7 +894,7 @@ function renderParentPanel(data) {
         <div>
           <div class="eyebrow">Panel para familias</div>
           <h1>${data.guardian.name}</h1>
-          <p>Traducimos el juego a aprendizaje real para que puedan acompanar sin volver la experiencia escolar o pesada.</p>
+          <p>Traducimos el juego a aprendizaje real para que puedan acompañar sin volver la experiencia escolar o pesada.</p>
         </div>
         <div class="dashboard-hero-badge">
           <strong>${summary.weekly_minutes} min</strong>
@@ -919,16 +919,16 @@ function renderParentPanel(data) {
           <h2>Como ayudar hoy</h2>
           <div class="dashboard-action-list">
             ${renderActionItem("family", "Mirar la semana", `${summary.weekly_minutes} minutos jugados con foco en ${summary.strongest}.`, "parent-weekly-reading")}
-            ${renderActionItem("timer", "Hablar dos minutos", "Una charla breve ayuda mas que corregirle la respuesta.", "parent-home-actions")}
+            ${renderActionItem("timer", "Hablar dos minutos", "Una charla breve ayuda más que corregirle la respuesta.", "parent-home-actions")}
             ${renderActionItem("lightbulb", "Guiar con preguntas", "Preguntas simples fortalecen autonomia y confianza.", "parent-home-actions")}
           </div>
         </article>
       </div>
 
       <div class="dashboard-grid dashboard-grid-3">
-        ${renderStatCard("spark", "Que esta aprendiendo", summary.strongest, "Es el concepto donde muestra mas confianza.", "parent-weekly-reading")}
-        ${renderStatCard("support", "Autonomia", child?.autonomy || "En observacion", "Se observa mejor respuesta cuando la mision tiene objetivo claro y visual.", "parent-home-actions")}
-        ${renderStatCard("family", "Necesita apoyo en", summary.needs_support, "Conviene acompanar con preguntas cortas y sin anticipar la respuesta.", "parent-home-actions")}
+        ${renderStatCard("spark", "Que esta aprendiendo", summary.strongest, "Es el concepto donde muestra más confianza.", "parent-weekly-reading")}
+        ${renderStatCard("support", "Autonomia", child?.autonomy || "En observación", "Se observa mejor respuesta cuando la misión tiene objetivo claro y visual.", "parent-home-actions")}
+        ${renderStatCard("family", "Necesita apoyo en", summary.needs_support, "Conviene acompañar con preguntas cortas y sin anticipar la respuesta.", "parent-home-actions")}
       </div>
 
       <div class="dashboard-grid dashboard-grid-2">
@@ -1004,7 +1004,7 @@ function renderInstitutionPanel(data) {
           <div>
             <div class="eyebrow">Mi plan</div>
             <h2>${subscription.plan_key === "trial" ? "Piloto activo" : subscription.plan_key}</h2>
-            <p>Converti el piloto en una implementacion estable con mas grupos, mas evidencia pedagogica y reportes listos para direccion o referentes institucionales.</p>
+            <p>Converti el piloto en una implementacion estable con más grupos, más evidencia pedagógica y reportes listos para direccion o referentes institucionales.</p>
           </div>
           <div class="institution-plan-meter">
             <span>Uso actual</span>
@@ -1025,7 +1025,7 @@ function renderInstitutionPanel(data) {
           ${renderInstitutionPlanCard({
             name: "Piloto",
             badge: "Activo ahora",
-            price: "90 dias gratis",
+            price: "90 días gratis",
             audience: "Para validar Yo Aprendo en una escuela o grupo inicial.",
             features: ["Hasta 50 alumnos", "2 docentes", "Seguimiento institucional", "Soporte de activacion"],
             cta: "Continuar piloto",
@@ -1045,7 +1045,7 @@ function renderInstitutionPanel(data) {
             badge: "A medida",
             price: "Convenio",
             audience: "Para Ceibal, redes, inspecciones o despliegues con SSO.",
-            features: ["Multiples instituciones", "Reportes agregados", "Integracion institucional", "Acompanamiento de adopcion"],
+            features: ["Multiples instituciones", "Reportes agregados", "Integracion institucional", "Acompanamiento de adopción"],
             cta: "Hablar por convenio",
             tone: "enterprise"
           })}
@@ -1054,7 +1054,7 @@ function renderInstitutionPanel(data) {
         <div class="institution-plan-proof">
           <div>
             <strong>Por que avanzar ahora</strong>
-            <p>Cuando el piloto pasa a uso semanal, el valor deja de estar en probar la herramienta y pasa a ordenar adopcion, seguimiento y evidencia para tomar decisiones.</p>
+            <p>Cuando el piloto pasa a uso semanal, el valor deja de estar en probar la herramienta y pasa a ordenar adopción, seguimiento y evidencia para tomar decisiones.</p>
           </div>
           <button class="btn btn-primary" type="button">Quiero ampliar mi plan</button>
         </div>
@@ -1068,7 +1068,7 @@ function renderInstitutionPanel(data) {
           [
             "Valida grupos activos y alumnos cargados.",
             "Registra alumnos desde el aula correcta.",
-            "Abre acceso familiar para ampliar el acompanamiento."
+            "Abre acceso familiar para ampliar el acompañamiento."
           ]
         )}
 
@@ -1077,17 +1077,17 @@ function renderInstitutionPanel(data) {
           <h2>Gestion clara</h2>
           <div class="dashboard-action-list">
             ${renderActionItem("groups", "Ordenar la estructura", "La escuela y los docentes dan el alta; las familias solo observan.", "institution-groups")}
-            ${renderActionItem("chart", "Mirar actividad y alertas", "Prioriza acompanamiento donde haya menos avance o asistencia baja.", "institution-alerts")}
+            ${renderActionItem("chart", "Mirar actividad y alertas", "Prioriza acompañamiento donde haya menos avance o asistencia baja.", "institution-alerts")}
             ${renderActionItem("family", "Invitar familias", "El acceso observador ayuda a casa sin desordenar el seguimiento escolar.", "institution-guardian-access")}
           </div>
         </article>
       </div>
 
       <div class="dashboard-grid dashboard-grid-4">
-        ${renderStatCard("groups", "Grupos activos", data.summary.classroom_count, "Con codigos de acceso y asignacion visible.", "institution-groups")}
+        ${renderStatCard("groups", "Grupos activos", data.summary.classroom_count, "Con códigos de acceso y asignación visible.", "institution-groups")}
         ${renderStatCard("students", "Alumnos", data.summary.student_count, "Total del recorrido institucional.", "institution-student-register")}
-        ${renderStatCard("today", "Activos hoy", data.summary.active_today, "Ingresaron y jugaron al menos una mision.", "institution-alerts")}
-        ${renderStatCard("family", "Familias vinculadas", data.summary.linked_guardians, "Con acceso de observacion ya creado.", "institution-guardian-access")}
+        ${renderStatCard("today", "Activos hoy", data.summary.active_today, "Ingresaron y jugaron al menos una misión.", "institution-alerts")}
+        ${renderStatCard("family", "Familias vinculadas", data.summary.linked_guardians, "Con acceso de observación ya creado.", "institution-guardian-access")}
       </div>
 
       <div class="dashboard-grid dashboard-grid-2">
@@ -1100,7 +1100,7 @@ function renderInstitutionPanel(data) {
                 (classroom) => `
                   <div class="dashboard-mini-item">
                     <strong>${classroom.name}</strong>
-                    <span>${classroom.grade_label} - ${classroom.student_count} alumnos - codigo ${classroom.group_code}</span>
+                    <span>${classroom.grade_label} - ${classroom.student_count} alumnos - código ${classroom.group_code}</span>
                   </div>
                 `
               )
@@ -1120,8 +1120,8 @@ function renderInstitutionPanel(data) {
           <div class="eyebrow">Alta de alumnos</div>
           <h2>Registro y accesos</h2>
           <div class="dashboard-highlight">
-            <strong>Como se registra un nino</strong>
-            <p>La maestra crea el grupo, registra al alumno y el sistema genera o valida su codigo de acceso para entrar al juego.</p>
+            <strong>Cómo se registra un niño</strong>
+            <p>La maestra crea el grupo, registra al alumno y el sistema genera o valida su código de acceso para entrar al juego.</p>
           </div>
           <form id="createStudentForm" class="dashboard-form-grid dashboard-form-grid-compact">
             <select class="dashboard-input" name="classroom_id" required>
@@ -1138,7 +1138,7 @@ function renderInstitutionPanel(data) {
       <div class="dashboard-grid dashboard-grid-2">
         <article class="dashboard-card" id="institution-guardian-access">
           <div class="eyebrow">Vinculo con familias</div>
-          <h2>Crear acceso de observacion</h2>
+          <h2>Crear acceso de observación</h2>
           <form id="linkGuardianForm" class="dashboard-form-grid dashboard-form-grid-compact">
             <select class="dashboard-input" name="student_id" required>
               ${data.available_students.map((student) => `<option value="${student.id}">${student.name} - ${student.classroom_name}</option>`).join("")}
@@ -1151,7 +1151,7 @@ function renderInstitutionPanel(data) {
         </article>
 
         <article class="dashboard-card" id="institution-alerts">
-          <div class="eyebrow">Alertas pedagogicas</div>
+          <div class="eyebrow">Alertas pedagógicas</div>
           <h2>A quien mirar primero</h2>
           <div class="dashboard-mini-list">
             ${data.alerts
@@ -1210,7 +1210,7 @@ function renderOwnerPanel(data) {
           <div>
             <div class="eyebrow">Panel del producto</div>
             <h1>${data.owner.name}</h1>
-            <p>Metricas agregadas para medir adopcion, demostrar valor pedagogico y preparar conversaciones con instituciones o Ceibal.</p>
+            <p>Métricas agregadas para medir adopción, demostrar valor pedagógico y preparar conversaciones con instituciones o Ceibal.</p>
           </div>
           <div class="owner-topline-actions">
             <span class="owner-health-pill">Piloto activo</span>
@@ -1269,7 +1269,7 @@ function renderOwnerPanel(data) {
 
                 <aside class="owner-insight-rail">
                   <article class="dashboard-card">
-                    <div class="eyebrow">Evidencia pedagogica</div>
+                    <div class="eyebrow">Evidencia pedagógica</div>
                     <h2>Conceptos trabajados</h2>
                     <div class="dashboard-progress-list">
                       ${data.concept_overview
@@ -1488,13 +1488,13 @@ export function renderDashboard() {
       appShell.innerHTML = `
         <header class="topbar">
           <div class="topbar-left">
-            <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Nivel 4</span></div>
+            <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Yo Aprendo</span></div>
             <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span><span>Paneles de seguimiento</span></div>
           </div>
 
           <div class="topbar-right">
             <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span><span>${backLabel}</span></button>
-            <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesion</span></button>
+            <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesión</span></button>
           </div>
         </header>
 
@@ -1529,12 +1529,12 @@ export function renderDashboard() {
       appShell.innerHTML = `
         <header class="topbar">
           <div class="topbar-left">
-            <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Nivel 4</span></div>
+            <div class="pill level-pill"><span class="mission-header-badge ui-icon-wrap" aria-hidden="true">${uiIcon("trophy")}</span><span>Yo Aprendo</span></div>
             <div class="pill title-pill"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span><span>Paneles de seguimiento</span></div>
           </div>
           <div class="topbar-right">
             <button class="pill nav-pill" id="backToMapBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span><span>${backLabel}</span></button>
-            <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesion</span></button>
+            <button class="pill nav-pill" id="logoutBtn" type="button"><span class="mission-header-icon ui-icon-wrap" aria-hidden="true">${uiIcon("log-out")}</span><span>Cerrar sesión</span></button>
           </div>
         </header>
         <main class="dashboard-screen">
