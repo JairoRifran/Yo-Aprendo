@@ -18,34 +18,6 @@ import {
 } from "../utils/audio.js";
 import { uiIcon } from "../utils/icons.js";
 
-const DEMO_SESSION_BY_ROLE = {
-  student: {
-    role: "student",
-    entity_id: "stu-sofi",
-    display_name: "Sofi"
-  },
-  parent: {
-    role: "parent",
-    entity_id: "guardian-sofi",
-    display_name: "Familia de Sofi"
-  },
-  teacher: {
-    role: "teacher",
-    entity_id: "teacher-lucia",
-    display_name: "Profe Lucia"
-  },
-  institution: {
-    role: "institution",
-    entity_id: "inst-uy",
-    display_name: "Escuela Demo Uruguay"
-  },
-  owner: {
-    role: "owner",
-    entity_id: "owner",
-    display_name: "Jairo Rifran"
-  }
-};
-
 function getLiveStudentDashboardData(data) {
   const worlds = grade4Data.worlds;
   const missions = worlds.flatMap((world) => world.missions);
@@ -109,7 +81,13 @@ async function ensureDashboardData() {
   const role = appState.selectedDashboardRole || appState.currentUserRole || "student";
   const session = appState.session && appState.session.role === role
     ? appState.session
-    : DEMO_SESSION_BY_ROLE[role];
+    : role === "owner"
+      ? { role: "owner", entity_id: "owner", display_name: "Jairo Rifran" }
+      : null;
+
+  if (!session) {
+    throw new Error("Inicia sesion con un acceso real para ver este panel.");
+  }
 
   if (
     appState.dashboardData &&
@@ -386,6 +364,7 @@ function ownerModules() {
   return [
     { id: "overview", icon: "progress", label: "Resumen ejecutivo", hint: "Adopcion, planes y evidencia" },
     { id: "institutions", icon: "groups", label: "Instituciones", hint: "Centros, plan y traccion" },
+    { id: "leads", icon: "badge", label: "Solicitudes", hint: "Planes, compras y convenios" },
     { id: "students", icon: "students", label: "Alumnos", hint: "Usuarios cargados por aula" },
     { id: "active", icon: "today", label: "Actividad", hint: "Uso real y recurrencia" },
     { id: "progress", icon: "progress", label: "Aprendizajes", hint: "Avance por concepto" },
@@ -508,14 +487,28 @@ function ownerMetricConfig(metric) {
     institutions: {
       title: "Instituciones",
       subtitle: "Centros registrados, plan, estado y traccion.",
-      columns: ["Institucion", "Plan", "Alumnos", "Docentes", "Familias", "Avance"],
+      columns: ["Institucion", "Contacto", "Email", "Plan", "Estado", "Alumnos", "Avance"],
       rows: (data) => (data.details?.institutions || data.institutions || []).map((item) => [
         item.name,
+        item.contact || "-",
+        item.email || "-",
         item.plan,
+        item.status,
         item.students,
-        item.teachers,
-        item.guardians,
         `${item.avg_completion}%`
+      ])
+    },
+    leads: {
+      title: "Solicitudes comerciales",
+      subtitle: "Instituciones que pidieron plan, compra o conversacion de convenio.",
+      columns: ["Institucion", "Contacto", "Email", "Plan", "Estado", "Nota"],
+      rows: (data) => (data.details?.leads || []).map((item) => [
+        item.name,
+        item.contact || "-",
+        item.email || "-",
+        item.plan,
+        item.status,
+        item.notes || "-"
       ])
     },
     students: {
@@ -1220,6 +1213,7 @@ function renderOwnerPanel(data) {
 
         <div class="owner-kpi-strip">
           <div><span>Instituciones</span><strong>${summary.institutions}</strong></div>
+          <div><span>Solicitudes</span><strong>${summary.commercial_leads || 0}</strong></div>
           <div><span>Alumnos</span><strong>${summary.students}</strong></div>
           <div><span>Activos</span><strong>${summary.active_students}</strong></div>
           <div><span>Avance</span><strong>${summary.avg_completion}%</strong></div>
@@ -1232,7 +1226,8 @@ function renderOwnerPanel(data) {
               <div class="owner-overview-grid">
                 <section class="owner-summary-area">
                   <div class="dashboard-grid dashboard-grid-4 owner-stat-grid">
-                    ${renderOwnerMetricCard("groups", "Instituciones", summary.institutions, "Centros registrados en la plataforma.", "institutions")}
+                    ${renderOwnerMetricCard("groups", "Instituciones", summary.institutions, "Centros y leads registrados en la plataforma.", "institutions")}
+                    ${renderOwnerMetricCard("badge", "Solicitudes", summary.commercial_leads || 0, "Pedidos de plan escuela o convenio a seguir.", "leads")}
                     ${renderOwnerMetricCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.", "students")}
                     ${renderOwnerMetricCard("today", "Activos", summary.active_students, "Alumnos con estado activo.", "active")}
                     ${renderOwnerMetricCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.", "progress")}
@@ -1261,6 +1256,7 @@ function renderOwnerPanel(data) {
                         <div class="dashboard-mini-item"><strong>Piloto</strong><span>${data.plan_breakdown.trial || 0} instituciones</span></div>
                         <div class="dashboard-mini-item"><strong>Escuela</strong><span>${data.plan_breakdown.school || 0} instituciones</span></div>
                         <div class="dashboard-mini-item"><strong>Red educativa</strong><span>${data.plan_breakdown.enterprise || 0} instituciones</span></div>
+                        <div class="dashboard-mini-item"><strong>Solicitudes comerciales</strong><span>${summary.commercial_leads || 0} pedidos de plan o convenio</span></div>
                         <div class="dashboard-mini-item good"><strong>Candidatas a expansion</strong><span>${summary.expansion_candidates} pilotos con senales de traccion</span></div>
                       </div>
                     </article>

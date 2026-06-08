@@ -8,7 +8,7 @@ from statistics import mean
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text, create_engine, select
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text, create_engine, delete, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 from sqlalchemy.types import JSON
@@ -197,6 +197,14 @@ class InstitutionRegisterRequest(BaseModel):
     billing_email: str = Field(default="", max_length=160)
 
 
+class InstitutionPlanRequestRequest(BaseModel):
+    plan_key: str = Field(default="school", max_length=40)
+    institution_name: str = Field(min_length=2, max_length=160)
+    contact_name: str = Field(min_length=2, max_length=120)
+    email: str = Field(min_length=5, max_length=160)
+    student_count: str = Field(default="", max_length=80)
+
+
 app = FastAPI(title="YoAprendo API", version="0.3.0")
 
 app.add_middleware(
@@ -241,6 +249,8 @@ def default_subscription(institution_id: str, billing_email: str = "") -> Instit
 
 def seed_database(session: Session) -> None:
     if session.scalar(select(Institution.id).limit(1)):
+        return
+    if os.getenv("YOAPRENDO_SEED_DEMO", "").lower() not in {"1", "true", "yes"}:
         return
 
     seed = load_seed()
@@ -344,11 +354,72 @@ def seed_database(session: Session) -> None:
         )
 
 
+def remove_known_demo_data(session: Session) -> None:
+    if os.getenv("YOAPRENDO_KEEP_DEMO_DATA", "").lower() in {"1", "true", "yes"}:
+        return
+
+    demo_institution_ids = [
+        row[0]
+        for row in session.execute(
+            select(Institution.id).where(
+                Institution.code.in_(["INST-4A"]),
+                Institution.teacher_email.like("%@yoaprendo.demo"),
+            )
+        ).all()
+    ]
+    if not demo_institution_ids:
+        return
+
+    demo_classroom_ids = [
+        row[0]
+        for row in session.execute(
+            select(Classroom.id).where(Classroom.institution_id.in_(demo_institution_ids))
+        ).all()
+    ]
+    demo_student_ids = [
+        row[0]
+        for row in session.execute(
+            select(Student.id).where(Student.classroom_id.in_(demo_classroom_ids))
+        ).all()
+    ]
+    demo_teacher_ids = [
+        row[0]
+        for row in session.execute(
+            select(Teacher.id).where(Teacher.institution_id.in_(demo_institution_ids))
+        ).all()
+    ]
+    demo_guardian_ids = [
+        row[0]
+        for row in session.execute(
+            select(Guardian.id).where(Guardian.code.in_(["FAM-404"]))
+        ).all()
+    ]
+
+    if demo_guardian_ids:
+        session.execute(delete(guardian_students).where(guardian_students.c.guardian_id.in_(demo_guardian_ids)))
+        session.execute(delete(Guardian).where(Guardian.id.in_(demo_guardian_ids)))
+    if demo_student_ids:
+        session.execute(delete(guardian_students).where(guardian_students.c.student_id.in_(demo_student_ids)))
+        session.execute(delete(Student).where(Student.id.in_(demo_student_ids)))
+    if demo_teacher_ids:
+        session.execute(delete(teacher_classrooms).where(teacher_classrooms.c.teacher_id.in_(demo_teacher_ids)))
+        session.execute(delete(Teacher).where(Teacher.id.in_(demo_teacher_ids)))
+    if demo_classroom_ids:
+        session.execute(delete(teacher_classrooms).where(teacher_classrooms.c.classroom_id.in_(demo_classroom_ids)))
+        session.execute(delete(Classroom).where(Classroom.id.in_(demo_classroom_ids)))
+
+    session.execute(delete(InstitutionUser).where(InstitutionUser.institution_id.in_(demo_institution_ids)))
+    session.execute(delete(InstitutionSubscription).where(InstitutionSubscription.institution_id.in_(demo_institution_ids)))
+    session.execute(delete(Institution).where(Institution.id.in_(demo_institution_ids)))
+
+
 def ensure_subscription_rows(session: Session) -> None:
     institutions = session.scalars(select(Institution)).all()
     for institution in institutions:
         if institution.subscription is None:
             session.add(default_subscription(institution.id, institution.teacher_email))
+        if institution.subscription and institution.subscription.status == "lead":
+            continue
         if not institution.users:
             session.add(
                 InstitutionUser(
@@ -367,6 +438,7 @@ def init_database() -> None:
     Base.metadata.create_all(bind=engine)
     with db_session() as session:
         seed_database(session)
+        remove_known_demo_data(session)
         ensure_subscription_rows(session)
 
 
@@ -402,6 +474,16 @@ def unique_student_code(session: Session, value: str) -> str:
     candidate = base
     suffix = 1
     while session.scalar(select(Student).where(Student.student_code == candidate)):
+        suffix += 1
+        candidate = f"{base}-{suffix}"
+    return candidate
+
+
+def unique_institution_code(session: Session, value: str) -> str:
+    base = value.upper().replace(" ", "")[:18] or "INST"
+    candidate = base
+    suffix = 1
+    while session.scalar(select(Institution).where(Institution.code == candidate)):
         suffix += 1
         candidate = f"{base}-{suffix}"
     return candidate
@@ -616,8 +698,11 @@ def owner_dashboard(session: Session) -> dict:
         row = {
             "id": institution.id,
             "name": institution.name,
+            "contact": institution.teacher_name,
+            "email": institution.teacher_email,
             "plan": plan,
             "status": institution.subscription.status if institution.subscription else "trialing",
+            "notes": institution.notes,
             "students": len(institution_students),
             "teachers": len(institution.teachers),
             "classrooms": len(institution_classrooms),
@@ -658,6 +743,7 @@ def owner_dashboard(session: Session) -> dict:
             "weekly_minutes": sum(student.weekly_minutes for student in students),
             "at_risk_students": sum(1 for student in students if student.attendance != "Activa"),
             "expansion_candidates": len(expansion_candidates),
+            "commercial_leads": sum(1 for institution in institutions if institution.subscription and institution.subscription.status == "lead"),
         },
         "plan_breakdown": plan_counts,
         "funnel": {
@@ -682,6 +768,18 @@ def owner_dashboard(session: Session) -> dict:
         "institutions": sorted(institution_rows, key=lambda item: item["students"], reverse=True),
         "details": {
             "institutions": institution_rows,
+            "leads": [
+                {
+                    "name": institution.name,
+                    "contact": institution.teacher_name,
+                    "email": institution.teacher_email,
+                    "plan": institution.subscription.plan_key if institution.subscription else "school",
+                    "status": institution.subscription.status if institution.subscription else "lead",
+                    "notes": institution.notes,
+                }
+                for institution in institutions
+                if institution.subscription and institution.subscription.status == "lead"
+            ],
             "students": [
                 {
                     "id": student.id,
@@ -994,14 +1092,85 @@ def register_institution(payload: InstitutionRegisterRequest):
         }
 
 
+@app.post("/api/institutions/plan-request")
+def request_institution_plan(payload: InstitutionPlanRequestRequest):
+    with db_session() as session:
+        plan_key = payload.plan_key.strip().lower()
+        if plan_key not in {"school", "enterprise"}:
+            plan_key = "school"
+
+        contact_email = payload.email.strip().lower()
+        institution_name = payload.institution_name.strip()
+        existing = session.scalar(
+            select(Institution).where(
+                Institution.teacher_email == contact_email,
+                Institution.name == institution_name,
+            )
+        )
+        if existing:
+            if existing.subscription:
+                existing.subscription.plan_key = plan_key
+                existing.subscription.status = "lead"
+            existing.teacher_name = payload.contact_name.strip()
+            existing.notes = (
+                f"Solicitud comercial: {plan_key}. "
+                f"Contacto: {payload.contact_name.strip()}. "
+                f"Alumnos estimados: {payload.student_count.strip() or 'Sin dato'}."
+            )
+            session.flush()
+            return {
+                "ok": True,
+                "lead": {
+                    "id": existing.id,
+                    "name": existing.name,
+                    "plan": plan_key,
+                    "status": "lead",
+                },
+            }
+
+        institution_id = unique_id(session, Institution, "lead", institution_name)
+        institution = Institution(
+            id=institution_id,
+            name=institution_name,
+            code=unique_institution_code(session, f"LEAD-{institution_name}"),
+            teacher_name=payload.contact_name.strip(),
+            teacher_email=contact_email,
+            notes=(
+                f"Solicitud comercial: {plan_key}. "
+                f"Contacto: {payload.contact_name.strip()}. "
+                f"Alumnos estimados: {payload.student_count.strip() or 'Sin dato'}."
+            ),
+        )
+        session.add(institution)
+        session.flush()
+
+        subscription = default_subscription(institution_id, contact_email)
+        subscription.plan_key = plan_key
+        subscription.status = "lead"
+        subscription.student_limit = 300 if plan_key == "school" else 999999
+        subscription.teacher_limit = 999
+        session.add(subscription)
+        session.flush()
+
+        return {
+            "ok": True,
+            "lead": {
+                "id": institution.id,
+                "name": institution.name,
+                "plan": plan_key,
+                "status": "lead",
+            },
+        }
+
+
 @app.get("/api/access/demo")
 def access_demo():
     return {
-        "student": {"name": "Sofi", "code": "APRENDO"},
-        "parent": {"name": "Familia de Sofi", "code": "FAM-404"},
-        "teacher": {"name": "Profe Lucia", "code": "DOC-4A"},
-        "institution": {"name": "Escuela Demo Uruguay", "code": "INST-4A"},
-        "owner": {"name": "rifranjairo@gmail.com", "code": "Clave privada"},
+        "student": {"name": "", "code": ""},
+        "parent": {"name": "", "code": ""},
+        "teacher": {"name": "", "code": ""},
+        "institution": {"name": "", "code": ""},
+        "owner": {"name": "rifranjairo@gmail.com", "code": ""},
     }
 
 

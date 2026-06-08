@@ -1,6 +1,6 @@
 import { appState } from "../state/appState.js";
 import { goToDashboard, goToWorldMap } from "../utils/navigation.js";
-import { loginWithAccess, registerInstitution } from "../utils/api.js";
+import { loginWithAccess, registerInstitution, requestInstitutionPlan } from "../utils/api.js";
 import { saveSession } from "../utils/storage.js";
 import {
   unlockAudio,
@@ -20,9 +20,7 @@ const ROLE_META = {
     codeLabel: "Isla o grupo",
     codePlaceholder: "Código de clase",
     cta: "Entrar a jugar",
-    loginNote: "Vas a entrar directo al mundo de juego.",
-    demoName: "Sofi",
-    demoCode: "APRENDO"
+    loginNote: "Ingresa con el código que te dio tu docente o institución."
   },
   parent: {
     title: "Soy familia",
@@ -30,11 +28,9 @@ const ROLE_META = {
     helper: "Consulta progreso, fortalezas y sugerencias simples para acompañar.",
     namePlaceholder: "Familia de...",
     codeLabel: "Codigo familiar",
-    codePlaceholder: "FAM-404",
+    codePlaceholder: "Codigo familiar",
     cta: "Ver seguimiento",
-    loginNote: "Vas a entrar al panel de familias.",
-    demoName: "Familia de Sofi",
-    demoCode: "FAM-404"
+    loginNote: "Ingresa con el código familiar generado por la institución."
   },
   teacher: {
     title: "Soy docente",
@@ -42,11 +38,9 @@ const ROLE_META = {
     helper: "Revisa grupos asignados, registra alumnos y detecta quiénes necesitan apoyo.",
     namePlaceholder: "Nombre docente",
     codeLabel: "Codigo docente",
-    codePlaceholder: "DOC-4A",
+    codePlaceholder: "Codigo docente",
     cta: "Abrir panel docente",
-    loginNote: "Vas a entrar al panel docente de tus grupos.",
-    demoName: "Profe Lucia",
-    demoCode: "DOC-4A"
+    loginNote: "Ingresa con tu código docente o email institucional."
   },
   institution: {
     title: "Soy institucion",
@@ -54,11 +48,9 @@ const ROLE_META = {
     helper: "Consulta actividad, crea grupos, habilita familias y revisa el plan institucional.",
     namePlaceholder: "Escuela o grupo",
     codeLabel: "Clave institucional",
-    codePlaceholder: "INST-4A",
+    codePlaceholder: "Clave institucional",
     cta: "Abrir panel institucional",
-    loginNote: "Vas a entrar al panel institucional.",
-    demoName: "Escuela Demo Uruguay",
-    demoCode: "INST-4A"
+    loginNote: "Si tu centro ya fue creado, entra con la clave institucional."
   },
   owner: {
     title: "Soy producto",
@@ -69,13 +61,11 @@ const ROLE_META = {
     codePlaceholder: "Tu contraseña",
     codeType: "password",
     cta: "Abrir métricas",
-    loginNote: "Vas a entrar al panel del producto.",
-    demoName: "rifranjairo@gmail.com",
-    demoCode: "clave privada"
+    loginNote: "Acceso privado del owner para ver todos los registros y secciones comerciales."
   }
 };
 
-const PUBLIC_START_ROLES = ["student", "parent", "teacher", "institution"];
+const PUBLIC_START_ROLES = ["student", "parent", "teacher", "institution", "owner"];
 
 function roleCard(role, selectedRole) {
   const meta = ROLE_META[role];
@@ -94,7 +84,6 @@ function roleCard(role, selectedRole) {
       <span class="start-art-role-copy">
         <strong>${meta.title}</strong>
         <span>${meta.subtitle}</span>
-        <em class="start-art-role-demo">${meta.demoName} &middot; ${meta.demoCode}</em>
       </span>
       <span class="start-art-role-arrow" aria-hidden="true"><i data-lucide="arrow-right"></i></span>
     </button>
@@ -121,7 +110,7 @@ function renderChooserPanel(selectedRole) {
     <section class="start-art-login-panel chooser">
       <div class="start-art-side-label">Acceso a Yo Aprendo</div>
       <h2>Elegí cómo querés entrar</h2>
-      <p>Cada perfil abre una experiencia distinta: juego, seguimiento o gestión institucional.</p>
+      <p>Cada perfil abre una experiencia distinta: juego, seguimiento, gestión institucional o visión comercial.</p>
       <div class="start-art-access-grid chooser-grid">
         ${PUBLIC_START_ROLES.map((role) => roleCard(role, selectedRole)).join("")}
       </div>
@@ -167,8 +156,8 @@ function renderLoginPanel(meta, currentName, currentCode) {
 
         <button id="startEnterBtn" class="btn btn-primary start-art-submit" type="button">${meta.cta}</button>
         ${
-          meta.title === "Institucion"
-            ? `<button id="openInstitutionRegisterBtn" class="btn btn-secondary start-art-submit" type="button">Registrar institucion</button>`
+          appState.currentUserRole === "institution"
+            ? `<button id="openInstitutionRegisterBtn" class="btn btn-secondary start-art-submit" type="button">Registrar una institucion</button>`
             : ""
         }
         <div class="start-role-note start-art-role-note" id="startRoleNote">${meta.loginNote}</div>
@@ -185,8 +174,8 @@ function renderInstitutionRegisterPanel() {
         <div class="start-art-side-label">Alta institucional</div>
         <button class="start-art-back-link" id="backToInstitutionLogin" type="button">Ya tengo acceso</button>
       </div>
-      <h2>Crear institucion</h2>
-      <p>La institucion crea el espacio, queda en plan piloto y luego habilita docentes, aulas, alumnos y familias.</p>
+      <h2>Crear espacio institucional</h2>
+      <p>Completa estos datos para abrir el panel del centro. El alta queda registrada para el owner, activa un piloto inicial y deja listo el camino para elegir plan cuando el centro decida escalar.</p>
 
       <form class="start-art-form" id="institutionRegisterForm">
         <label class="start-field-label" for="institutionNameInput">Nombre del centro</label>
@@ -207,8 +196,8 @@ function renderInstitutionRegisterPanel() {
         <label class="start-field-label" for="departmentInput">Departamento</label>
         <input id="departmentInput" class="start-input" name="department" type="text" maxlength="80" placeholder="Montevideo, Canelones..." />
 
-        <button id="institutionRegisterBtn" class="btn btn-primary start-art-submit" type="submit">Crear piloto institucional</button>
-        <div class="start-role-note start-art-role-note">Piloto inicial: 90 días, hasta 50 alumnos y 2 docentes.</div>
+        <button id="institutionRegisterBtn" class="btn btn-primary start-art-submit" type="submit">Crear piloto y entrar al panel</button>
+        <div class="start-role-note start-art-role-note">Piloto inicial: 90 días, hasta 50 alumnos y 2 docentes. Luego puedes elegir Plan Escuela o convenio a medida.</div>
         <div class="start-art-form-error" id="institutionRegisterError"></div>
       </form>
     </section>
@@ -223,14 +212,14 @@ function renderInstitutionLandingPanel() {
         <div class="institution-modal-top">
           <div>
             <div class="start-art-side-label">Para instituciones</div>
-            <h2 id="institutionLandingTitle">Una nueva forma de aprender pensamiento computacional</h2>
+            <h2 id="institutionLandingTitle">Lleva pensamiento computacional a tu centro con seguimiento real</h2>
           </div>
           <button class="institution-modal-close" id="backToInstitutionLogin" type="button" aria-label="Cerrar">×</button>
         </div>
 
         <div class="institution-modal-body">
           <section class="institution-modal-intro">
-            <p>Yo Aprendo convierte el aprendizaje en una aventura guiada: los niños juegan, las docentes acompañan y la institucion obtiene una lectura clara del avance real.</p>
+            <p>Yo Aprendo combina juego, gestión escolar y evidencia pedagógica: los estudiantes avanzan por misiones, los docentes acompañan con datos simples y la dirección ve adopción, progreso y oportunidades de mejora sin depender de planillas sueltas.</p>
             <div class="institution-modal-proof">
               <span>4 mundos</span>
               <span>28 micro misiones</span>
@@ -245,42 +234,42 @@ function renderInstitutionLandingPanel() {
             </div>
             <div class="institution-value-item">
               <strong>Gestion ordenada</strong>
-              <span>La institucion crea docentes, aulas, alumnos y accesos familiares desde un mismo espacio.</span>
+              <span>El centro crea docentes, aulas, alumnos y accesos familiares desde un mismo espacio, con reglas claras por rol.</span>
             </div>
             <div class="institution-value-item">
               <strong>Seguimiento accionable</strong>
-              <span>Paneles para ver avance, actividad, alertas y necesidades de apoyo sin planillas dispersas.</span>
+              <span>Paneles para ver avance, actividad, alertas y necesidades de apoyo con información que sirve para decidir.</span>
             </div>
           </div>
 
           <div class="institution-modal-grid">
             <div class="institution-flow">
               <strong>Cómo empieza una institucion</strong>
-              <span>1. Crea el centro</span>
-              <span>2. Activa el piloto</span>
-              <span>3. Carga docentes y aulas</span>
-              <span>4. Invita familias cuando corresponde</span>
+              <span>1. Conoce la propuesta y elige un camino</span>
+              <span>2. Crea el piloto o solicita un plan</span>
+              <span>3. Carga docentes, aulas y alumnos</span>
+              <span>4. Mide adopción y decide si escala</span>
             </div>
 
             <div class="institution-plan-list">
               <button class="institution-plan-card featured" type="button" data-institution-plan="trial">
                 <div class="start-art-side-label small">Piloto</div>
                 <h3>90 días gratis</h3>
-                <p>Para validar el uso en una escuela o grupo inicial.</p>
+                <p>Para probar con un grupo inicial y validar valor pedagógico antes de comprar.</p>
                 <strong>50 alumnos · 2 docentes</strong>
                 <em>Crear piloto</em>
               </button>
               <button class="institution-plan-card" type="button" data-institution-plan="school">
                 <div class="start-art-side-label small">Escuela</div>
                 <h3>Plan mensual</h3>
-                <p>Para centros que ya quieren operar con varios grupos.</p>
+                <p>Para centros que quieren trabajar con varios grupos, docentes y seguimiento familiar.</p>
                 <strong>Hasta 300 alumnos</strong>
                 <em>Solicitar incorporación</em>
               </button>
               <button class="institution-plan-card" type="button" data-institution-plan="enterprise">
                 <div class="start-art-side-label small">Red educativa</div>
                 <h3>A medida</h3>
-                <p>Para Ceibal, redes, convenios y despliegues con SSO.</p>
+                <p>Para redes educativas, convenios, Ceibal o despliegues con integraciones.</p>
                 <strong>Integracion institucional</strong>
                 <em>Hablar con el equipo</em>
               </button>
@@ -302,13 +291,13 @@ function renderInstitutionPlanRequestPanel(planKey = "school") {
     school: {
       eyebrow: "Plan Escuela",
       title: "Incorporar Yo Aprendo en tu centro",
-      text: "Dejanos los datos de la institucion y preparamos una propuesta para operar con varios grupos, docentes y seguimiento familiar.",
+      text: "Dejanos los datos de la institución y registramos el interés para preparar una propuesta concreta: alcance, grupos, docentes, acompañamiento y condiciones de implementación.",
       cta: "Solicitar plan escuela"
     },
     enterprise: {
       eyebrow: "Red educativa",
       title: "Despliegue para redes, convenios o Ceibal",
-      text: "Armamos una conversación institucional para evaluar volumen, integraciones, SSO, auditoría y condiciones de despliegue.",
+      text: "Armamos una conversación institucional para evaluar volumen, integraciones, SSO, auditoría, soporte y condiciones de despliegue.",
       cta: "Solicitar reunión"
     }
   };
@@ -337,7 +326,7 @@ function renderInstitutionPlanRequestPanel(planKey = "school") {
         <input id="requestSizeInput" class="start-input" name="student_count" type="text" maxlength="80" placeholder="Ej: 450 alumnos" />
 
         <button id="institutionPlanRequestBtn" class="btn btn-primary start-art-submit" type="submit">${copy.cta}</button>
-        <div class="start-role-note start-art-role-note">Te dejamos la solicitud preparada para contacto comercial. El piloto sigue disponible si queres probar hoy.</div>
+        <div class="start-role-note start-art-role-note">La solicitud queda registrada en el dashboard del owner para seguimiento comercial. El piloto sigue disponible si quieres probar hoy.</div>
         <div class="start-art-form-error" id="institutionPlanRequestResult"></div>
       </form>
     </section>
@@ -369,12 +358,6 @@ function renderStartFooter() {
 export function renderStart() {
   const appShell = document.querySelector(".app-shell");
   if (!appShell) return;
-
-  if (appState.currentUserRole === "owner") {
-    appState.currentUserRole = "student";
-    appState.currentUserName = "";
-    appState.currentAccessCode = "";
-  }
 
   const selectedRole = appState.currentUserRole || "student";
   const meta = ROLE_META[selectedRole];
@@ -506,10 +489,11 @@ export function renderStart() {
     button.addEventListener("click", () => {
       unlockAudio();
       playSelect();
-      appState.currentUserRole = button.dataset.roleCard;
-      appState.currentUserName = ROLE_META[button.dataset.roleCard].demoName;
-      appState.currentAccessCode = button.dataset.roleCard === "owner" ? "" : ROLE_META[button.dataset.roleCard].demoCode;
-      appState.startAccessMode = "login";
+      const role = button.dataset.roleCard;
+      appState.currentUserRole = role;
+      appState.currentUserName = role === "owner" ? "rifranjairo@gmail.com" : "";
+      appState.currentAccessCode = "";
+      appState.startAccessMode = role === "institution" ? "institution-landing" : "login";
       window.renderApp();
     });
   });
@@ -573,13 +557,40 @@ export function renderStart() {
     window.renderApp();
   });
 
-  document.getElementById("institutionPlanRequestForm")?.addEventListener("submit", (event) => {
+  document.getElementById("institutionPlanRequestForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     unlockAudio();
     playSelect();
+
     const resultNode = document.getElementById("institutionPlanRequestResult");
-    if (resultNode) {
-      resultNode.textContent = "Solicitud registrada. El siguiente paso es coordinar contacto institucional.";
+    const submitButton = document.getElementById("institutionPlanRequestBtn");
+    const form = new FormData(event.currentTarget);
+    const planKey = appState.selectedInstitutionPlan || "school";
+
+    if (resultNode) resultNode.textContent = "";
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Registrando...";
+    }
+
+    try {
+      await requestInstitutionPlan({
+        plan_key: planKey,
+        institution_name: form.get("institution_name"),
+        contact_name: form.get("contact_name"),
+        email: form.get("email"),
+        student_count: form.get("student_count")
+      });
+      if (resultNode) {
+        resultNode.textContent = "Solicitud registrada. El owner ya puede verla en el dashboard para seguimiento comercial.";
+      }
+    } catch (error) {
+      if (resultNode) resultNode.textContent = error.message || "No pudimos registrar la solicitud.";
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = planKey === "enterprise" ? "Solicitar reunión" : "Solicitar plan escuela";
+      }
     }
   });
 

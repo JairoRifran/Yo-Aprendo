@@ -373,10 +373,11 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "GET" && pathname === "/api/access/demo") {
       sendJson(res, 200, {
-        student: { name: "Sofi", code: "APRENDO" },
-        parent: { name: "Familia de Sofi", code: "FAM-404" },
-        teacher: { name: "Profe Lucia", code: "DOC-4A" },
-        institution: { name: "Escuela Demo Uruguay", code: "INST-4A" }
+        student: { name: "", code: "" },
+        parent: { name: "", code: "" },
+        teacher: { name: "", code: "" },
+        institution: { name: "", code: "" },
+        owner: { name: "rifranjairo@gmail.com", code: "" }
       });
       return;
     }
