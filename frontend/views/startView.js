@@ -212,14 +212,14 @@ function renderInstitutionLandingPanel() {
         <div class="institution-modal-top">
           <div>
             <div class="start-art-side-label">Para instituciones</div>
-            <h2 id="institutionLandingTitle">Lleva pensamiento computacional a tu centro con seguimiento real</h2>
+            <h2 id="institutionLandingTitle">Llevá el pensamiento computacional a tu institución con resultados medibles</h2>
           </div>
           <button class="institution-modal-close" id="backToInstitutionLogin" type="button" aria-label="Cerrar">×</button>
         </div>
 
         <div class="institution-modal-body">
           <section class="institution-modal-intro">
-            <p>Yo Aprendo combina juego, gestión escolar y evidencia pedagógica: los estudiantes avanzan por misiones, los docentes acompañan con datos simples y la dirección ve adopción, progreso y oportunidades de mejora sin depender de planillas sueltas.</p>
+            <p>YoAprendo es la primera solución integral diseñada para directores, docentes y estudiantes de primaria. Combinamos un videojuego de aventuras atrapante con un sistema de gestión y analíticas pedagógicas en tiempo real. Seguí el avance del currículo, identificá a alumnos rezagados y demostrá el impacto del pensamiento computacional sin esfuerzo administrativo.</p>
             <div class="institution-modal-proof">
               <span>4 mundos</span>
               <span>28 micro misiones</span>
@@ -229,56 +229,56 @@ function renderInstitutionLandingPanel() {
 
           <div class="institution-value-grid">
             <div class="institution-value-item">
-              <strong>Más valor pedagógico</strong>
-              <span>Misiones cortas, visuales y progresivas para trabajar secuencias, bucles, decisiones y datos.</span>
+              <strong>Videojuego educativo premium</strong>
+              <span>Misiones y retos lúdicos secuenciados de forma pedagógica que mantienen a los alumnos motivados y enganchados.</span>
             </div>
             <div class="institution-value-item">
-              <strong>Gestion ordenada</strong>
-              <span>El centro crea docentes, aulas, alumnos y accesos familiares desde un mismo espacio, con reglas claras por rol.</span>
+              <strong>Gestión y control institucional</strong>
+              <span>Administración centralizada para crear docentes, aulas, alumnos y habilitar el acceso a las familias en segundos.</span>
             </div>
             <div class="institution-value-item">
-              <strong>Seguimiento accionable</strong>
-              <span>Paneles para ver avance, actividad, alertas y necesidades de apoyo con información que sirve para decidir.</span>
+              <strong>Datos y evidencia Ceibal</strong>
+              <span>Dashboards analíticos en tiempo real para medir la adopción del centro, identificar alertas y sustentar decisiones.</span>
             </div>
           </div>
 
           <div class="institution-modal-grid">
             <div class="institution-flow">
-              <strong>Cómo empieza una institucion</strong>
+              <strong>Cómo empieza una institución</strong>
               <span>1. Conoce la propuesta y elige un camino</span>
               <span>2. Crea el piloto o solicita un plan</span>
               <span>3. Carga docentes, aulas y alumnos</span>
-              <span>4. Mide adopción y decide si escala</span>
+              <span>4. Mide la adopción y decide si escala</span>
             </div>
 
             <div class="institution-plan-list">
               <button class="institution-plan-card featured" type="button" data-institution-plan="trial">
-                <div class="start-art-side-label small">Piloto</div>
+                <div class="start-art-side-label small">Piloto sin costo</div>
                 <h3>90 días gratis</h3>
-                <p>Para probar con un grupo inicial y validar valor pedagógico antes de comprar.</p>
+                <p>Validá el impacto pedagógico y la adopción de los alumnos en tu centro sin compromisos.</p>
                 <strong>50 alumnos · 2 docentes</strong>
-                <em>Crear piloto</em>
+                <em>Iniciar piloto gratis</em>
               </button>
               <button class="institution-plan-card" type="button" data-institution-plan="school">
-                <div class="start-art-side-label small">Escuela</div>
-                <h3>Plan mensual</h3>
-                <p>Para centros que quieren trabajar con varios grupos, docentes y seguimiento familiar.</p>
-                <strong>Hasta 300 alumnos</strong>
-                <em>Solicitar incorporación</em>
+                <div class="start-art-side-label small">Plan Escuela</div>
+                <h3>Despliegue completo</h3>
+                <p>Ideal para centros educativos que buscan integrar la propuesta en sus aulas y el seguimiento familiar.</p>
+                <strong>Hasta 300 alumnos y docentes ilimitados</strong>
+                <em>Solicitar Plan Escuela</em>
               </button>
               <button class="institution-plan-card" type="button" data-institution-plan="enterprise">
-                <div class="start-art-side-label small">Red educativa</div>
-                <h3>A medida</h3>
-                <p>Para redes educativas, convenios, Ceibal o despliegues con integraciones.</p>
-                <strong>Integracion institucional</strong>
-                <em>Hablar con el equipo</em>
+                <div class="start-art-side-label small">Convenios y Redes</div>
+                <h3>Planes a medida</h3>
+                <p>Diseñado para redes de colegios, convenios públicos, Ceibal o proyectos con integraciones personalizadas.</p>
+                <strong>Soporte prioritario e integración SSO</strong>
+                <em>Contactar al equipo</em>
               </button>
             </div>
           </div>
         </div>
 
         <div class="institution-landing-actions">
-          <button id="startInstitutionRegisterBtn" class="btn btn-primary start-art-submit" type="button">Crear piloto institucional</button>
+          <button id="startInstitutionRegisterBtn" class="btn btn-primary start-art-submit" type="button">Iniciar piloto gratis</button>
           <button id="backToInstitutionAccessBtn" class="btn btn-secondary start-art-submit" type="button">Entrar con acceso existente</button>
         </div>
       </div>
