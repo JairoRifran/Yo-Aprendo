@@ -212,65 +212,65 @@ function renderInstitutionLandingPanel() {
         <div class="institution-modal-top">
           <div>
             <div class="start-art-side-label">Para instituciones</div>
-            <h2 id="institutionLandingTitle">Llevá el pensamiento computacional a tu institución con resultados medibles</h2>
+            <h2 id="institutionLandingTitle">Llevá el pensamiento computacional a tu centro</h2>
           </div>
           <button class="institution-modal-close" id="backToInstitutionLogin" type="button" aria-label="Cerrar">×</button>
         </div>
 
         <div class="institution-modal-body">
           <section class="institution-modal-intro">
-            <p>YoAprendo es la primera solución integral diseñada para directores, docentes y estudiantes de primaria. Combinamos un videojuego de aventuras atrapante con un sistema de gestión y analíticas pedagógicas en tiempo real. Seguí el avance del currículo, identificá a alumnos rezagados y demostrá el impacto del pensamiento computacional sin esfuerzo administrativo.</p>
+            <p>YoAprendo combina un videojuego educativo con gestión y analíticas en tiempo real. Habilitá aulas, seguí el progreso curricular y acompañá a tus docentes sin esfuerzo administrativo.</p>
             <div class="institution-modal-proof">
               <span>4 mundos</span>
               <span>28 micro misiones</span>
-              <span>paneles por rol</span>
+              <span>Gestión por rol</span>
             </div>
           </section>
 
           <div class="institution-value-grid">
             <div class="institution-value-item">
-              <strong>Videojuego educativo premium</strong>
-              <span>Misiones y retos lúdicos secuenciados de forma pedagógica que mantienen a los alumnos motivados y enganchados.</span>
+              <strong>Videojuego premium</strong>
+              <span>Misiones lúdicas secuenciadas pedagógicamente para motivar a tus estudiantes.</span>
             </div>
             <div class="institution-value-item">
-              <strong>Gestión y control institucional</strong>
-              <span>Administración centralizada para crear docentes, aulas, alumnos y habilitar el acceso a las familias en segundos.</span>
+              <strong>Gestión simple</strong>
+              <span>Crea docentes, aulas, alumnos y accesos familiares en segundos.</span>
             </div>
             <div class="institution-value-item">
-              <strong>Datos y evidencia Ceibal</strong>
-              <span>Dashboards analíticos en tiempo real para medir la adopción del centro, identificar alertas y sustentar decisiones.</span>
+              <strong>Reportes y evidencia</strong>
+              <span>Visualiza la adopción en tiempo real y toma decisiones basadas en datos.</span>
             </div>
           </div>
 
           <div class="institution-modal-grid">
             <div class="institution-flow">
-              <strong>Cómo empieza una institución</strong>
-              <span>1. Conoce la propuesta y elige un camino</span>
-              <span>2. Crea el piloto o solicita un plan</span>
-              <span>3. Carga docentes, aulas y alumnos</span>
-              <span>4. Mide la adopción y decide si escala</span>
+              <strong>Cómo funciona</strong>
+              <span>1. Elige tu plan o piloto gratis</span>
+              <span>2. Crea tu espacio en minutos</span>
+              <span>3. Suma a tus docentes y grupos</span>
+              <span>4. Evalúa el impacto pedagógico</span>
             </div>
 
             <div class="institution-plan-list">
               <button class="institution-plan-card featured" type="button" data-institution-plan="trial">
-                <div class="start-art-side-label small">Piloto sin costo</div>
+                <div class="start-art-side-label small">Piloto gratis</div>
                 <h3>90 días gratis</h3>
-                <p>Validá el impacto pedagógico y la adopción de los alumnos en tu centro sin compromisos.</p>
+                <p>Probá el impacto en tu centro sin ningún compromiso.</p>
                 <strong>50 alumnos · 2 docentes</strong>
                 <em>Iniciar piloto gratis</em>
               </button>
               <button class="institution-plan-card" type="button" data-institution-plan="school">
                 <div class="start-art-side-label small">Plan Escuela</div>
                 <h3>Despliegue completo</h3>
-                <p>Ideal para centros educativos que buscan integrar la propuesta en sus aulas y el seguimiento familiar.</p>
-                <strong>Hasta 300 alumnos y docentes ilimitados</strong>
+                <p>Acceso para todo el colegio y seguimiento familiar.</p>
+                <strong>Hasta 300 alumnos · Docentes ilimitados</strong>
                 <em>Solicitar Plan Escuela</em>
               </button>
               <button class="institution-plan-card" type="button" data-institution-plan="enterprise">
-                <div class="start-art-side-label small">Convenios y Redes</div>
+                <div class="start-art-side-label small">Convenios</div>
                 <h3>Planes a medida</h3>
-                <p>Diseñado para redes de colegios, convenios públicos, Ceibal o proyectos con integraciones personalizadas.</p>
-                <strong>Soporte prioritario e integración SSO</strong>
+                <p>Para redes de colegios o proyectos con integraciones a medida.</p>
+                <strong>SSO y soporte prioritario</strong>
                 <em>Contactar al equipo</em>
               </button>
             </div>
