@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de producto | YoAprendo</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0b74d1" />
+  <link rel="icon" type="image/png" href="./img/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="./img/favicon.png" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js" defer></script>
+</head>
+<body>
+  <div class="app-shell"></div>
+
+  <script type="module">
+    import { appState } from "./state/appState.js";
+    import { renderDashboard } from "./views/dashboardView.js";
+
+    appState.currentView = "dashboard";
+    appState.currentUserRole = "owner";
+    appState.selectedDashboardRole = "owner";
+    appState.currentUserName = "Jairo Rifran";
+    appState.session = {
+      role: "owner",
+      entity_id: "owner",
+      display_name: "Jairo Rifran"
+    };
+    appState.dashboardData = null;
+    appState.dashboardError = "";
+
+    window.renderApp = renderDashboard;
+    renderDashboard();
+  </script>
+</body>
+</html>

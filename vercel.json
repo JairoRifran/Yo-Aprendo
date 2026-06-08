@@ -44,6 +44,14 @@
       "dest": "/frontend/contacto.html"
     },
     {
+      "src": "/dashboard-producto",
+      "dest": "/frontend/dashboard-producto.html"
+    },
+    {
+      "src": "/producto",
+      "dest": "/frontend/dashboard-producto.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/$1"
     }
