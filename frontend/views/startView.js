@@ -65,7 +65,7 @@ const ROLE_META = {
   }
 };
 
-const PUBLIC_START_ROLES = ["student", "parent", "teacher", "institution", "owner"];
+const PUBLIC_START_ROLES = ["student", "parent", "teacher", "institution"];
 
 function roleCard(role, selectedRole) {
   const meta = ROLE_META[role];
