@@ -1616,7 +1616,6 @@ function renderLoopSimulation(mission, challenge, localState) {
   `;
 }function renderMultipleChoiceSimulation(mission, challenge, localState) {
   if (mission.id === "4-2-1") {
-    // El Baile del Cangrejo
     const crabSvg = `
       <svg class="crab-svg" viewBox="0 0 100 80">
         <ellipse cx="50" cy="50" rx="28" ry="18" />
@@ -1642,19 +1641,47 @@ function renderLoopSimulation(mission, challenge, localState) {
 
     return `
       <div class="beach-stage">
+        <div class="sea-shore-waves"></div>
         <div class="beach-sands"></div>
+        
+        <!-- SVG Left Palm Tree -->
+        <div class="palm-tree palm-tree-left">
+          <svg viewBox="0 0 100 160" width="100%" height="100%">
+            <path class="palm-trunk" d="M 50 160 Q 40 100 48 40" stroke="#78350f" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <g class="palm-leaves">
+              <path d="M 48 40 Q 20 20 10 35" fill="none"/>
+              <path d="M 48 40 Q 25 45 22 65" fill="none"/>
+              <path d="M 48 40 Q 55 15 72 20" fill="none"/>
+              <path d="M 48 40 Q 60 50 55 75" fill="none"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- SVG Right Palm Tree -->
+        <div class="palm-tree palm-tree-right">
+          <svg viewBox="0 0 100 160" width="100%" height="100%">
+            <path class="palm-trunk" d="M 50 160 Q 40 100 48 40" stroke="#78350f" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <g class="palm-leaves">
+              <path d="M 48 40 Q 20 20 10 35" fill="none"/>
+              <path d="M 48 40 Q 25 45 22 65" fill="none"/>
+              <path d="M 48 40 Q 55 15 72 20" fill="none"/>
+              <path d="M 48 40 Q 60 50 55 75" fill="none"/>
+            </g>
+          </svg>
+        </div>
+
         <div class="crabs-group">
           <div class="crab-wrapper crab-1">
             ${crabSvg}
-            <span class="crab-label">Cangrejo 1</span>
+            <span class="wood-sign">Cangrejo 1</span>
           </div>
           <div class="crab-wrapper crab-2">
             ${crabSvg}
-            <span class="crab-label">Cangrejo 2</span>
+            <span class="wood-sign">Cangrejo 2</span>
           </div>
           <div class="crab-wrapper crab-3">
             ${crabSvg}
-            <span class="crab-label">Cangrejo 3</span>
+            <span class="wood-sign">Cangrejo 3</span>
           </div>
         </div>
       </div>
@@ -1662,11 +1689,25 @@ function renderLoopSimulation(mission, challenge, localState) {
   }
 
   if (mission.id === "4-2-3") {
-    // El Faro de Destellos
+    // Generate multiple Twinkling Stars
+    const starsHtml = Array.from({ length: 14 }, (_, idx) => {
+      const top = Math.random() * 70;
+      const left = Math.random() * 95;
+      const delay = Math.random() * 2;
+      return `<div class="twinkle-star" style="top:${top}%; left:${left}%; animation-delay:${delay}s;"></div>`;
+    }).join("");
+
     return `
       <div class="lighthouse-stage">
         <div class="starry-sky" aria-hidden="true"></div>
-        <div class="lighthouse-tower">
+        ${starsHtml}
+        
+        <!-- Cliff crags in SVG -->
+        <svg class="cliff-crags" viewBox="0 0 320 100" preserveAspectRatio="none">
+          <path class="cliff-path" d="M 0 100 L 0 50 Q 80 40 120 65 T 240 45 Q 280 60 320 35 L 320 100 Z" />
+        </svg>
+
+        <div class="lighthouse-tower" style="bottom: 12px;">
           <div class="lighthouse-cabin">
             <div class="lighthouse-lens"></div>
             <div class="lighthouse-beam"></div>
@@ -1678,22 +1719,44 @@ function renderLoopSimulation(mission, challenge, localState) {
   }
 
   if (mission.id === "4-2-5") {
-    // La Batería de Bit
     const opt = localState.selectedOptionId;
     const isCorrect = opt === "a";
     const batteryClass = isCorrect ? "state-full" : (opt ? "state-empty" : "");
     const bitStateClass = isCorrect ? "happy" : (opt ? "sad" : "");
 
+    // Steam puffs
+    const steamHtml = Array.from({ length: 3 }, (_, idx) => {
+      const left = 30 + idx * 8;
+      const delay = idx * 0.7;
+      return `<div class="steam-puff-effect" style="left:${left}px; bottom: 35px; animation-delay:${delay}s;"></div>`;
+    }).join("");
+
     return `
       <div class="battery-stage">
-        <div class="battery-cylinder ${batteryClass}">
+        <div class="lab-workshop" aria-hidden="true"></div>
+        
+        <!-- Steampunk copper pipes -->
+        <svg class="pipes-layout" viewBox="0 0 320 200">
+          <path class="pipe-line" d="M 10 30 L 120 30 L 120 180" />
+          <path class="pipe-line" d="M 310 170 L 220 170 L 220 100" />
+          <circle class="pipe-joint" cx="120" cy="30" r="7" />
+          <circle class="pipe-joint" cx="220" cy="170" r="7" />
+        </svg>
+        
+        <div class="gauge-gauge">
+          <div class="gauge-arrow"></div>
+        </div>
+        
+        ${steamHtml}
+
+        <div class="battery-cylinder ${batteryClass}" style="z-index: 3;">
           <div class="battery-cell-segment"></div>
           <div class="battery-cell-segment"></div>
           <div class="battery-cell-segment"></div>
         </div>
-        <div class="battery-bit-wrapper">
+        <div class="battery-bit-wrapper" style="z-index: 3;">
           <img class="battery-bit-sprite ${bitStateClass}" src="./img/mission-robot-pirate.png" alt="Bit" />
-          <span class="crab-label" style="margin-top: 12px; color: #fff;">Eficiencia energética</span>
+          <span class="wood-sign">Batería de Bit</span>
         </div>
       </div>
     `;
@@ -2131,6 +2194,11 @@ function renderChallengeBody(challenge, localState, mission) {
           </section>
           
           <aside class="mission-loop-hud-sidebar">
+          <!-- Submarine Cabin Rivets -->
+          <div class="hud-rivet hud-rivet-tl"></div>
+          <div class="hud-rivet hud-rivet-tr"></div>
+          <div class="hud-rivet hud-rivet-bl"></div>
+          <div class="hud-rivet hud-rivet-br"></div>
             <div class="mission-loop-hud-header">
               <button id="guidedBackToSubmapBtn" type="button" aria-label="Volver">
                 <span class="ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span>

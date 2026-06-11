@@ -21246,3 +21246,306 @@ body.legal-page-body .legal-page {
   50% { transform: rotate(-5deg) translateY(2px); }
 }
 
+
+
+/* --- PREMIUM GAME STYLE FOR MULTIPLE CHOICE SIMULATIONS --- */
+.beach-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 20px;
+}
+
+.beach-sands {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(180deg, #fef08a 0%, #facc15 100%);
+  z-index: 2;
+  border-top: 6px solid #eab308;
+  box-shadow: inset 0 8px 12px rgba(0,0,0,0.15);
+}
+
+.sea-shore-waves {
+  position: absolute;
+  bottom: 120px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background: rgba(56, 189, 248, 0.45);
+  z-index: 1;
+  border-radius: 50% 50% 0 0 / 15px 15px 0 0;
+  animation: seaShoreWaveMove 3s infinite ease-in-out alternate;
+}
+
+@keyframes seaShoreWaveMove {
+  0% { transform: translateY(0) scaleY(1); opacity: 0.6; }
+  100% { transform: translateY(8px) scaleY(1.15); opacity: 0.95; }
+}
+
+/* Palm Trees drawing in CSS/SVG */
+.palm-tree {
+  position: absolute;
+  bottom: 120px;
+  width: 90px;
+  height: 150px;
+  z-index: 3;
+  pointer-events: none;
+}
+.palm-tree-left {
+  left: 10px;
+  transform: scaleX(-1);
+}
+.palm-tree-right {
+  right: 10px;
+}
+
+.palm-trunk {
+  fill: #78350f;
+  stroke: #451a03;
+  stroke-width: 1.5;
+}
+
+.palm-leaves path {
+  fill: #15803d;
+  stroke: #166534;
+  stroke-width: 1.5;
+  transform-origin: bottom center;
+  animation: palmLeavesSway 2.5s infinite ease-in-out alternate;
+}
+
+@keyframes palmLeavesSway {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(3deg); }
+}
+
+.crabs-group {
+  display: flex;
+  gap: 50px;
+  z-index: 4;
+  margin-bottom: 20px;
+}
+
+.crab-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.crab-svg {
+  width: 92px;
+  height: 76px;
+  fill: #ef4444;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));
+  transform-origin: bottom center;
+  transition: transform 0.2s;
+}
+
+/* Wood Sign Labels (Rustic style) */
+.wood-sign {
+  background: linear-gradient(180deg, #92400e 0%, #78350f 100%);
+  border: 2px solid #451a03;
+  border-radius: 8px;
+  box-shadow: 
+    0 6px 12px rgba(0,0,0,0.5), 
+    inset 0 1px 3px rgba(255,255,255,0.25);
+  font-family: Fredoka, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fef08a;
+  padding: 4px 14px;
+  text-shadow: 0 1.5px 0 #451a03;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  border-bottom-width: 4px;
+}
+
+.wood-sign::before,
+.wood-sign::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: #f2c35b;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  border: 0.5px solid #451a03;
+}
+
+/* --- LIGHTHOUSE ARENA CRAGS --- */
+.cliff-crags {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  z-index: 1;
+}
+
+.cliff-path {
+  fill: #1e293b;
+  stroke: #0f172a;
+  stroke-width: 2.5;
+}
+
+.twinkle-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #fff;
+  border-radius: 50%;
+  z-index: 2;
+  animation: starTwinkle 1.8s infinite ease-in-out alternate;
+  box-shadow: 0 0 6px #fff;
+}
+
+@keyframes starTwinkle {
+  0% { opacity: 0.2; transform: scale(0.7); }
+  100% { opacity: 1; transform: scale(1.3); }
+}
+
+/* --- SUBMARINE LAB / STEAM WORKSHOP (M5) --- */
+.lab-workshop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: 
+    linear-gradient(180deg, rgba(13, 27, 42, 0.95), rgba(6, 13, 23, 0.98));
+}
+
+.pipes-layout {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pipe-line {
+  stroke: #b45309;
+  stroke-width: 8;
+  stroke-linecap: round;
+  fill: none;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.pipe-joint {
+  fill: #d97706;
+  stroke: #78350f;
+  stroke-width: 1.5;
+}
+
+.gauge-gauge {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  width: 44px;
+  height: 44px;
+  background: radial-gradient(circle, #f8fafc 0%, #cbd5e1 100%);
+  border: 3px solid #78350f;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 
+    0 4px 8px rgba(0,0,0,0.5),
+    inset 0 0 6px rgba(0,0,0,0.2);
+}
+
+.gauge-arrow {
+  position: absolute;
+  top: calc(50% - 1.5px);
+  left: 50%;
+  width: 16px;
+  height: 3px;
+  background: #dc2626;
+  transform-origin: left center;
+  transform: rotate(45deg);
+  animation: gaugeVibrate 1.2s infinite ease-in-out alternate;
+}
+
+@keyframes gaugeVibrate {
+  0% { transform: rotate(15deg); }
+  100% { transform: rotate(75deg); }
+}
+
+/* Steam particles */
+.steam-puff-effect {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  filter: blur(5px);
+  animation: steamPuff 2s infinite linear;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes steamPuff {
+  0% { transform: translateY(0) scale(0.4); opacity: 0; }
+  30% { opacity: 0.5; }
+  100% { transform: translateY(-70px) translateX(20px) scale(1.6); opacity: 0; }
+}
+
+/* --- HUD CABINET METALLIC OVERLAY --- */
+.hud-rivet {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle at 35% 35%, #cbd5e1 0%, #64748b 100%);
+  border-radius: 50%;
+  border: 1px solid #1e293b;
+  box-shadow: 
+    inset -1px -1px 2px rgba(0,0,0,0.7),
+    1px 1px 2px rgba(255,255,255,0.15);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.hud-rivet-tl { top: 12px; left: 12px; }
+.hud-rivet-tr { top: 12px; right: 12px; }
+.hud-rivet-bl { bottom: 12px; left: 12px; }
+.hud-rivet-br { bottom: 12px; right: 12px; }
+
+.mission-loop-hud-sidebar {
+  border-left: 3px solid rgba(242, 195, 91, 0.45) !important;
+  position: relative;
+}
+
+/* Submarine Dial Volver Button */
+.mission-loop-hud-header #guidedBackToSubmapBtn {
+  background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%) !important;
+  border: 2px solid #7f1d1d !important;
+  border-radius: 14px !important;
+  font-family: Fredoka, sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  padding: 8px 18px !important;
+  box-shadow: 
+    0 4px 10px rgba(0,0,0,0.4),
+    inset 0 1px 3px rgba(255,255,255,0.2) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mission-loop-hud-header #guidedBackToSubmapBtn:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%) !important;
+  box-shadow: 
+    0 6px 15px rgba(239, 68, 68, 0.35),
+    inset 0 1px 3px rgba(255,255,255,0.3) !important;
+}
+
+.mission-loop-hud-header #guidedBackToSubmapBtn:active {
+  transform: translateY(1px);
+}
