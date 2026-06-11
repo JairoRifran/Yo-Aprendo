@@ -20764,3 +20764,485 @@ body.legal-page-body .legal-page {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+/* --- LOOP FULLSCREEN LAYOUT & SIMULATIONS --- */
+.mission-screen-loop-fullscreen {
+  height: 100vh !important;
+  min-height: 640px;
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: relative;
+}
+
+.mission-screen-loop-fullscreen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: 
+    linear-gradient(180deg, rgba(6, 20, 38, 0.4), rgba(4, 15, 30, 0.85)),
+    url("./img/path-guided-bg.png") center center / cover no-repeat;
+}
+
+.mission-screen-loop-fullscreen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at center, rgba(16, 36, 66, 0.25) 0%, rgba(5, 15, 30, 0.75) 100%);
+  pointer-events: none;
+}
+
+.mission-screen-loop-fullscreen .mission-panel {
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.mission-screen-loop-fullscreen .mission-hero {
+  display: none !important;
+}
+
+.mission-loop-fullscreen-stage {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: stretch;
+  position: relative;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .mission-loop-fullscreen-stage {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+}
+
+.mission-loop-visual-arena {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  position: relative;
+  background: radial-gradient(circle at center, rgba(16, 40, 75, 0.45) 0%, rgba(5, 15, 30, 0.6) 100%);
+  border-right: 1.5px solid rgba(89, 212, 255, 0.15);
+  box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.mission-loop-hud-sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(12, 24, 45, 0.96) 0%, rgba(5, 10, 20, 0.98) 100%);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+  gap: 20px;
+  position: relative;
+}
+
+.mission-loop-hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(89, 212, 255, 0.1);
+  padding-bottom: 14px;
+}
+
+.mission-loop-hud-header .wallet {
+  display: flex;
+  gap: 12px;
+}
+
+.mission-loop-hud-header .wallet span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: Fredoka, sans-serif;
+  font-size: 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.mission-loop-hud-header #guidedBackToSubmapBtn {
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-family: Fredoka, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.mission-loop-hud-header #guidedBackToSubmapBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+}
+
+.mission-loop-hud-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.mission-loop-hud-body h1 {
+  font-family: Fredoka, sans-serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 700;
+  color: #59d4ff;
+  text-shadow: 0 0 10px rgba(89, 212, 255, 0.25);
+  margin: 0;
+}
+
+.mission-loop-hud-body .mission-prompt {
+  font-family: Quicksand, sans-serif;
+  font-size: 15px;
+  color: #c0d8ff;
+  line-height: 1.5;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  border-radius: 16px;
+  border-left: 4px solid #f2c35b;
+}
+
+.mission-loop-hud-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.mission-loop-hud-submit {
+  flex-grow: 1;
+  padding: 14px 20px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  font-family: Fredoka, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.mission-loop-hud-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.mission-loop-hud-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #334155;
+  box-shadow: none;
+}
+
+/* --- MISSION 1: El Baile del Cangrejo --- */
+.beach-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  position: relative;
+}
+
+.beach-sands {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  background: #fef08a;
+  opacity: 0.85;
+  border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+  filter: blur(2px);
+}
+
+.crabs-group {
+  display: flex;
+  gap: 40px;
+  z-index: 2;
+}
+
+.crab-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.crab-svg {
+  width: 72px;
+  height: 60px;
+  fill: #ef4444;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+  transform-origin: bottom center;
+}
+
+.crab-label {
+  font-family: Fredoka, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fb7185;
+  margin-top: 8px;
+  background: rgba(0,0,0,0.4);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.crab-1 .crab-svg {
+  animation: crabDanceJump 1.2s infinite ease-in-out;
+}
+
+.crab-2 .crab-svg {
+  animation: crabDanceSlide 1.2s infinite ease-in-out;
+  fill: #f97316;
+}
+
+.crab-3 .crab-svg {
+  animation: crabDanceJumpSlide 1.2s infinite ease-in-out;
+  fill: #ec4899;
+}
+
+@keyframes crabDanceJump {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-30px) scaleY(0.9); }
+}
+
+@keyframes crabDanceSlide {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(20px) rotate(10deg); }
+}
+
+@keyframes crabDanceJumpSlide {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-20px) translateX(-20px) rotate(-15deg); }
+}
+
+/* --- MISSION 3: El Faro de Destellos --- */
+.lighthouse-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.starry-sky {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #0c1a30 0%, #030712 100%);
+  z-index: 1;
+}
+
+.lighthouse-tower {
+  width: 80px;
+  height: 160px;
+  position: relative;
+  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 10px 10px 0 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.lighthouse-tower::before {
+  content: '';
+  position: absolute;
+  width: 90px;
+  height: 10px;
+  background: #475569;
+  bottom: 0;
+  border-radius: 4px;
+}
+
+.lighthouse-cabin {
+  width: 50px;
+  height: 40px;
+  background: transparent;
+  border: 3px solid #475569;
+  position: absolute;
+  top: -40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lighthouse-roof {
+  position: absolute;
+  top: -65px;
+  width: 0;
+  height: 0;
+  border-left: 28px solid transparent;
+  border-right: 28px solid transparent;
+  border-bottom: 25px solid #1e293b;
+}
+
+.lighthouse-lens {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  z-index: 3;
+  animation: lighthouseFlashAnim 2.4s infinite steps(1);
+}
+
+.lighthouse-beam {
+  position: absolute;
+  width: 200px;
+  height: 100px;
+  background: radial-gradient(ellipse at left, rgba(254, 240, 138, 0.4) 0%, transparent 70%);
+  clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
+  left: 12px;
+  top: -30px;
+  transform-origin: left center;
+  z-index: 2;
+  animation: lighthouseBeamAnim 2.4s infinite steps(1);
+}
+
+@keyframes lighthouseFlashAnim {
+  0%, 50% { background: #fbbf24; box-shadow: 0 0 30px #fbbf24; }
+  50.01%, 100% { background: #38bdf8; box-shadow: 0 0 30px #38bdf8; }
+}
+
+@keyframes lighthouseBeamAnim {
+  0%, 50% { 
+    background: radial-gradient(ellipse at left, rgba(251, 191, 36, 0.45) 0%, transparent 70%);
+    transform: rotate(5deg);
+  }
+  50.01%, 100% { 
+    background: radial-gradient(ellipse at left, rgba(56, 189, 248, 0.45) 0%, transparent 70%);
+    transform: rotate(-5deg);
+  }
+}
+
+/* --- MISSION 5: La Batería de Bit --- */
+.battery-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+}
+
+.battery-cylinder {
+  width: 80px;
+  height: 140px;
+  border: 4px solid #f2c35b;
+  border-radius: 12px;
+  position: relative;
+  padding: 8px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
+  background: rgba(0,0,0,0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+.battery-cylinder::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: calc(50% - 14px);
+  width: 28px;
+  height: 8px;
+  background: #f2c35b;
+  border-radius: 4px 4px 0 0;
+}
+
+.battery-cell-segment {
+  width: 100%;
+  height: 34px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  transition: all 0.4s;
+}
+
+.battery-cylinder.state-full .battery-cell-segment {
+  background: #10b981;
+  box-shadow: 0 0 12px #10b981;
+}
+
+.battery-cylinder.state-empty .battery-cell-segment {
+  background: rgba(255,255,255,0.05);
+  box-shadow: none;
+}
+.battery-cylinder.state-empty .battery-cell-segment:first-child {
+  background: #ef4444;
+  box-shadow: 0 0 12px #ef4444;
+  animation: batteryAlertFlash 0.5s infinite alternate;
+}
+
+@keyframes batteryAlertFlash {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+.battery-bit-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.battery-bit-sprite {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+}
+
+.battery-bit-sprite.happy {
+  animation: bitHappyJump 0.5s infinite alternate;
+}
+
+.battery-bit-sprite.sad {
+  animation: bitSadShrug 1s infinite alternate;
+}
+
+@keyframes bitHappyJump {
+  from { transform: translateY(0) scaleY(1); }
+  to { transform: translateY(-10px) scaleY(1.05); }
+}
+
+@keyframes bitSadShrug {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-5deg) translateY(2px); }
+}
+

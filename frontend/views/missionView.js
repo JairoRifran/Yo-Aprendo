@@ -1614,7 +1614,99 @@ function renderLoopSimulation(mission, challenge, localState) {
       <div class="loop-sim-art">🌀</div>
     </div>
   `;
-}function renderChallengeBody(challenge, localState, mission) {
+}function renderMultipleChoiceSimulation(mission, challenge, localState) {
+  if (mission.id === "4-2-1") {
+    // El Baile del Cangrejo
+    const crabSvg = `
+      <svg class="crab-svg" viewBox="0 0 100 80">
+        <ellipse cx="50" cy="50" rx="28" ry="18" />
+        <circle cx="38" cy="25" r="4.5" fill="#fff" />
+        <circle cx="38" cy="25" r="2" fill="#000" />
+        <path d="M 38 30 L 38 36" stroke="#ef4444" stroke-width="2" />
+        
+        <circle cx="62" cy="25" r="4.5" fill="#fff" />
+        <circle cx="62" cy="25" r="2" fill="#000" />
+        <path d="M 62 30 L 62 36" stroke="#ef4444" stroke-width="2" />
+        
+        <path d="M 22 50 Q 12 55 16 65" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" />
+        <path d="M 25 60 Q 16 68 22 74" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" />
+        
+        <path d="M 78 50 Q 88 55 84 65" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" />
+        <path d="M 75 60 Q 84 68 78 74" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" />
+        
+        <path d="M 30 40 Q 15 30 24 16" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" fill="none" />
+        <path d="M 70 40 Q 85 30 76 16" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" fill="none" />
+        <path d="M 45 55 Q 50 60 55 55" stroke="#000" stroke-width="2" fill="none" />
+      </svg>
+    `;
+
+    return `
+      <div class="beach-stage">
+        <div class="beach-sands"></div>
+        <div class="crabs-group">
+          <div class="crab-wrapper crab-1">
+            ${crabSvg}
+            <span class="crab-label">Cangrejo 1</span>
+          </div>
+          <div class="crab-wrapper crab-2">
+            ${crabSvg}
+            <span class="crab-label">Cangrejo 2</span>
+          </div>
+          <div class="crab-wrapper crab-3">
+            ${crabSvg}
+            <span class="crab-label">Cangrejo 3</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (mission.id === "4-2-3") {
+    // El Faro de Destellos
+    return `
+      <div class="lighthouse-stage">
+        <div class="starry-sky" aria-hidden="true"></div>
+        <div class="lighthouse-tower">
+          <div class="lighthouse-cabin">
+            <div class="lighthouse-lens"></div>
+            <div class="lighthouse-beam"></div>
+          </div>
+          <div class="lighthouse-roof"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (mission.id === "4-2-5") {
+    // La Batería de Bit
+    const opt = localState.selectedOptionId;
+    const isCorrect = opt === "a";
+    const batteryClass = isCorrect ? "state-full" : (opt ? "state-empty" : "");
+    const bitStateClass = isCorrect ? "happy" : (opt ? "sad" : "");
+
+    return `
+      <div class="battery-stage">
+        <div class="battery-cylinder ${batteryClass}">
+          <div class="battery-cell-segment"></div>
+          <div class="battery-cell-segment"></div>
+          <div class="battery-cell-segment"></div>
+        </div>
+        <div class="battery-bit-wrapper">
+          <img class="battery-bit-sprite ${bitStateClass}" src="./img/mission-robot-pirate.png" alt="Bit" />
+          <span class="crab-label" style="margin-top: 12px; color: #fff;">Eficiencia energética</span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div style="display:flex; justify-content:center; align-items:center; height:100%; color:#fff;">
+      <p>Simulación de Reto Teórico</p>
+    </div>
+  `;
+}
+
+function renderChallengeBody(challenge, localState, mission) {
   if (challenge.type === "reorder") {
     const isFirstStepsMission = mission?.id === "4-1-1";
     const isOrderCorrectMission = mission?.id === "4-1-2";
@@ -2031,6 +2123,60 @@ function renderLoopSimulation(mission, challenge, localState) {
       `;
     }
 
+    if (mission?.id.startsWith("4-2-")) {
+      return `
+        <div class="mission-loop-fullscreen-stage">
+          <section class="mission-loop-visual-arena">
+            ${renderMultipleChoiceSimulation(mission, challenge, localState)}
+          </section>
+          
+          <aside class="mission-loop-hud-sidebar">
+            <div class="mission-loop-hud-header">
+              <button id="guidedBackToSubmapBtn" type="button" aria-label="Volver">
+                <span class="ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span>
+                Volver
+              </button>
+              <div class="wallet">
+                <span><i class="currency-icon gold"></i>${appState.coins}</span>
+                <span><i class="currency-icon gems"></i>${appState.gems}</span>
+              </div>
+            </div>
+            
+            <div class="mission-loop-hud-body">
+              <span class="eyebrow" style="color:#fbbf24; font-weight:bold; font-size:11px; letter-spacing:1px; text-transform:uppercase;">Micro-misión ${mission.number}</span>
+              <h1>${mission.title}</h1>
+              <p class="mission-prompt">${challenge.prompt || "Elige la opción que mejor resuelve el reto."}</p>
+              
+              <div class="mission-options" style="margin-top:16px;">
+                ${(challenge.options || [])
+                  .map((option) => {
+                    const selected = localState.selectedOptionId === option.id;
+                    return `
+                      <button
+                        class="mission-option ${selected ? "selected" : ""}"
+                        data-option-id="${option.id}"
+                        type="button"
+                      >
+                        <strong>${option.id.toUpperCase()}</strong>
+                        <span>${option.text}</span>
+                      </button>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            </div>
+            
+            <div class="mission-loop-hud-actions">
+              <button class="mission-loop-hud-submit" id="validateMissionBtn" type="button" ${!localState.selectedOptionId ? "disabled" : ""}>
+                Probar respuesta
+                <span class="ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-right")}</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      `;
+    }
+
     return `
       <p class="mission-helper">Elige la opcion que mejor resuelve el reto.</p>
       <div class="mission-options">
@@ -2154,98 +2300,120 @@ function renderLoopSimulation(mission, challenge, localState) {
   if (challenge.type === "loop-builder") {
     const isRunning = localState.isRunning || false;
     return `
-      <div class="mission-loop-game">
-        <section class="mission-loop-board-panel">
+      <div class="mission-loop-fullscreen-stage">
+        <section class="mission-loop-visual-arena">
           ${renderLoopSimulation(mission, challenge, localState)}
         </section>
         
-        <section class="mission-loop-control-panel">
-          <p class="mission-helper">Consola del Capitán: Ajustá los diales mecánicos para configurar la repetición del patrón.</p>
+        <aside class="mission-loop-hud-sidebar">
+          <div class="mission-loop-hud-header">
+            <button id="guidedBackToSubmapBtn" type="button" aria-label="Volver">
+              <span class="ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-left")}</span>
+              Volver
+            </button>
+            <div class="wallet">
+              <span><i class="currency-icon gold"></i>${appState.coins}</span>
+              <span><i class="currency-icon gems"></i>${appState.gems}</span>
+            </div>
+          </div>
           
-          <div class="mission-loop-layout">
-            <div class="mission-loop-card">
-              <div class="eyebrow">Diales de Ciclos (Repeticiones)</div>
-              <div class="mission-loop-options">
-                ${(challenge.repeatOptions || [])
-                  .map(
-                    (count) => `
-                      <button
-                        class="mission-loop-choice ${localState.repeatCount === count ? "selected" : ""} ${isRunning ? "disabled" : ""}"
-                        data-repeat-count="${count}"
-                        type="button"
-                        ${isRunning ? "disabled" : ""}
-                      >
-                        <span class="loop-choice-bullet"></span>
-                        <span class="loop-choice-label">${count} ciclos</span>
-                      </button>
-                    `
-                  )
-                  .join("")}
+          <div class="mission-loop-hud-body">
+            <span class="eyebrow" style="color:#fbbf24; font-weight:bold; font-size:11px; letter-spacing:1px; text-transform:uppercase;">Micro-misión ${mission.number}</span>
+            <h1>${mission.title}</h1>
+            <p class="mission-prompt">${challenge.prompt || "Consola del Capitán: Ajustá los diales mecánicos para configurar la repetición del patrón."}</p>
+            
+            <div class="mission-loop-layout">
+              <div class="mission-loop-card">
+                <div class="eyebrow">Diales de Ciclos (Repeticiones)</div>
+                <div class="mission-loop-options">
+                  ${(challenge.repeatOptions || [])
+                    .map(
+                      (count) => `
+                        <button
+                          class="mission-loop-choice ${localState.repeatCount === count ? "selected" : ""} ${isRunning ? "disabled" : ""}"
+                          data-repeat-count="${count}"
+                          type="button"
+                          ${isRunning ? "disabled" : ""}
+                        >
+                          <span class="loop-choice-bullet"></span>
+                          <span class="loop-choice-label">${count} ciclos</span>
+                        </button>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </div>
+              
+              <div class="mission-loop-card">
+                <div class="eyebrow">Mecanismo de Acción</div>
+                <div class="mission-loop-options">
+                  ${(challenge.actionOptions || [])
+                    .map(
+                      (action) => `
+                        <button
+                          class="mission-loop-choice ${localState.actionId === action.id ? "selected" : ""} ${isRunning ? "disabled" : ""}"
+                          data-action-id="${action.id}"
+                          type="button"
+                          ${isRunning ? "disabled" : ""}
+                        >
+                          <span class="loop-choice-bullet"></span>
+                          <span class="loop-choice-label">${action.label}</span>
+                        </button>
+                      `
+                    )
+                    .join("")}
+                </div>
               </div>
             </div>
             
-            <div class="mission-loop-card">
-              <div class="eyebrow">Mecanismo de Acción</div>
-              <div class="mission-loop-options">
-                ${(challenge.actionOptions || [])
-                  .map(
-                    (action) => `
-                      <button
-                        class="mission-loop-choice ${localState.actionId === action.id ? "selected" : ""} ${isRunning ? "disabled" : ""}"
-                        data-action-id="${action.id}"
-                        type="button"
-                        ${isRunning ? "disabled" : ""}
-                      >
-                        <span class="loop-choice-bullet"></span>
-                        <span class="loop-choice-label">${action.label}</span>
-                      </button>
-                    `
-                  )
-                  .join("")}
+            <div class="mission-loop-preview">
+              <div class="captain-preview-header">
+                <span class="sonar-ping"></span>
+                <strong>Holograma de Configuración</strong>
               </div>
-            </div>
-          </div>
-          
-          <div class="mission-loop-preview">
-            <div class="captain-preview-header">
-              <span class="sonar-ping"></span>
-              <strong>Holograma de Configuración</strong>
-            </div>
-            <div class="captain-preview-hologram">
-              <div class="captain-hologram-gear">
-                <svg class="gear-svg" viewBox="0 0 100 100">
-                  <path d="M50 30a20 20 0 1 0 0 40 20 20 0 0 0 0-40zm0 10a10 10 0 1 1 0 20 10 10 0 0 1 0-20z" fill="currentColor"/>
-                  <path d="M50 10l-4 8 8 0z M50 90l-4-8 8 0z M10 50l8-4 0 8z M90 50l-8-4 0 8z M22 22l6 6-6 0z M78 78l-6-6 6 0z M22 78l6-6-6 0z M78 22l-6 6 6 0z" fill="currentColor"/>
-                </svg>
-                <div class="gear-number">${localState.repeatCount || "?"}</div>
-                <div class="gear-label">CICLOS</div>
-              </div>
-              
-              <div class="captain-hologram-link">
-                <svg class="arrow-connector" viewBox="0 0 60 20">
-                  <path d="M 0 10 L 50 10 M 42 4 L 50 10 L 42 16" fill="none" stroke="#59d4ff" stroke-width="3" stroke-linecap="round"/>
-                </svg>
-              </div>
-
-              <div class="captain-hologram-action">
-                <div class="action-icon-socket">
-                  ${getActionSvgIcon(localState.actionId)}
+              <div class="captain-preview-hologram">
+                <div class="captain-hologram-gear">
+                  <svg class="gear-svg" viewBox="0 0 100 100">
+                    <path d="M50 30a20 20 0 1 0 0 40 20 20 0 0 0 0-40zm0 10a10 10 0 1 1 0 20 10 10 0 0 1 0-20z" fill="currentColor"/>
+                    <path d="M50 10l-4 8 8 0z M50 90l-4-8 8 0z M10 50l8-4 0 8z M90 50l-8-4 0 8z M22 22l6 6-6 0z M78 78l-6-6 6 0z M22 78l6-6-6 0z M78 22l-6 6 6 0z" fill="currentColor"/>
+                  </svg>
+                  <div class="gear-number">${localState.repeatCount || "?"}</div>
+                  <div class="gear-label">CICLOS</div>
                 </div>
-                <div class="action-label">${
-                  (challenge.actionOptions || []).find((item) => item.id === localState.actionId)?.label || "Elegir acción..."
-                }</div>
+                
+                <div class="captain-hologram-link">
+                  <svg class="arrow-connector" viewBox="0 0 60 20">
+                    <path d="M 0 10 L 50 10 M 42 4 L 50 10 L 42 16" fill="none" stroke="#59d4ff" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                </div>
+
+                <div class="captain-hologram-action">
+                  <div class="action-icon-socket">
+                    ${getActionSvgIcon(localState.actionId)}
+                  </div>
+                  <div class="action-label">${
+                    (challenge.actionOptions || []).find((item) => item.id === localState.actionId)?.label || "Elegir acción..."
+                  }</div>
+                </div>
               </div>
+            </div>
+            
+            <div class="mission-loop-track">
+              ${Array.from({ length: localState.repeatCount || 0 }, (_, index) => `
+                <div class="mission-loop-step ${localState.isRunning && localState.animationStep === index ? "active" : ""} ${localState.hasRun && localState.animationStep > index ? "done" : ""}" style="animation-delay:${index * 0.1}s;">
+                  ${index + 1}
+                </div>
+              `).join("")}
             </div>
           </div>
           
-          <div class="mission-loop-track">
-            ${Array.from({ length: localState.repeatCount || 0 }, (_, index) => `
-              <div class="mission-loop-step ${localState.isRunning && localState.animationStep === index ? "active" : ""} ${localState.hasRun && localState.animationStep > index ? "done" : ""}" style="animation-delay:${index * 0.1}s;">
-                ${index + 1}
-              </div>
-            `).join("")}
+          <div class="mission-loop-hud-actions">
+            <button class="mission-loop-hud-submit" id="validateMissionBtn" type="button" ${isRunning ? "disabled" : ""}>
+              Activar bucle
+              <span class="ui-icon-wrap" aria-hidden="true">${uiIcon("arrow-right")}</span>
+            </button>
           </div>
-        </section>
+        </aside>
       </div>
     `;
   }
@@ -2266,9 +2434,11 @@ export function renderMission() {
     challenge.type === "reorder"
       ? `${getCorrectCount(missionModel.state.orderedItems || [], challenge.solution || [])}/${(challenge.solution || []).length || 0}`
       : world.short;
-  const isFullScreenMission = mission.id === "4-1-1" || mission.id === "4-1-2" || mission.id === "4-1-3" || mission.id === "4-1-4" || mission.id === "4-1-5" || mission.id === "4-1-6" || mission.id === "4-1-final";
+  const isFullScreenMission = mission.id.startsWith("4-1-") || mission.id.startsWith("4-2-");
   const missionScreenClass =
-    mission.id === "4-1-1"
+    mission.id.startsWith("4-2-")
+      ? " mission-screen-loop-fullscreen"
+      : mission.id === "4-1-1"
       ? " mission-screen-path-guided mission-screen-first-steps"
       : mission.id === "4-1-2"
       ? " mission-screen-order-correct mission-screen-order-full"
