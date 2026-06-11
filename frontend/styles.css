@@ -20972,198 +20972,744 @@ body.legal-page-body .legal-page {
 
 
 
-/* --- MISSION 3: El Faro de Destellos --- */
+/* === MISSION 3: EL FARO DE DESTELLOS === */
 .lighthouse-stage {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #070b19 0%, #0f172a 60%, #1e1b4b 100%);
 }
 
-.starry-sky {
+/* Aurora Borealis effect */
+.aurora-band {
   position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, #0c1a30 0%, #030712 100%);
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 60%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.15) 0%, rgba(14, 165, 233, 0.15) 40%, transparent 70%);
+  filter: blur(40px);
   z-index: 1;
+  pointer-events: none;
+}
+.aurora-band-1 {
+  animation: auroraFlow1 12s ease-in-out infinite alternate;
+}
+.aurora-band-2 {
+  background: radial-gradient(ellipse at 30% 20%, rgba(168, 85, 247, 0.15) 0%, rgba(236, 72, 153, 0.1) 40%, transparent 75%);
+  animation: auroraFlow2 18s ease-in-out infinite alternate;
 }
 
-.lighthouse-tower {
-  width: 80px;
-  height: 160px;
-  position: relative;
-  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
-  border-radius: 10px 10px 0 0;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+@keyframes auroraFlow1 {
+  0% { transform: translate(-20%, -10%) skewX(-15deg) scaleY(1); }
+  100% { transform: translate(10%, 10%) skewX(15deg) scaleY(1.3); }
+}
+@keyframes auroraFlow2 {
+  0% { transform: translate(10%, -5%) skewX(10deg) scaleY(1.2); }
+  100% { transform: translate(-15%, 5%) skewX(-10deg) scaleY(0.9); }
 }
 
-.lighthouse-tower::before {
-  content: '';
+/* Starry Night elements */
+.twinkle-star {
   position: absolute;
-  width: 90px;
-  height: 10px;
-  background: #475569;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ffffff;
+  z-index: 1;
+  pointer-events: none;
+  animation: starTwinkleAnim 1.8s infinite alternate ease-in-out;
+}
+@keyframes starTwinkleAnim {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 12px rgba(255, 255, 255, 0.9); }
+}
+
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 50px;
+  background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+  transform: rotate(-35deg);
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  animation: shootStarAnim 10s infinite linear;
+}
+@keyframes shootStarAnim {
+  0% { transform: translate(150px, -50px) rotate(-35deg); opacity: 0; }
+  8% { opacity: 1; }
+  15% { transform: translate(-100px, 200px) rotate(-35deg); opacity: 0; }
+  100% { transform: translate(-100px, 200px) rotate(-35deg); opacity: 0; }
+}
+
+/* Glowing Moon */
+.night-moon {
+  position: absolute;
+  top: 10%;
+  right: 12%;
+  width: 70px;
+  height: 70px;
+  background: radial-gradient(circle at 30% 30%, #fffef0 0%, #e2e8f0 70%, #cbd5e1 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 40px rgba(254, 243, 199, 0.4), 0 0 80px rgba(254, 243, 199, 0.2);
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.moon-crater {
+  position: absolute;
+  background: rgba(100, 116, 139, 0.15);
+  border-radius: 50%;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+.moon-crater-1 { width: 14px; height: 14px; top: 25%; left: 25%; }
+.moon-crater-2 { width: 8px; height: 8px; top: 60%; left: 45%; }
+.moon-crater-3 { width: 18px; height: 10px; top: 45%; left: 65%; transform: rotate(15deg); }
+
+/* Night Ocean */
+.night-ocean {
+  position: absolute;
+  left: 0;
+  right: 0;
   bottom: 0;
+  height: 60px;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.night-wave {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 100%;
+  border-radius: 43%;
+  opacity: 0.8;
+}
+.night-wave-1 {
+  bottom: -40px;
+  background: rgba(15, 23, 42, 0.9);
+  animation: nightWaveMove 12s infinite linear;
+}
+.night-wave-2 {
+  bottom: -48px;
+  background: rgba(30, 27, 75, 0.95);
+  animation: nightWaveMove 8s infinite linear reverse;
+}
+@keyframes nightWaveMove {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Cliff & Grass */
+.cliff-crags {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 95px;
+  z-index: 3;
+  pointer-events: none;
+}
+.cliff-path {
+  fill: #1a233a;
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 1px;
+}
+.cliff-detail {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 2px;
+  stroke-linecap: round;
+}
+.cliff-grass-patches {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  height: 40px;
+  z-index: 4;
+  pointer-events: none;
+}
+.cliff-grass {
+  position: absolute;
+  font-size: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  animation: grassSway 4s ease-in-out infinite alternate;
+  transform-origin: bottom center;
+}
+@keyframes grassSway {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(5deg); }
+}
+
+/* Fireflies */
+.night-firefly {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: #fef08a;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #fef08a, 0 0 15px #fef08a;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  animation: fireflyFloat 6s infinite ease-in-out;
+}
+@keyframes fireflyFloat {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.8); }
+  30% { opacity: 0.8; }
+  70% { opacity: 0.8; }
+  100% { opacity: 0; transform: translate(30px, -40px) scale(0.6); }
+}
+
+/* Lighthouse Tower & Platform */
+.lighthouse-tower {
+  width: 50px;
+  height: 180px;
+  position: absolute;
+  bottom: 45px;
+  left: 12%;
+  z-index: 4;
+  background: #e2e8f0;
+  border-radius: 3px 3px 0 0;
+  box-shadow: 10px 0 20px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.lighthouse-stripe {
+  width: 100%;
+  height: 60px;
+  background: #ef4444;
+}
+.lighthouse-stripe:nth-child(2) {
+  background: #ffffff;
+}
+.lighthouse-stripe:nth-child(3) {
+  background: #ef4444;
+}
+.lighthouse-window {
+  position: absolute;
+  width: 8px;
+  height: 14px;
+  background: #fef08a;
+  box-shadow: 0 0 8px #fef08a;
+  border-radius: 4px 4px 0 0;
+  left: calc(50% - 4px);
+  z-index: 5;
+}
+.lh-win-1 { top: 40px; }
+.lh-win-2 { top: 110px; }
+
+.lighthouse-base-platform {
+  position: absolute;
+  width: 74px;
+  height: 12px;
+  background: #334155;
   border-radius: 4px;
+  bottom: 45px;
+  left: calc(12% - 12px);
+  z-index: 4;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 .lighthouse-cabin {
-  width: 50px;
-  height: 40px;
-  background: transparent;
-  border: 3px solid #475569;
   position: absolute;
-  top: -40px;
+  width: 42px;
+  height: 35px;
+  background: rgba(30, 41, 59, 0.4);
+  border: 3px solid #475569;
+  border-radius: 4px;
+  top: -35px;
+  left: calc(50% - 21px);
+  z-index: 6;
   display: flex;
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(2px);
 }
-
 .lighthouse-roof {
   position: absolute;
-  top: -65px;
+  top: -62px;
+  left: calc(50% - 25px);
   width: 0;
   height: 0;
-  border-left: 28px solid transparent;
-  border-right: 28px solid transparent;
-  border-bottom: 25px solid #1e293b;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 28px solid #b91c1c;
+  z-index: 6;
+  filter: drop-shadow(0 -2px 5px rgba(0,0,0,0.3));
 }
-
 .lighthouse-lens {
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
+  background: #fffbdf;
   border-radius: 50%;
-  z-index: 3;
-  animation: lighthouseFlashAnim 2.4s infinite steps(1);
+  box-shadow: 0 0 25px #fbbf24;
+  z-index: 7;
+  animation: lensFlashAnim 3s infinite ease-in-out;
+}
+@keyframes lensFlashAnim {
+  0%, 100% { transform: scale(0.9); box-shadow: 0 0 15px #fbbf24; }
+  50% { transform: scale(1.15); box-shadow: 0 0 35px #fffbdf, 0 0 60px #fbbf24; }
 }
 
 .lighthouse-beam {
   position: absolute;
-  width: 200px;
-  height: 100px;
-  background: radial-gradient(ellipse at left, rgba(254, 240, 138, 0.4) 0%, transparent 70%);
-  clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
-  left: 12px;
-  top: -30px;
-  transform-origin: left center;
-  z-index: 2;
-  animation: lighthouseBeamAnim 2.4s infinite steps(1);
+  width: 350px;
+  height: 180px;
+  top: -100px;
+  z-index: 8;
+  pointer-events: none;
+  transform-origin: 20px 100px;
+  opacity: 0.75;
+}
+.lighthouse-beam-left {
+  left: -330px;
+  background: radial-gradient(ellipse at right, rgba(254, 240, 138, 0.45) 0%, rgba(254, 240, 138, 0.1) 40%, transparent 75%);
+  clip-path: polygon(0 20%, 100% 50%, 0 80%);
+  animation: beamRotateLeft 8s ease-in-out infinite alternate;
+}
+.lighthouse-beam-right {
+  left: 20px;
+  background: radial-gradient(ellipse at left, rgba(254, 240, 138, 0.45) 0%, rgba(254, 240, 138, 0.1) 40%, transparent 75%);
+  clip-path: polygon(100% 20%, 0 50%, 100% 80%);
+  animation: beamRotateRight 8s ease-in-out infinite alternate;
+}
+@keyframes beamRotateLeft {
+  0% { transform: rotate(-10deg); opacity: 0.4; }
+  50% { opacity: 0.85; }
+  100% { transform: rotate(10deg); opacity: 0.4; }
+}
+@keyframes beamRotateRight {
+  0% { transform: rotate(10deg); opacity: 0.4; }
+  50% { opacity: 0.85; }
+  100% { transform: rotate(-10deg); opacity: 0.4; }
 }
 
-@keyframes lighthouseFlashAnim {
-  0%, 50% { background: #fbbf24; box-shadow: 0 0 30px #fbbf24; }
-  50.01%, 100% { background: #38bdf8; box-shadow: 0 0 30px #38bdf8; }
+/* Glassmorphism Title Banner */
+.lighthouse-title-banner {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  color: #ffffff;
+  font-family: Fredoka, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  animation: bannerEntry 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.lighthouse-title-icon {
+  font-size: 20px;
+  animation: bounceSlow 3s infinite ease-in-out;
 }
 
-@keyframes lighthouseBeamAnim {
-  0%, 50% { 
-    background: radial-gradient(ellipse at left, rgba(251, 191, 36, 0.45) 0%, transparent 70%);
-    transform: rotate(5deg);
-  }
-  50.01%, 100% { 
-    background: radial-gradient(ellipse at left, rgba(56, 189, 248, 0.45) 0%, transparent 70%);
-    transform: rotate(-5deg);
-  }
-}
-
-/* --- MISSION 5: La Batería de Bit --- */
+/* === MISSION 5: LA BATERÍA DE BIT === */
 .battery-stage {
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 40px;
+  gap: 60px;
   position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #111827 0%, #1e1b4b 50%, #0f172a 100%);
+  padding-bottom: 20px;
 }
 
-.battery-cylinder {
+.lab-workshop {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(30, 41, 59, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(30, 41, 59, 0.3) 0%, transparent 50%);
+  z-index: 0;
+}
+
+.lab-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Submarine Portholes */
+.lab-porthole {
+  position: absolute;
   width: 80px;
-  height: 140px;
-  border: 4px solid #f2c35b;
-  border-radius: 12px;
+  height: 80px;
+  border-radius: 50%;
+  border: 6px solid #b45309;
+  box-shadow: 
+    inset 0 4px 10px rgba(0,0,0,0.8),
+    0 4px 15px rgba(0,0,0,0.6),
+    0 0 0 2px rgba(245, 158, 11, 0.2);
+  z-index: 2;
+  overflow: hidden;
+}
+.lab-porthole-1 {
+  top: 15%;
+  left: 8%;
+}
+.lab-porthole-2 {
+  top: 25%;
+  right: 8%;
+}
+.porthole-water {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+  z-index: 1;
+}
+.porthole-fish {
+  position: absolute;
+  font-size: 16px;
+  z-index: 2;
+  animation: fishSwim1 10s linear infinite;
+  white-space: nowrap;
+}
+.porthole-fish-2 {
+  animation: fishSwim2 14s linear infinite;
+}
+
+@keyframes fishSwim1 {
+  0% { transform: translate(-20px, 30px) scaleX(1); }
+  49% { transform: translate(90px, 15px) scaleX(1); }
+  50% { transform: translate(90px, 15px) scaleX(-1); }
+  99% { transform: translate(-20px, 30px) scaleX(-1); }
+  100% { transform: translate(-20px, 30px) scaleX(1); }
+}
+@keyframes fishSwim2 {
+  0% { transform: translate(90px, 40px) scaleX(-1); }
+  49% { transform: translate(-20px, 10px) scaleX(-1); }
+  50% { transform: translate(-20px, 10px) scaleX(1); }
+  99% { transform: translate(90px, 40px) scaleX(1); }
+  100% { transform: translate(90px, 40px) scaleX(-1); }
+}
+
+/* Copper Pipes Layout */
+.pipes-layout {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+.pipe-line {
+  fill: none;
+  stroke: #c2410c;
+  stroke-width: 8px;
+  stroke-linecap: round;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+}
+.pipe-joint {
+  fill: #ea580c;
+  stroke: #7c2d12;
+  stroke-width: 2px;
+}
+.pipe-valve {
+  fill: #ef4444;
+  stroke: #991b1b;
+  stroke-width: 1px;
+  transform-origin: center;
+  animation: valvePulse 4s infinite ease-in-out alternate;
+}
+@keyframes valvePulse {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(15deg); }
+}
+
+/* Pressure Gauges */
+.gauge-gauge {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  background: radial-gradient(circle, #f8fafc 0%, #e2e8f0 80%, #94a3b8 100%);
+  border: 3px solid #475569;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.gauge-gauge-1 {
+  top: 15%;
+  left: 35%;
+}
+.gauge-gauge-2 {
+  bottom: 25%;
+  right: 32%;
+}
+.gauge-arrow {
+  position: absolute;
+  width: 2px;
+  height: 18px;
+  background: #dc2626;
+  bottom: 50%;
+  left: calc(50% - 1px);
+  transform-origin: bottom center;
+  animation: gaugeWiggle 2.5s infinite ease-in-out;
+}
+.gauge-label {
+  position: absolute;
+  bottom: 4px;
+  font-size: 7px;
+  color: #475569;
+  font-weight: 700;
+  font-family: monospace;
+}
+@keyframes gaugeWiggle {
+  0%, 100% { transform: rotate(-40deg); }
+  50% { transform: rotate(20deg); }
+  75% { transform: rotate(5deg); }
+}
+
+/* Steam Puffs escaping */
+.steam-puff-effect {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  filter: blur(5px);
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  animation: steamRiseAnim 3s infinite ease-out;
+}
+@keyframes steamRiseAnim {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  15% { opacity: 0.6; }
+  50% { transform: translateY(-40px) scale(1.2); opacity: 0.3; }
+  100% { transform: translateY(-80px) scale(1.8); opacity: 0; }
+}
+
+/* Underwater / Lab bubbles */
+.lab-bubble {
+  position: absolute;
+  bottom: -10px;
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: bubbleRiseAnim 7s infinite linear;
+}
+@keyframes bubbleRiseAnim {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-320px) translateX(30px); opacity: 0; }
+}
+
+/* Electric Sparks */
+.electric-spark {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: #38bdf8;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 60%, 80% 100%, 0% 50%, 40% 40%);
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 0 10px #38bdf8;
+  animation: sparkFlash 5s infinite steps(1);
+}
+@keyframes sparkFlash {
+  0%, 95%, 100% { opacity: 0; }
+  96%, 98% { opacity: 0.95; transform: scale(1.2) rotate(15deg); }
+  97%, 99% { opacity: 0.8; transform: scale(0.8) rotate(-10deg); }
+}
+
+/* Warning Light Dome */
+.lab-warning-light {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 20px;
+  background: #475569;
+  border-radius: 16px 16px 0 0;
+  border: 2px solid #334155;
+  z-index: 4;
+}
+.lab-warning-light.light-green {
+  background: #10b981;
+  box-shadow: 0 0 20px 8px rgba(16, 185, 129, 0.7);
+  animation: lightPulseGreen 1.5s infinite alternate ease-in-out;
+}
+.lab-warning-light.light-red {
+  background: #ef4444;
+  box-shadow: 0 0 20px 8px rgba(239, 68, 68, 0.7);
+  animation: lightPulseRed 0.6s infinite alternate ease-in-out;
+}
+@keyframes lightPulseGreen {
+  from { opacity: 0.6; box-shadow: 0 0 10px 4px rgba(16, 185, 129, 0.4); }
+  to { opacity: 1; box-shadow: 0 0 25px 12px rgba(16, 185, 129, 0.85); }
+}
+@keyframes lightPulseRed {
+  from { opacity: 0.5; box-shadow: 0 0 8px 3px rgba(239, 68, 68, 0.3); }
+  to { opacity: 1; box-shadow: 0 0 30px 15px rgba(239, 68, 68, 0.95); }
+}
+
+/* Battery Upgrade styling */
+.battery-cylinder {
+  width: 100px;
+  height: 180px;
+  border: 6px solid #e2e8f0;
+  border-radius: 18px;
   position: relative;
-  padding: 8px;
+  padding: 10px;
   display: flex;
   flex-direction: column-reverse;
-  gap: 6px;
-  background: rgba(0,0,0,0.4);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  box-shadow: 
+    inset 0 8px 16px rgba(0,0,0,0.6),
+    0 12px 36px rgba(0,0,0,0.7),
+    0 0 0 3px rgba(255,255,255,0.05);
+  backdrop-filter: blur(4px);
+  z-index: 5;
+  transition: border-color 0.5s ease;
 }
-
 .battery-cylinder::before {
   content: '';
   position: absolute;
-  top: -12px;
-  left: calc(50% - 14px);
-  width: 28px;
-  height: 8px;
-  background: #f2c35b;
-  border-radius: 4px 4px 0 0;
+  top: -15px;
+  left: calc(50% - 18px);
+  width: 36px;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
 }
 
 .battery-cell-segment {
   width: 100%;
-  height: 34px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 4px;
-  transition: all 0.4s;
+  height: 36px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255,255,255,0.02);
 }
 
+/* Battery States */
+.battery-cylinder.state-full {
+  border-color: #34d399;
+}
+.battery-cylinder.state-full::before {
+  background: #34d399;
+}
 .battery-cylinder.state-full .battery-cell-segment {
-  background: #10b981;
-  box-shadow: 0 0 12px #10b981;
+  background: linear-gradient(90deg, #10b981 0%, #34d399 50%, #059669 100%);
+  box-shadow: 
+    0 0 15px rgba(16, 185, 129, 0.6),
+    inset 0 2px 4px rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.15);
 }
 
-.battery-cylinder.state-empty .battery-cell-segment {
-  background: rgba(255,255,255,0.05);
-  box-shadow: none;
+.battery-cylinder.state-empty {
+  border-color: #f87171;
+}
+.battery-cylinder.state-empty::before {
+  background: #f87171;
 }
 .battery-cylinder.state-empty .battery-cell-segment:first-child {
-  background: #ef4444;
-  box-shadow: 0 0 12px #ef4444;
-  animation: batteryAlertFlash 0.5s infinite alternate;
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 50%, #b91c1c 100%);
+  box-shadow: 
+    0 0 15px rgba(239, 68, 68, 0.6),
+    inset 0 2px 4px rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.15);
+  animation: batteryAlertFlash 0.4s infinite alternate ease-in-out;
 }
 
-@keyframes batteryAlertFlash {
-  from { opacity: 0.4; }
-  to { opacity: 1; }
+.battery-energy-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  z-index: -1;
+  background: transparent;
+  transition: background 0.5s ease;
+}
+.battery-cylinder.state-full .battery-energy-glow {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+  animation: energyPulse 3s infinite ease-in-out alternate;
+}
+@keyframes energyPulse {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 
+/* Robot HUD inside lab */
 .battery-bit-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 5;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
 }
-
 .battery-bit-sprite {
-  width: 90px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  transition: transform 0.3s ease;
+}
+.battery-bit-sprite:hover {
+  transform: scale(1.05);
 }
 
-.battery-bit-sprite.happy {
-  animation: bitHappyJump 0.5s infinite alternate;
+/* Status Banner inside Lab */
+.lab-title-banner {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  color: #ffffff;
+  font-family: Fredoka, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  animation: bannerEntry 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.lab-title-icon {
+  font-size: 20px;
+  animation: bounceSlow 3s infinite ease-in-out;
 }
 
-.battery-bit-sprite.sad {
-  animation: bitSadShrug 1s infinite alternate;
-}
-
-@keyframes bitHappyJump {
-  from { transform: translateY(0) scaleY(1); }
-  to { transform: translateY(-10px) scaleY(1.05); }
-}
-
-@keyframes bitSadShrug {
-  0%, 100% { transform: rotate(0); }
-  50% { transform: rotate(-5deg) translateY(2px); }
-}
 
 
 

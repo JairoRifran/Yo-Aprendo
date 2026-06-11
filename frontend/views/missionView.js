@@ -1761,30 +1761,84 @@ function renderLoopSimulation(mission, challenge, localState) {
   }
 
   if (mission.id === "4-2-3") {
-    // Generate multiple Twinkling Stars
-    const starsHtml = Array.from({ length: 14 }, (_, idx) => {
-      const top = Math.random() * 70;
+    // Twinkling Stars - varied sizes
+    const starsHtml = Array.from({ length: 25 }, (_, idx) => {
+      const top = Math.random() * 55;
       const left = Math.random() * 95;
-      const delay = Math.random() * 2;
-      return `<div class="twinkle-star" style="top:${top}%; left:${left}%; animation-delay:${delay}s;"></div>`;
+      const delay = Math.random() * 3;
+      const size = 1.5 + Math.random() * 3.5;
+      return `<div class="twinkle-star" style="top:${top}%; left:${left}%; animation-delay:${delay}s; width:${size}px; height:${size}px;"></div>`;
+    }).join("");
+
+    // Shooting stars
+    const shootingStarsHtml = Array.from({ length: 2 }, (_, i) => {
+      const top = 10 + i * 20;
+      const delay = i * 7 + 3;
+      return `<div class="shooting-star" style="top:${top}%; animation-delay:${delay}s;"></div>`;
+    }).join("");
+
+    // Fireflies
+    const firefliesHtml = Array.from({ length: 8 }, (_, i) => {
+      const bottom = 20 + Math.random() * 40;
+      const left = 5 + Math.random() * 90;
+      const delay = Math.random() * 5;
+      return `<div class="night-firefly" style="bottom:${bottom}%; left:${left}%; animation-delay:${delay}s;"></div>`;
     }).join("");
 
     return `
       <div class="lighthouse-stage">
-        <div class="starry-sky" aria-hidden="true"></div>
+        <div class="night-sky"></div>
+        <div class="aurora-band aurora-band-1"></div>
+        <div class="aurora-band aurora-band-2"></div>
+
+        <div class="night-moon">
+          <div class="moon-crater moon-crater-1"></div>
+          <div class="moon-crater moon-crater-2"></div>
+          <div class="moon-crater moon-crater-3"></div>
+        </div>
+
         ${starsHtml}
-        
-        <!-- Cliff crags in SVG -->
-        <svg class="cliff-crags" viewBox="0 0 320 100" preserveAspectRatio="none">
-          <path class="cliff-path" d="M 0 100 L 0 50 Q 80 40 120 65 T 240 45 Q 280 60 320 35 L 320 100 Z" />
+        ${shootingStarsHtml}
+        ${firefliesHtml}
+
+        <div class="night-ocean">
+          <div class="night-wave night-wave-1"></div>
+          <div class="night-wave night-wave-2"></div>
+        </div>
+
+        <svg class="cliff-crags" viewBox="0 0 400 120" preserveAspectRatio="none">
+          <path class="cliff-path" d="M 0 120 L 0 65 Q 40 55 80 70 T 160 50 Q 200 60 240 45 Q 300 55 360 40 L 400 50 L 400 120 Z" />
+          <path class="cliff-detail" d="M 60 85 Q 80 78 100 85" />
+          <path class="cliff-detail" d="M 200 65 Q 220 58 240 65" />
+          <path class="cliff-detail" d="M 300 60 Q 320 53 340 60" />
         </svg>
 
-        <div class="lighthouse-tower" style="bottom: 12px;">
+        <div class="cliff-grass-patches">
+          <span class="cliff-grass" style="left:5%; bottom:0;">🌿</span>
+          <span class="cliff-grass" style="left:25%; bottom:5px;">🌱</span>
+          <span class="cliff-grass" style="left:60%; bottom:2px;">🌿</span>
+          <span class="cliff-grass" style="right:15%; bottom:0;">🌱</span>
+        </div>
+
+        <div class="lighthouse-tower">
+          <div class="lighthouse-stripe"></div>
+          <div class="lighthouse-stripe"></div>
+          <div class="lighthouse-stripe"></div>
+          <div class="lighthouse-window lh-win-1"></div>
+          <div class="lighthouse-window lh-win-2"></div>
           <div class="lighthouse-cabin">
             <div class="lighthouse-lens"></div>
-            <div class="lighthouse-beam"></div>
+            <div class="lighthouse-beam lighthouse-beam-left"></div>
+            <div class="lighthouse-beam lighthouse-beam-right"></div>
           </div>
           <div class="lighthouse-roof"></div>
+          <div class="lighthouse-base-platform"></div>
+        </div>
+
+        <div class="lighthouse-title-banner">
+          <span class="lighthouse-title-icon">🌟</span>
+          <span>¡El Faro de Destellos!</span>
+          <span class="lighthouse-title-icon">💡</span>
         </div>
       </div>
     `;
@@ -1797,38 +1851,87 @@ function renderLoopSimulation(mission, challenge, localState) {
     const bitStateClass = isCorrect ? "happy" : (opt ? "sad" : "");
 
     // Steam puffs
-    const steamHtml = Array.from({ length: 3 }, (_, idx) => {
-      const left = 30 + idx * 8;
-      const delay = idx * 0.7;
-      return `<div class="steam-puff-effect" style="left:${left}px; bottom: 35px; animation-delay:${delay}s;"></div>`;
+    const steamHtml = Array.from({ length: 5 }, (_, idx) => {
+      const left = 15 + idx * 12;
+      const delay = idx * 0.6;
+      const size = 18 + Math.random() * 14;
+      return `<div class="steam-puff-effect" style="left:${left}%; bottom:25%; animation-delay:${delay}s; width:${size}px; height:${size}px;"></div>`;
+    }).join("");
+
+    // Underwater bubbles
+    const bubblesHtml = Array.from({ length: 6 }, (_, i) => {
+      const left = 10 + Math.random() * 80;
+      const delay = Math.random() * 4;
+      const size = 4 + Math.random() * 8;
+      return `<div class="lab-bubble" style="left:${left}%; animation-delay:${delay}s; width:${size}px; height:${size}px;"></div>`;
+    }).join("");
+
+    // Electric sparks
+    const sparksHtml = Array.from({ length: 3 }, (_, i) => {
+      const left = 20 + i * 25;
+      const top = 30 + Math.random() * 30;
+      const delay = i * 1.5;
+      return `<div class="electric-spark" style="left:${left}%; top:${top}%; animation-delay:${delay}s;"></div>`;
     }).join("");
 
     return `
       <div class="battery-stage">
-        <div class="lab-workshop" aria-hidden="true"></div>
-        
-        <!-- Steampunk copper pipes -->
-        <svg class="pipes-layout" viewBox="0 0 320 200">
-          <path class="pipe-line" d="M 10 30 L 120 30 L 120 180" />
-          <path class="pipe-line" d="M 310 170 L 220 170 L 220 100" />
-          <circle class="pipe-joint" cx="120" cy="30" r="7" />
-          <circle class="pipe-joint" cx="220" cy="170" r="7" />
+        <div class="lab-workshop"></div>
+        <div class="lab-grid-overlay"></div>
+
+        <div class="lab-porthole lab-porthole-1">
+          <div class="porthole-water"></div>
+          <div class="porthole-fish">🐟</div>
+        </div>
+        <div class="lab-porthole lab-porthole-2">
+          <div class="porthole-water"></div>
+          <div class="porthole-fish porthole-fish-2">🐠</div>
+        </div>
+
+        <svg class="pipes-layout" viewBox="0 0 400 250">
+          <path class="pipe-line" d="M 10 40 L 80 40 L 80 200" />
+          <path class="pipe-line" d="M 390 30 L 320 30 L 320 130" />
+          <path class="pipe-line" d="M 10 220 L 150 220 L 150 160" />
+          <path class="pipe-line" d="M 390 210 L 280 210" />
+          <circle class="pipe-joint" cx="80" cy="40" r="8" />
+          <circle class="pipe-joint" cx="320" cy="30" r="8" />
+          <circle class="pipe-joint" cx="150" cy="220" r="8" />
+          <circle class="pipe-joint" cx="80" cy="200" r="6" />
+          <rect class="pipe-valve" x="75" y="110" width="10" height="20" rx="2" />
+          <rect class="pipe-valve" x="315" y="70" width="10" height="20" rx="2" />
         </svg>
         
-        <div class="gauge-gauge">
+        <div class="gauge-gauge gauge-gauge-1">
           <div class="gauge-arrow"></div>
+          <div class="gauge-label">PSI</div>
         </div>
-        
-        ${steamHtml}
+        <div class="gauge-gauge gauge-gauge-2">
+          <div class="gauge-arrow" style="animation-delay: 0.5s;"></div>
+          <div class="gauge-label">BAR</div>
+        </div>
 
-        <div class="battery-cylinder ${batteryClass}" style="z-index: 3;">
+        ${steamHtml}
+        ${bubblesHtml}
+        ${sparksHtml}
+
+        <div class="lab-warning-light ${opt ? (isCorrect ? 'light-green' : 'light-red') : ''}"></div>
+
+        <div class="battery-cylinder ${batteryClass}" style="z-index: 5;">
           <div class="battery-cell-segment"></div>
           <div class="battery-cell-segment"></div>
           <div class="battery-cell-segment"></div>
+          <div class="battery-cell-segment"></div>
+          <div class="battery-energy-glow"></div>
         </div>
-        <div class="battery-bit-wrapper" style="z-index: 3;">
+        <div class="battery-bit-wrapper" style="z-index: 5;">
           <img class="battery-bit-sprite ${bitStateClass}" src="./img/mission-robot-pirate.png" alt="Bit" />
           <span class="wood-sign">Batería de Bit</span>
+        </div>
+
+        <div class="lab-title-banner">
+          <span class="lab-title-icon">⚡</span>
+          <span>¡La Batería de Bit!</span>
+          <span class="lab-title-icon">🔋</span>
         </div>
       </div>
     `;
