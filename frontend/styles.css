@@ -19718,10 +19718,10 @@ body.legal-page-body .legal-page {
 /* Premium custom Loops Simulation styles */
 .mission-loop-game {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 32px;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 24px;
   align-items: stretch;
-  min-height: 480px;
+  min-height: 520px;
   margin-top: 16px;
 }
 
@@ -19736,20 +19736,381 @@ body.legal-page-body .legal-page {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(13, 27, 49, 0.45);
-  border: 1px solid rgba(89, 212, 255, 0.15);
-  backdrop-filter: blur(12px);
-  border-radius: 24px;
+  background: radial-gradient(circle at center, rgba(12, 36, 66, 0.9) 0%, rgba(5, 15, 30, 0.98) 100%);
+  border: 2px solid rgba(89, 212, 255, 0.25);
+  border-radius: 28px;
   padding: 24px;
-  box-shadow: inset 0 0 20px rgba(89, 212, 255, 0.05);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    inset 0 0 32px rgba(89, 212, 255, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
+/* Nautical Cockpit Panel (Captain's Console) */
 .mission-loop-control-panel {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  background: linear-gradient(135deg, rgba(16, 28, 48, 0.92) 0%, rgba(9, 16, 30, 0.98) 100%);
+  border: 2px solid rgba(242, 195, 91, 0.25);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    inset 0 0 24px rgba(242, 195, 91, 0.05);
 }
 
+.mission-helper {
+  font-family: Quicksand, sans-serif;
+  font-size: 14px;
+  color: #b0c9e0;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+  border-bottom: 1px dashed rgba(89, 212, 255, 0.15);
+  padding-bottom: 12px;
+}
+
+/* Submarine Console Dials & Layout */
+.mission-loop-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 10px 0;
+}
+
+.mission-loop-card {
+  background: rgba(8, 14, 26, 0.6);
+  border: 1px solid rgba(89, 212, 255, 0.12);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.mission-loop-card .eyebrow {
+  font-family: Fredoka, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #f2c35b;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mission-loop-card .eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #f2c35b;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #f2c35b;
+}
+
+.mission-loop-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Submarine Copper Dials */
+.mission-loop-choice {
+  flex: 1 1 calc(50% - 8px);
+  min-width: 110px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(242, 195, 91, 0.2);
+  background: linear-gradient(180deg, #112035 0%, #0b1524 100%);
+  color: #b0d8ff;
+  font-family: Fredoka, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.mission-loop-choice:hover:not(.disabled) {
+  border-color: #59d4ff;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(89, 212, 255, 0.2);
+}
+
+.mission-loop-choice.selected {
+  border-color: #f2c35b;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(242, 195, 91, 0.25) 0%, rgba(128, 81, 17, 0.3) 100%);
+  box-shadow: 
+    0 4px 12px rgba(242, 195, 91, 0.25),
+    inset 0 0 10px rgba(242, 195, 91, 0.15);
+  animation: choiceGlowPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes choiceGlowPulse {
+  from { border-color: rgba(242, 195, 91, 0.4); box-shadow: 0 0 8px rgba(242, 195, 91, 0.15); }
+  to { border-color: rgba(242, 195, 91, 0.8); box-shadow: 0 0 16px rgba(242, 195, 91, 0.4); }
+}
+
+.loop-choice-bullet {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  position: relative;
+  transition: all 0.25s;
+}
+
+.mission-loop-choice.selected .loop-choice-bullet {
+  background: #f2c35b;
+  border-color: #fff;
+  box-shadow: 0 0 8px #f2c35b;
+}
+
+.mission-loop-choice.selected .loop-choice-bullet::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* Hologram Preview Box */
+.mission-loop-preview {
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.captain-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #59d4ff;
+  font-family: Fredoka, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.sonar-ping {
+  width: 8px;
+  height: 8px;
+  background: #59d4ff;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+}
+
+.sonar-ping::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid #59d4ff;
+  animation: sonarRing 1.6s infinite ease-out;
+}
+
+@keyframes sonarRing {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.captain-preview-hologram {
+  background: linear-gradient(180deg, rgba(6, 20, 38, 0.9) 0%, rgba(2, 8, 18, 0.96) 100%);
+  border: 1px solid rgba(89, 212, 255, 0.2);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 
+    inset 0 0 20px rgba(89, 212, 255, 0.1),
+    0 4px 15px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.captain-preview-hologram::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(89, 212, 255, 0.02) 0px,
+    rgba(89, 212, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+}
+
+.captain-hologram-gear {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  color: #f2c35b;
+}
+
+.gear-svg {
+  width: 60px;
+  height: 60px;
+  animation: gearSpin 8s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(242, 195, 91, 0.3));
+}
+
+@keyframes gearSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.gear-number {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: Fredoka, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 6px rgba(255,255,255,0.8);
+}
+
+.gear-label {
+  font-family: Quicksand, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 6px;
+  color: #f2c35b;
+}
+
+.captain-hologram-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-connector {
+  width: 44px;
+  filter: drop-shadow(0 0 4px rgba(89,212,255,0.4));
+  animation: arrowPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes arrowPulse {
+  from { opacity: 0.5; transform: scaleX(0.9); }
+  to { opacity: 1; transform: scaleX(1.1); }
+}
+
+.captain-hologram-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #59d4ff;
+  max-width: 140px;
+  text-align: center;
+}
+
+.action-icon-socket {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(89, 212, 255, 0.08);
+  border: 2px dashed rgba(89, 212, 255, 0.4);
+  display: grid;
+  place-items: center;
+  color: #59d4ff;
+  filter: drop-shadow(0 0 8px rgba(89, 212, 255, 0.2));
+  transition: all 0.3s;
+}
+
+.action-icon-socket svg {
+  width: 32px;
+  height: 32px;
+  stroke-width: 2.2;
+}
+
+.captain-hologram-action .action-label {
+  font-family: Fredoka, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 8px;
+  color: #b0d8ff;
+  text-shadow: 0 0 4px rgba(89,212,255,0.2);
+}
+
+/* Radar Sonar Track (Steps track at the bottom) */
+.mission-loop-track {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 12px;
+  background: rgba(8, 14, 26, 0.4);
+  border: 1px solid rgba(89, 212, 255, 0.08);
+  border-radius: 16px;
+}
+
+.mission-loop-step {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #5d7e9e;
+  font-family: Fredoka, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.mission-loop-step.active {
+  background: radial-gradient(circle, #0284c7 0%, #075985 100%);
+  border-color: #59d4ff;
+  color: #fff;
+  box-shadow: 
+    0 0 15px rgba(89, 212, 255, 0.6),
+    inset 0 0 6px rgba(255,255,255,0.4);
+  transform: scale(1.18);
+}
+
+.mission-loop-step.active::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(89, 212, 255, 0.4);
+  animation: stepRadarExpand 1s infinite linear;
+}
+
+@keyframes stepRadarExpand {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.mission-loop-step.done {
+  background: radial-gradient(circle, #059669 0%, #065f46 100%);
+  border-color: #34d399;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+}
+
+/* Loop Simulation Container */
 .loop-sim-container {
   width: 100%;
   height: 100%;
@@ -19758,6 +20119,8 @@ body.legal-page-body .legal-page {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .loop-sim-title {
@@ -19766,367 +20129,612 @@ body.legal-page-body .legal-page {
   font-weight: 700;
   color: #59d4ff;
   text-shadow: 0 0 10px rgba(89, 212, 255, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loop-sim-title svg {
+  width: 24px;
+  height: 24px;
 }
 
 .loop-sim-stage {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   flex-grow: 1;
   width: 100%;
-  min-height: 160px;
+  min-height: 200px;
   position: relative;
 }
 
 .loop-sim-status-msg {
+  font-family: Quicksand, sans-serif;
   font-size: 15px;
   color: #b0d8ff;
   text-align: center;
-  min-height: 24px;
+  min-height: 26px;
   font-weight: bold;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(89, 212, 255, 0.08);
 }
 
-/* Walk Simulation */
+/* --- MISSION 2: Baldosas del Eco --- */
+.loop-sim-walk .loop-sim-stage {
+  background: radial-gradient(ellipse at bottom, rgba(7, 30, 54, 0.5) 0%, transparent 70%);
+}
+
 .loop-sim-tile {
-  width: 58px;
-  height: 58px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(20, 40, 68, 0.8) 0%, rgba(10, 20, 35, 0.9) 100%);
+  border: 2px solid rgba(89, 212, 255, 0.15);
   display: grid;
   place-items: center;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 6px 12px rgba(0,0,0,0.3),
+    inset 0 1px 3px rgba(255,255,255,0.05);
 }
 
 .loop-sim-tile.start {
-  border-color: rgba(56, 189, 248, 0.4);
-  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
 }
 
 .loop-sim-tile.goal {
-  border-color: rgba(234, 179, 8, 0.5);
-  background: rgba(234, 179, 8, 0.15);
-  box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+  border-color: rgba(242, 195, 91, 0.5);
+  box-shadow: 0 0 12px rgba(242, 195, 91, 0.2);
 }
 
 .loop-sim-tile.has-robot {
-  background: rgba(16, 185, 129, 0.2);
-  border-color: rgba(16, 185, 129, 0.5);
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(6, 95, 70, 0.4) 100%);
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 
+    0 0 20px rgba(16, 185, 129, 0.4),
+    inset 0 0 8px rgba(16, 185, 129, 0.2);
+}
+
+/* Glowing Runes inside tiles */
+.loop-sim-tile::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid rgba(89, 212, 255, 0.1);
+  border-radius: 50%;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.loop-sim-tile.has-robot::before {
+  border-color: rgba(52, 211, 153, 0.4);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
 }
 
 .loop-sim-robot-sprite {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
-  animation: robotBounce 0.6s ease-in-out infinite alternate;
+  animation: robotPremiumBounce 0.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+  z-index: 3;
+}
+
+@keyframes robotPremiumBounce {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(-6px) scale(1.04); }
 }
 
 .loop-sim-star {
-  font-size: 20px;
-  animation: starPulse 1s ease-in-out infinite alternate;
+  font-size: 22px;
+  z-index: 2;
+  animation: starPremiumPulse 1.2s ease-in-out infinite alternate;
 }
 
-.loop-sim-tile-index {
+@keyframes starPremiumPulse {
+  from { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 2px rgba(242, 195, 91, 0.5)); }
+  to { transform: scale(1.22) rotate(15deg); filter: drop-shadow(0 0 10px rgba(242, 195, 91, 0.9)); }
+}
+
+/* Ostra Marina instead of just star */
+.oyster-goal {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.oyster-goal svg {
+  width: 44px;
+  height: 44px;
+  fill: #f2c35b;
+  filter: drop-shadow(0 0 6px rgba(242, 195, 91, 0.4));
+  animation: oysterFloat 2s ease-in-out infinite alternate;
+}
+
+@keyframes oysterFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+/* Bubble stream animation */
+.bubble-particle {
   position: absolute;
-  bottom: -22px;
-  font-size: 11px;
-  color: #5d7e9e;
-  font-weight: 700;
+  border-radius: 50%;
+  background: rgba(89, 212, 255, 0.3);
+  border: 0.5px solid rgba(255,255,255,0.4);
+  bottom: 0px;
+  pointer-events: none;
+  animation: bubbleRise 1.2s infinite ease-in;
 }
 
-/* Garden Simulation */
+@keyframes bubbleRise {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(-80px) translateX(var(--x-drift, 10px)) scale(1.2); opacity: 0; }
+}
+
+/* --- MISSION 4: El Invernadero Melódico --- */
+.loop-sim-garden {
+  padding: 10px;
+}
+
+.garden-shelf {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: flex-end;
+  background: linear-gradient(180deg, transparent 70%, rgba(120, 80, 40, 0.45) 70%, rgba(60, 40, 20, 0.8) 100%);
+  border-bottom: 4px solid rgba(242, 195, 91, 0.3);
+  padding: 16px 20px 4px;
+  border-radius: 8px;
+  width: 100%;
+}
+
 .loop-sim-pot {
-  width: 64px;
-  height: 72px;
+  width: 68px;
+  height: 96px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
   position: relative;
-  padding-bottom: 8px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  transition: all 0.3s;
+  padding-bottom: 6px;
+  border-radius: 14px 14px 8px 8px;
+  background: linear-gradient(180deg, rgba(30, 45, 70, 0.4) 0%, rgba(15, 25, 45, 0.7) 100%);
+  border: 1.5px solid rgba(255,255,255,0.06);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loop-sim-pot::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 24px;
+  background: linear-gradient(180deg, #5c402c, #3d2516);
+  border-radius: 0 0 6px 6px;
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .loop-sim-pot.current {
-  border-color: rgba(56, 189, 248, 0.4);
-  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(89, 212, 255, 0.4);
+  box-shadow: 
+    0 0 15px rgba(89, 212, 255, 0.2),
+    inset 0 0 8px rgba(89, 212, 255, 0.1);
 }
 
 .loop-sim-pot.watered {
-  border-color: rgba(16, 185, 129, 0.3);
-  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(52, 211, 153, 0.3);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 25, 45, 0.7) 100%);
 }
 
-.loop-sim-plant {
-  font-size: 24px;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.loop-sim-pot.watered .loop-sim-plant {
-  transform: scale(0.6) translateY(10px);
-  opacity: 0.5;
-}
-
-.loop-sim-flower {
-  font-size: 28px;
-  position: absolute;
-  top: 4px;
-  animation: bloomAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-.loop-sim-watering-can {
-  font-size: 20px;
-  position: absolute;
-  top: -36px;
-  animation: pourAnim 0.6s ease-in-out infinite alternate;
-}
-
-.loop-sim-pot-index {
-  font-size: 11px;
-  color: #5d7e9e;
-  margin-top: 4px;
-}
-
-/* Windmill Simulation */
-.loop-sim-windmill-body {
-  width: 80px;
-  height: 110px;
-  background: linear-gradient(180deg, #1e293b, #0f172a);
-  border: 2px solid rgba(89, 212, 255, 0.2);
-  border-radius: 40px 40px 10px 10px;
+/* SVG Growing Plant */
+.plant-svg {
+  width: 44px;
+  height: 56px;
+  margin-bottom: 12px;
   position: relative;
-  margin-right: 40px;
+  z-index: 2;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: bottom center;
+}
+
+.loop-sim-pot.watered .plant-svg {
+  transform: scale(1.22);
+}
+
+.plant-stem {
+  stroke: #10b981;
+  stroke-width: 4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: growStem 0.8s ease-out forwards;
+}
+
+@keyframes growStem {
+  to { stroke-dashoffset: 0; }
+}
+
+.plant-leaf {
+  fill: #34d399;
+  transform: scale(0);
+  transform-origin: 22px 36px;
+  animation: growLeaves 0.4s 0.6s ease-out forwards;
+}
+
+.leaf-right {
+  transform-origin: 22px 36px;
+}
+
+@keyframes growLeaves {
+  to { transform: scale(1); }
+}
+
+.plant-flower {
+  transform: scale(0);
+  transform-origin: 22px 14px;
+  animation: growFlower 0.6s 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes growFlower {
+  to { transform: scale(1); }
+}
+
+/* Watering can & droplets animation */
+.watering-can-svg {
+  width: 42px;
+  height: 32px;
+  position: absolute;
+  top: -46px;
+  z-index: 10;
+  fill: #fbbf24;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  animation: wateringCanTilt 0.8s infinite ease-in-out alternate;
+  transform-origin: right bottom;
+}
+
+@keyframes wateringCanTilt {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-6px) rotate(-28deg); }
+}
+
+.rain-particle {
+  position: absolute;
+  width: 2px;
+  height: 8px;
+  background: #38bdf8;
+  border-radius: 1px;
+  top: -15px;
+  left: 22px;
+  opacity: 0.8;
+  animation: rainDropFall 0.5s infinite linear;
+}
+
+@keyframes rainDropFall {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(34px); opacity: 0; }
+}
+
+/* Floating Music Notes */
+.music-note-particle {
+  position: absolute;
+  font-size: 20px;
+  pointer-events: none;
+  animation: musicFloatUp 1.8s ease-out forwards;
+  z-index: 10;
+}
+
+@keyframes musicFloatUp {
+  0% { transform: translateY(20px) translateX(0) scale(0.6) rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-70px) translateX(var(--drift-x, 15px)) scale(1.1) rotate(var(--rot, 20deg)); opacity: 0; }
+}
+
+/* --- MISSION 6: El Generador del Eco --- */
+.loop-sim-windmill .loop-sim-stage {
+  gap: 32px;
+}
+
+.loop-sim-windmill-body {
+  width: 90px;
+  height: 125px;
+  background: linear-gradient(180deg, #1e293b 0%, #0b1329 100%);
+  border: 3.5px solid #f2c35b;
+  border-radius: 50px 50px 14px 14px;
+  position: relative;
+  box-shadow: 
+    0 8px 24px rgba(0,0,0,0.5),
+    inset 0 0 15px rgba(242, 195, 91, 0.15);
+  margin-right: 48px;
 }
 
 .loop-sim-windmill-blades {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   position: absolute;
-  top: -40px;
-  left: -10px;
+  top: -46px;
+  left: -18px;
   display: grid;
   place-items: center;
+}
+
+.windmill-rotor-center {
+  width: 22px;
+  height: 22px;
+  background: #f2c35b;
+  border-radius: 50%;
+  position: absolute;
+  z-index: 5;
+  box-shadow: 0 0 8px #f2c35b;
 }
 
 .blade {
   position: absolute;
-  width: 12px;
-  height: 50px;
-  background: linear-gradient(180deg, #38bdf8, #0284c7);
-  border-radius: 6px;
+  width: 14px;
+  height: 58px;
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  border-radius: 7px;
   transform-origin: bottom center;
   bottom: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-.blade-1 { transform: rotate(0deg); }
-.blade-2 { transform: rotate(90deg); }
-.blade-3 { transform: rotate(180deg); }
-.blade-4 { transform: rotate(270deg); }
+.blade::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 3px;
+  width: 8px;
+  height: 22px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 4px;
+}
+
+/* Electric Cables */
+.electric-cables-svg {
+  position: absolute;
+  top: 30px;
+  left: 70px;
+  width: 140px;
+  height: 120px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cable-wire {
+  stroke: rgba(255,255,255,0.12);
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 4 4;
+}
+
+.cable-wire.active {
+  stroke: #f2c35b;
+  stroke-dasharray: 6 3;
+  animation: electricPulse 0.8s infinite linear;
+  filter: drop-shadow(0 0 4px rgba(242, 195, 91, 0.8));
+}
+
+@keyframes electricPulse {
+  to { stroke-dashoffset: -18px; }
+}
 
 .loop-sim-bulbs-track {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  z-index: 2;
 }
 
 .loop-sim-bulb {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(135deg, rgba(30,45,70,0.6), rgba(15,25,40,0.8));
+  border: 1.5px solid rgba(255,255,255,0.1);
   display: grid;
   place-items: center;
   position: relative;
-  transition: all 0.3s;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .loop-sim-bulb.lit {
-  background: rgba(234, 179, 8, 0.2);
-  border-color: rgba(234, 179, 8, 0.6);
-  box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.3) 0%, rgba(234, 179, 8, 0.1) 100%);
+  border-color: rgba(234, 179, 8, 0.7);
+  box-shadow: 
+    0 0 24px rgba(234, 179, 8, 0.5),
+    inset 0 0 10px rgba(234, 179, 8, 0.2);
 }
 
-.loop-sim-bulb-glass {
-  font-size: 18px;
-  opacity: 0.4;
-  transition: opacity 0.3s;
+/* Beautiful SVG Bulb */
+.bulb-svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: #5d7e9e;
+  stroke-width: 1.8;
+  transition: all 0.35s;
 }
 
-.loop-sim-bulb.lit .loop-sim-bulb-glass {
-  opacity: 1;
-  animation: bulbGlow 1.2s ease-in-out infinite alternate;
+.loop-sim-bulb.lit .bulb-svg {
+  stroke: #fbbf24;
+  fill: rgba(251, 191, 36, 0.15);
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
 }
 
-.loop-sim-bulb-index {
+.bulb-glow-circle {
   position: absolute;
-  right: -18px;
-  font-size: 11px;
-  color: #5d7e9e;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(254, 240, 138, 0.25);
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.35s;
 }
 
-/* Circuit Simulation */
+.loop-sim-bulb.lit .bulb-glow-circle {
+  opacity: 1;
+  animation: bulbGlowBeat 1s ease-in-out infinite alternate;
+}
+
+@keyframes bulbGlowBeat {
+  from { transform: scale(0.9); opacity: 0.6; }
+  to { transform: scale(1.3); opacity: 0.9; }
+}
+
+/* --- MISSION 7: Circuito del Templo (Final) --- */
 .loop-sim-circuit-track {
-  width: 130px;
-  height: 130px;
-  border: 3px dashed rgba(89, 212, 255, 0.15);
+  width: 160px;
+  height: 160px;
+  border: 3px dashed rgba(89, 212, 255, 0.2);
   border-radius: 50%;
   position: relative;
   display: grid;
   place-items: center;
+  animation: compassRotate 15s linear infinite;
+  box-shadow: inset 0 0 25px rgba(89, 212, 255, 0.05);
+}
+
+@keyframes compassRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .loop-sim-circle-node {
   position: absolute;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: linear-gradient(135deg, rgba(30,45,70,0.8), rgba(15,25,40,0.95));
+  border: 2px solid rgba(255,255,255,0.08);
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-family: Fredoka, sans-serif;
+  font-size: 13px;
   font-weight: 700;
   color: #475569;
-  transition: all 0.3s;
+  transition: all 0.4s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  /* Counter-rotate to keep numbers upright */
+  transform: rotate(0);
 }
 
-.loop-sim-circle-node.node-0 { top: -18px; left: calc(50% - 18px); }
-.loop-sim-circle-node.node-1 { top: calc(50% - 18px); right: -18px; }
-.loop-sim-circle-node.node-2 { bottom: -18px; left: calc(50% - 18px); }
-.loop-sim-circle-node.node-3 { top: calc(50% - 18px); left: -18px; }
+.loop-sim-circle-node.node-0 { top: -22px; left: calc(50% - 22px); }
+.loop-sim-circle-node.node-1 { top: calc(50% - 22px); right: -22px; }
+.loop-sim-circle-node.node-2 { bottom: -22px; left: calc(50% - 22px); }
+.loop-sim-circle-node.node-3 { top: calc(50% - 22px); left: -22px; }
 
 .loop-sim-circle-node.active {
-  background: rgba(56, 189, 248, 0.15);
-  border-color: rgba(56, 189, 248, 0.5);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(2, 132, 199, 0.4) 100%);
+  border-color: rgba(56, 189, 248, 0.7);
   color: #38bdf8;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  box-shadow: 
+    0 0 16px rgba(56, 189, 248, 0.5),
+    inset 0 0 8px rgba(56, 189, 248, 0.2);
 }
 
 .loop-sim-circle-node.current {
-  background: rgba(16, 185, 129, 0.25);
-  border-color: rgba(16, 185, 129, 0.6);
-  color: #10b981;
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(6, 95, 70, 0.5) 100%);
+  border-color: rgba(16, 185, 129, 0.8);
+  color: #fff;
+  box-shadow: 
+    0 0 22px rgba(16, 185, 129, 0.6),
+    inset 0 0 10px rgba(16, 185, 129, 0.3);
 }
 
-.guardian-token {
+.node-glow {
   position: absolute;
-  font-size: 18px;
-  animation: floatToken 1s ease-in-out infinite alternate;
-}
-
-/* Code Preview Box styling */
-.loop-preview-box {
-  padding: 16px;
-  border-radius: 16px;
-  background: rgba(6, 12, 24, 0.85);
-  border: 1px solid rgba(89, 212, 255, 0.12);
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #e0f2fe;
-  margin-top: 10px;
-  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
-}
-
-.loop-preview-keyword {
-  color: #38bdf8;
-  font-weight: bold;
-  margin-right: 6px;
-}
-
-.loop-preview-value {
-  color: #fbbf24;
-  font-weight: bold;
-}
-
-.loop-preview-brace {
-  color: #94a3b8;
-  display: block;
-}
-
-.loop-preview-body {
-  padding-left: 20px;
-  border-left: 2px dashed rgba(89, 212, 255, 0.15);
-  margin: 4px 0;
-}
-
-.loop-preview-action {
-  color: #34d399;
-  font-weight: bold;
-  text-shadow: 0 0 8px rgba(52, 211, 153, 0.2);
-}
-
-/* Animation Keyframes */
-@keyframes robotBounce {
-  from { transform: translateY(0); }
-  to { transform: translateY(-4px); }
-}
-
-@keyframes starPulse {
-  from { transform: scale(1); filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.6)); }
-  to { transform: scale(1.2); filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.9)); }
-}
-
-@keyframes bloomAnim {
-  from { transform: scale(0) rotate(-20deg); opacity: 0; }
-  to { transform: scale(1) rotate(0); opacity: 1; }
-}
-
-@keyframes pourAnim {
-  from { transform: translateY(0) rotate(0); }
-  to { transform: translateY(-4px) rotate(-15deg); }
-}
-
-@keyframes bulbGlow {
-  from { filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.8)); }
-  to { filter: drop-shadow(0 0 10px rgba(234, 179, 8, 1)); }
-}
-
-@keyframes floatToken {
-  from { transform: translateY(0); }
-  to { transform: translateY(-3px); }
-}
-
-/* Loop Step preview updates */
-.mission-loop-step.active {
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.45), rgba(2, 132, 199, 0.35));
-  border-color: rgba(56, 189, 248, 0.7);
-  color: #e0f9ff;
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-  transform: scale(1.1);
-}
-
-.mission-loop-step.done {
-  background: linear-gradient(180deg, rgba(16, 185, 129, 0.3), rgba(6, 95, 70, 0.2));
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #d1fae5;
-}
-
-.mission-loop-choice.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.loop-choice-bullet {
-  width: 8px;
-  height: 8px;
+  inset: -4px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  display: inline-block;
-  margin-right: 10px;
-  transition: all 0.2s;
+  border: 1px solid rgba(89, 212, 255, 0);
+  transition: all 0.4s;
 }
 
-.mission-loop-choice.selected .loop-choice-bullet {
-  background: #fbbf24;
-  box-shadow: 0 0 8px #fbbf24;
+.loop-sim-circle-node.active .node-glow {
+  border-color: rgba(56, 189, 248, 0.4);
+  animation: compassNodePulse 1.2s infinite ease-out;
 }
 
+@keyframes compassNodePulse {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+/* Hover-drone Jellyfish instead of just 🤖 */
+.guardian-drone {
+  position: absolute;
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  animation: droneHover 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes droneHover {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+/* Sea temple water portal in the center */
+.temple-portal {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(3, 105, 161, 0.6) 100%);
+  border: 2.5px solid rgba(89, 212, 255, 0.3);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(89, 212, 255, 0.2);
+}
+
+.temple-portal::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(89, 212, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: portalSpin 3s infinite linear;
+}
+
+.temple-portal.active {
+  background: conic-gradient(
+    from 0deg,
+    #38bdf8,
+    #0284c7,
+    #10b981,
+    #38bdf8
+  );
+  border-color: #fff;
+  box-shadow: 
+    0 0 32px rgba(56, 189, 248, 0.8),
+    inset 0 0 15px rgba(255,255,255,0.4);
+}
+
+.temple-portal.active::before {
+  display: none;
+}
+
+@keyframes portalSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

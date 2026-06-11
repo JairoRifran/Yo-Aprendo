@@ -1280,23 +1280,146 @@ function renderPathGuidedMission(challenge, localState, mission) {
   `;
 }
 
+function getActionSvgIcon(actionId) {
+  if (actionId === "forward") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "turn-right") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M21 12a9 9 0 0 1-9 9m9-9V5m0 7H12" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 3a9 9 0 0 1 7.54 4.1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "turn-left") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M3 12a9 9 0 0 0 9 9m-9-9V5m0 7h9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 3a9 9 0 0 0-7.54 4.1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "jump") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M18 8a6 6 0 0 0-12 0c0 4-3 6-3 6h18s-3-2-3-6z" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "water") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "clap") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M8 12h8M12 8v8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "spin") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 3v9M12 12l6 6M12 12L6 18" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "stop") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="3" width="18" height="18" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "wave") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "patrol-step") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "rest") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-10-10z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  if (actionId === "turn") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+  return `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="12" r="10"/>
+    </svg>
+  `;
+}
+
 function renderLoopSimulation(mission, challenge, localState) {
   if (mission.id === "4-2-2") {
     const tilesHtml = Array.from({ length: 5 }, (_, i) => {
       const isStart = i === 0;
       const isGoal = i === 4;
       const hasRobot = localState.isRunning ? (localState.animationStep === i) : (localState.repeatCount === 4 && localState.actionId === "forward" && localState.hasRun ? i === 4 : i === 0);
+      
+      let bubblesHtml = "";
+      if (localState.isRunning && localState.animationStep === i) {
+        bubblesHtml = Array.from({ length: 4 }, (_, idx) => {
+          const drift = Math.random() * 20 - 10;
+          const delay = Math.random() * 0.5;
+          return `<div class="bubble-particle" style="--x-drift: ${drift}px; animation-delay: ${delay}s; left: ${20 + idx * 8}px;"></div>`;
+        }).join("");
+      }
+
       return `
         <div class="loop-sim-tile ${isStart ? "start" : ""} ${isGoal ? "goal" : ""} ${hasRobot ? "has-robot" : ""}">
-          ${isGoal ? '<span class="loop-sim-star" aria-hidden="true">⭐</span>' : ""}
+          ${isGoal ? `
+            <div class="oyster-goal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22a10 10 0 0 0 10-10C22 5.4 12 2 12 2S2 5.4 2 12a10 10 0 0 0 10 10z"/>
+                <circle cx="12" cy="12" r="3" fill="#fff" stroke="#f2c35b" stroke-width="1.5"/>
+              </svg>
+            </div>
+          ` : ""}
           ${hasRobot ? '<img class="loop-sim-robot-sprite" src="./img/mission-robot-pirate.png" alt="Bit" />' : ""}
           <span class="loop-sim-tile-index">${i + 1}</span>
+          ${bubblesHtml}
         </div>
       `;
     }).join("");
+
     return `
       <div class="loop-sim-container loop-sim-walk">
-        <div class="loop-sim-title">Camino de Baldosas del Eco</div>
+        <div class="loop-sim-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 22v-3a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Camino de Baldosas del Eco
+        </div>
         <div class="loop-sim-stage">
           ${tilesHtml}
         </div>
@@ -1311,18 +1434,66 @@ function renderLoopSimulation(mission, challenge, localState) {
     const potsHtml = Array.from({ length: 5 }, (_, i) => {
       const isWatered = localState.isRunning ? (localState.animationStep > i) : (localState.repeatCount === 5 && localState.actionId === "water" && localState.hasRun ? true : false);
       const isCurrent = localState.isRunning && localState.animationStep === i;
+      
+      let rainHtml = "";
+      if (isCurrent) {
+        rainHtml = Array.from({ length: 6 }, (_, idx) => {
+          const delay = Math.random() * 0.4;
+          return `<div class="rain-particle" style="animation-delay: ${delay}s; left: ${15 + idx * 8}px;"></div>`;
+        }).join("");
+      }
+
+      let musicNoteHtml = "";
+      if (isWatered && isCurrent) {
+        const notes = ["🎵", "🎶", "♩", "🎹", "🎸"];
+        const note = notes[i % notes.length];
+        const drift = Math.random() * 30 - 15;
+        musicNoteHtml = `<div class="music-note-particle" style="--drift-x: ${drift}px; --rot: ${Math.random() * 40 - 20}deg; left: 22px; color: hsl(${i * 60}, 90%, 65%);">${note}</div>`;
+      }
+
       return `
         <div class="loop-sim-pot ${isWatered ? "watered" : ""} ${isCurrent ? "current" : ""}">
-          <div class="loop-sim-plant">${isWatered ? "🌸" : "🌱"}</div>
-          ${isCurrent ? '<div class="loop-sim-watering-can animate-pour">💧</div>' : ""}
+          <svg class="plant-svg" viewBox="0 0 44 56">
+            <path class="plant-stem" d="M 22 56 L 22 24 C 22 24 24 16 22 10" />
+            <path class="plant-leaf leaf-left" d="M 22 36 Q 10 32 8 24 Q 16 26 22 36" />
+            <path class="plant-leaf leaf-right" d="M 22 36 Q 34 32 36 24 Q 28 26 22 36" />
+            ${isWatered ? `
+              <g class="plant-flower">
+                <circle cx="22" cy="10" r="8" fill="#ec4899" />
+                <circle cx="22" cy="10" r="4" fill="#fbbf24" />
+                <circle cx="15" cy="5" r="5" fill="#f43f5e" />
+                <circle cx="29" cy="5" r="5" fill="#f43f5e" />
+                <circle cx="15" cy="15" r="5" fill="#f43f5e" />
+                <circle cx="29" cy="15" r="5" fill="#f43f5e" />
+              </g>
+            ` : `
+              <g class="plant-bud" style="transform: scale(0.7); transform-origin: 22px 10px;">
+                <circle cx="22" cy="10" r="5" fill="#10b981" />
+              </g>
+            `}
+          </svg>
+          
+          ${isCurrent ? `
+            <svg class="watering-can-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h9a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            ${rainHtml}
+          ` : ""}
+          ${musicNoteHtml}
           <span class="loop-sim-pot-index">${i + 1}</span>
         </div>
       `;
     }).join("");
+
     return `
       <div class="loop-sim-container loop-sim-garden">
-        <div class="loop-sim-title">El Invernadero Melódico</div>
-        <div class="loop-sim-stage">
+        <div class="loop-sim-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          El Invernadero Melódico
+        </div>
+        <div class="garden-shelf">
           ${potsHtml}
         </div>
         <div class="loop-sim-status-msg">
@@ -1337,24 +1508,45 @@ function renderLoopSimulation(mission, challenge, localState) {
       const isLit = localState.isRunning ? (localState.animationStep > i) : (localState.repeatCount === 4 && localState.actionId === "spin" && localState.hasRun ? true : false);
       return `
         <div class="loop-sim-bulb ${isLit ? "lit" : ""}">
-          <span class="loop-sim-bulb-glass">💡</span>
+          <div class="bulb-glow-circle"></div>
+          <svg class="bulb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .6 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 18h6M10 22h4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           <span class="loop-sim-bulb-index">${i + 1}</span>
         </div>
       `;
     }).join("");
+
     const rotation = localState.isRunning ? (localState.animationStep * 90) : (localState.repeatCount === 4 && localState.actionId === "spin" && localState.hasRun ? 360 : 0);
+    const activeStep = localState.isRunning ? localState.animationStep : (localState.repeatCount === 4 && localState.actionId === "spin" && localState.hasRun ? 4 : 0);
+    
     return `
       <div class="loop-sim-container loop-sim-windmill">
-        <div class="loop-sim-title">El Generador del Eco</div>
+        <div class="loop-sim-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          El Generador del Eco
+        </div>
         <div class="loop-sim-stage">
           <div class="loop-sim-windmill-body">
-            <div class="loop-sim-windmill-blades" style="transform: rotate(${rotation}deg); transition: transform 0.3s ease;">
+            <div class="loop-sim-windmill-blades" style="transform: rotate(${rotation}deg); transition: transform 0.4s ease;">
+              <div class="windmill-rotor-center"></div>
               <div class="blade blade-1"></div>
               <div class="blade blade-2"></div>
               <div class="blade blade-3"></div>
               <div class="blade blade-4"></div>
             </div>
           </div>
+          
+          <svg class="electric-cables-svg">
+            <path class="cable-wire ${activeStep >= 1 ? "active" : ""}" d="M 30 50 Q 80 40 100 25" />
+            <path class="cable-wire ${activeStep >= 2 ? "active" : ""}" d="M 30 50 Q 80 60 100 55" />
+            <path class="cable-wire ${activeStep >= 3 ? "active" : ""}" d="M 30 50 Q 80 90 100 85" />
+            <path class="cable-wire ${activeStep >= 4 ? "active" : ""}" d="M 30 50 Q 80 120 100 115" />
+          </svg>
+
           <div class="loop-sim-bulbs-track">
             ${bulbsHtml}
           </div>
@@ -1373,18 +1565,35 @@ function renderLoopSimulation(mission, challenge, localState) {
       return `
         <div class="loop-sim-circle-node node-${i} ${isActive ? "active" : ""} ${isCurrent ? "current" : ""}">
           <span class="node-glow"></span>
-          ${isCurrent ? '<span class="guardian-token">🤖</span>' : ""}
+          ${isCurrent ? `
+            <div class="guardian-drone">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 2v5M12 17v5M2 12h5M17 12h5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          ` : ""}
           <span class="node-index">${i + 1}</span>
         </div>
       `;
     }).join("");
+
+    const isAllActive = localState.repeatCount === 4 && localState.actionId === "patrol-step" && localState.hasRun;
+
     return `
       <div class="loop-sim-container loop-sim-circuit">
-        <div class="loop-sim-title">Circuito de Patrulla del Templo</div>
+        <div class="loop-sim-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m16.2 7.8-2.9 2.9-2.9-2.9m0 8.4 2.9-2.9 2.9 2.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Circuito de Patrulla del Templo
+        </div>
         <div class="loop-sim-stage">
           <div class="loop-sim-circuit-track">
             ${nodesHtml}
           </div>
+          <div class="temple-portal ${isAllActive ? "active" : ""}"></div>
         </div>
         <div class="loop-sim-status-msg">
           ${localState.isRunning ? `Patrullando tramo ${localState.animationStep + 1} de 4...` : (localState.hasRun ? (localState.isSuccess ? "¡Patrulla completada e iluminación del templo activada!" : "El circuito quedó incompleto.") : "Listo para patrullar.")}
@@ -1395,14 +1604,17 @@ function renderLoopSimulation(mission, challenge, localState) {
 
   return `
     <div class="loop-sim-container loop-sim-empty">
-      <div class="loop-sim-title">Simulador de Bucles</div>
+      <div class="loop-sim-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" stroke-linecap="round"/>
+        </svg>
+        Simulador de Bucles
+      </div>
       <p>Armá el bucle en el panel lateral para ver la previsualización del código.</p>
       <div class="loop-sim-art">🌀</div>
     </div>
   `;
-}
-
-function renderChallengeBody(challenge, localState, mission) {
+}function renderChallengeBody(challenge, localState, mission) {
   if (challenge.type === "reorder") {
     const isFirstStepsMission = mission?.id === "4-1-1";
     const isOrderCorrectMission = mission?.id === "4-1-2";
@@ -1948,11 +2160,11 @@ function renderChallengeBody(challenge, localState, mission) {
         </section>
         
         <section class="mission-loop-control-panel">
-          <p class="mission-helper">Armá un bucle eligiendo cuántas veces se repite la acción y qué bloque se repite.</p>
+          <p class="mission-helper">Consola del Capitán: Ajustá los diales mecánicos para configurar la repetición del patrón.</p>
           
           <div class="mission-loop-layout">
             <div class="mission-loop-card">
-              <div class="eyebrow">Repetir</div>
+              <div class="eyebrow">Diales de Ciclos (Repeticiones)</div>
               <div class="mission-loop-options">
                 ${(challenge.repeatOptions || [])
                   .map(
@@ -1964,7 +2176,7 @@ function renderChallengeBody(challenge, localState, mission) {
                         ${isRunning ? "disabled" : ""}
                       >
                         <span class="loop-choice-bullet"></span>
-                        <span class="loop-choice-label">${count} veces</span>
+                        <span class="loop-choice-label">${count} ciclos</span>
                       </button>
                     `
                   )
@@ -1973,7 +2185,7 @@ function renderChallengeBody(challenge, localState, mission) {
             </div>
             
             <div class="mission-loop-card">
-              <div class="eyebrow">Acción a repetir</div>
+              <div class="eyebrow">Mecanismo de Acción</div>
               <div class="mission-loop-options">
                 ${(challenge.actionOptions || [])
                   .map(
@@ -1995,17 +2207,34 @@ function renderChallengeBody(challenge, localState, mission) {
           </div>
           
           <div class="mission-loop-preview">
-            <strong>Programa Armado</strong>
-            <div class="loop-preview-box">
-              <span class="loop-preview-keyword">REPETIR</span>
-              <span class="loop-preview-value">${localState.repeatCount} veces</span>
-              <span class="loop-preview-brace">{</span>
-              <div class="loop-preview-body">
-                <span class="loop-preview-action">${
-                  (challenge.actionOptions || []).find((item) => item.id === localState.actionId)?.label || "elegir acción..."
-                }</span>
+            <div class="captain-preview-header">
+              <span class="sonar-ping"></span>
+              <strong>Holograma de Configuración</strong>
+            </div>
+            <div class="captain-preview-hologram">
+              <div class="captain-hologram-gear">
+                <svg class="gear-svg" viewBox="0 0 100 100">
+                  <path d="M50 30a20 20 0 1 0 0 40 20 20 0 0 0 0-40zm0 10a10 10 0 1 1 0 20 10 10 0 0 1 0-20z" fill="currentColor"/>
+                  <path d="M50 10l-4 8 8 0z M50 90l-4-8 8 0z M10 50l8-4 0 8z M90 50l-8-4 0 8z M22 22l6 6-6 0z M78 78l-6-6 6 0z M22 78l6-6-6 0z M78 22l-6 6 6 0z" fill="currentColor"/>
+                </svg>
+                <div class="gear-number">${localState.repeatCount || "?"}</div>
+                <div class="gear-label">CICLOS</div>
               </div>
-              <span class="loop-preview-brace">}</span>
+              
+              <div class="captain-hologram-link">
+                <svg class="arrow-connector" viewBox="0 0 60 20">
+                  <path d="M 0 10 L 50 10 M 42 4 L 50 10 L 42 16" fill="none" stroke="#59d4ff" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </div>
+
+              <div class="captain-hologram-action">
+                <div class="action-icon-socket">
+                  ${getActionSvgIcon(localState.actionId)}
+                </div>
+                <div class="action-label">${
+                  (challenge.actionOptions || []).find((item) => item.id === localState.actionId)?.label || "Elegir acción..."
+                }</div>
+              </div>
             </div>
           </div>
           
