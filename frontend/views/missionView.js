@@ -962,7 +962,11 @@ function getMissionViewModel(mission) {
       state: withAssistantState({
         assistantTopic: "task",
         repeatCount: challenge.repeatOptions?.[0] ?? 1,
-        actionId: challenge.actionOptions?.[0]?.id ?? null
+        actionId: challenge.actionOptions?.[0]?.id ?? null,
+        isRunning: false,
+        animationStep: 0,
+        hasRun: false,
+        isSuccess: false
       }),
       validate(localState) {
         return (
@@ -1272,6 +1276,128 @@ function renderPathGuidedMission(challenge, localState, mission) {
         </button>
       </div>
 
+    </div>
+  `;
+}
+
+function renderLoopSimulation(mission, challenge, localState) {
+  if (mission.id === "4-2-2") {
+    const tilesHtml = Array.from({ length: 5 }, (_, i) => {
+      const isStart = i === 0;
+      const isGoal = i === 4;
+      const hasRobot = localState.isRunning ? (localState.animationStep === i) : (localState.repeatCount === 4 && localState.actionId === "forward" && localState.hasRun ? i === 4 : i === 0);
+      return `
+        <div class="loop-sim-tile ${isStart ? "start" : ""} ${isGoal ? "goal" : ""} ${hasRobot ? "has-robot" : ""}">
+          ${isGoal ? '<span class="loop-sim-star" aria-hidden="true">⭐</span>' : ""}
+          ${hasRobot ? '<img class="loop-sim-robot-sprite" src="./img/mission-robot-pirate.png" alt="Bit" />' : ""}
+          <span class="loop-sim-tile-index">${i + 1}</span>
+        </div>
+      `;
+    }).join("");
+    return `
+      <div class="loop-sim-container loop-sim-walk">
+        <div class="loop-sim-title">Camino de Baldosas del Eco</div>
+        <div class="loop-sim-stage">
+          ${tilesHtml}
+        </div>
+        <div class="loop-sim-status-msg">
+          ${localState.isRunning ? `Bit está avanzando... Paso ${localState.animationStep + 1} de ${localState.repeatCount}` : (localState.hasRun ? (localState.isSuccess ? "¡Faro alcanzado con éxito!" : "El robot se quedó corto o se pasó.") : "Listo para iniciar la simulación.")}
+        </div>
+      </div>
+    `;
+  }
+
+  if (mission.id === "4-2-4") {
+    const potsHtml = Array.from({ length: 5 }, (_, i) => {
+      const isWatered = localState.isRunning ? (localState.animationStep > i) : (localState.repeatCount === 5 && localState.actionId === "water" && localState.hasRun ? true : false);
+      const isCurrent = localState.isRunning && localState.animationStep === i;
+      return `
+        <div class="loop-sim-pot ${isWatered ? "watered" : ""} ${isCurrent ? "current" : ""}">
+          <div class="loop-sim-plant">${isWatered ? "🌸" : "🌱"}</div>
+          ${isCurrent ? '<div class="loop-sim-watering-can animate-pour">💧</div>' : ""}
+          <span class="loop-sim-pot-index">${i + 1}</span>
+        </div>
+      `;
+    }).join("");
+    return `
+      <div class="loop-sim-container loop-sim-garden">
+        <div class="loop-sim-title">El Invernadero Melódico</div>
+        <div class="loop-sim-stage">
+          ${potsHtml}
+        </div>
+        <div class="loop-sim-status-msg">
+          ${localState.isRunning ? `Regando planta ${localState.animationStep + 1} de 5...` : (localState.hasRun ? (localState.isSuccess ? "¡Todas las plantas florecieron en armonía!" : "Algunas plantas quedaron sin agua.") : "Listo para regar.")}
+        </div>
+      </div>
+    `;
+  }
+
+  if (mission.id === "4-2-6") {
+    const bulbsHtml = Array.from({ length: 4 }, (_, i) => {
+      const isLit = localState.isRunning ? (localState.animationStep > i) : (localState.repeatCount === 4 && localState.actionId === "spin" && localState.hasRun ? true : false);
+      return `
+        <div class="loop-sim-bulb ${isLit ? "lit" : ""}">
+          <span class="loop-sim-bulb-glass">💡</span>
+          <span class="loop-sim-bulb-index">${i + 1}</span>
+        </div>
+      `;
+    }).join("");
+    const rotation = localState.isRunning ? (localState.animationStep * 90) : (localState.repeatCount === 4 && localState.actionId === "spin" && localState.hasRun ? 360 : 0);
+    return `
+      <div class="loop-sim-container loop-sim-windmill">
+        <div class="loop-sim-title">El Generador del Eco</div>
+        <div class="loop-sim-stage">
+          <div class="loop-sim-windmill-body">
+            <div class="loop-sim-windmill-blades" style="transform: rotate(${rotation}deg); transition: transform 0.3s ease;">
+              <div class="blade blade-1"></div>
+              <div class="blade blade-2"></div>
+              <div class="blade blade-3"></div>
+              <div class="blade blade-4"></div>
+            </div>
+          </div>
+          <div class="loop-sim-bulbs-track">
+            ${bulbsHtml}
+          </div>
+        </div>
+        <div class="loop-sim-status-msg">
+          ${localState.isRunning ? `Generando energía... Vuelta ${localState.animationStep + 1}` : (localState.hasRun ? (localState.isSuccess ? "¡Molino activado y luces encendidas!" : "Falta energía para encender el camino.") : "Listo para girar las aspas.")}
+        </div>
+      </div>
+    `;
+  }
+
+  if (mission.id === "4-2-final") {
+    const nodesHtml = Array.from({ length: 4 }, (_, i) => {
+      const isActive = localState.isRunning ? (localState.animationStep >= i) : (localState.repeatCount === 4 && localState.actionId === "patrol-step" && localState.hasRun ? true : false);
+      const isCurrent = localState.isRunning ? (localState.animationStep % 4) === i : (localState.repeatCount === 4 && localState.actionId === "patrol-step" && localState.hasRun ? i === 3 : i === 0);
+      return `
+        <div class="loop-sim-circle-node node-${i} ${isActive ? "active" : ""} ${isCurrent ? "current" : ""}">
+          <span class="node-glow"></span>
+          ${isCurrent ? '<span class="guardian-token">🤖</span>' : ""}
+          <span class="node-index">${i + 1}</span>
+        </div>
+      `;
+    }).join("");
+    return `
+      <div class="loop-sim-container loop-sim-circuit">
+        <div class="loop-sim-title">Circuito de Patrulla del Templo</div>
+        <div class="loop-sim-stage">
+          <div class="loop-sim-circuit-track">
+            ${nodesHtml}
+          </div>
+        </div>
+        <div class="loop-sim-status-msg">
+          ${localState.isRunning ? `Patrullando tramo ${localState.animationStep + 1} de 4...` : (localState.hasRun ? (localState.isSuccess ? "¡Patrulla completada e iluminación del templo activada!" : "El circuito quedó incompleto.") : "Listo para patrullar.")}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="loop-sim-container loop-sim-empty">
+      <div class="loop-sim-title">Simulador de Bucles</div>
+      <p>Armá el bucle en el panel lateral para ver la previsualización del código.</p>
+      <div class="loop-sim-art">🌀</div>
     </div>
   `;
 }
@@ -1814,58 +1940,83 @@ function renderChallengeBody(challenge, localState, mission) {
   }
 
   if (challenge.type === "loop-builder") {
+    const isRunning = localState.isRunning || false;
     return `
-      <p class="mission-helper">Arma un bucle eligiendo cuántas veces se repite la acción y qué bloque se repite.</p>
-      <div class="mission-loop-layout">
-        <div class="mission-loop-card">
-          <div class="eyebrow">Repetir</div>
-          <div class="mission-loop-options">
-            ${(challenge.repeatOptions || [])
-              .map(
-                (count) => `
-                  <button
-                    class="mission-loop-choice ${localState.repeatCount === count ? "selected" : ""}"
-                    data-repeat-count="${count}"
-                    type="button"
-                  >
-                    ${count} veces
-                  </button>
-                `
-              )
-              .join("")}
+      <div class="mission-loop-game">
+        <section class="mission-loop-board-panel">
+          ${renderLoopSimulation(mission, challenge, localState)}
+        </section>
+        
+        <section class="mission-loop-control-panel">
+          <p class="mission-helper">Armá un bucle eligiendo cuántas veces se repite la acción y qué bloque se repite.</p>
+          
+          <div class="mission-loop-layout">
+            <div class="mission-loop-card">
+              <div class="eyebrow">Repetir</div>
+              <div class="mission-loop-options">
+                ${(challenge.repeatOptions || [])
+                  .map(
+                    (count) => `
+                      <button
+                        class="mission-loop-choice ${localState.repeatCount === count ? "selected" : ""} ${isRunning ? "disabled" : ""}"
+                        data-repeat-count="${count}"
+                        type="button"
+                        ${isRunning ? "disabled" : ""}
+                      >
+                        <span class="loop-choice-bullet"></span>
+                        <span class="loop-choice-label">${count} veces</span>
+                      </button>
+                    `
+                  )
+                  .join("")}
+              </div>
+            </div>
+            
+            <div class="mission-loop-card">
+              <div class="eyebrow">Acción a repetir</div>
+              <div class="mission-loop-options">
+                ${(challenge.actionOptions || [])
+                  .map(
+                    (action) => `
+                      <button
+                        class="mission-loop-choice ${localState.actionId === action.id ? "selected" : ""} ${isRunning ? "disabled" : ""}"
+                        data-action-id="${action.id}"
+                        type="button"
+                        ${isRunning ? "disabled" : ""}
+                      >
+                        <span class="loop-choice-bullet"></span>
+                        <span class="loop-choice-label">${action.label}</span>
+                      </button>
+                    `
+                  )
+                  .join("")}
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="mission-loop-card">
-          <div class="eyebrow">Accion</div>
-          <div class="mission-loop-options">
-            ${(challenge.actionOptions || [])
-              .map(
-                (action) => `
-                  <button
-                    class="mission-loop-choice ${localState.actionId === action.id ? "selected" : ""}"
-                    data-action-id="${action.id}"
-                    type="button"
-                  >
-                    ${action.label}
-                  </button>
-                `
-              )
-              .join("")}
+          
+          <div class="mission-loop-preview">
+            <strong>Programa Armado</strong>
+            <div class="loop-preview-box">
+              <span class="loop-preview-keyword">REPETIR</span>
+              <span class="loop-preview-value">${localState.repeatCount} veces</span>
+              <span class="loop-preview-brace">{</span>
+              <div class="loop-preview-body">
+                <span class="loop-preview-action">${
+                  (challenge.actionOptions || []).find((item) => item.id === localState.actionId)?.label || "elegir acción..."
+                }</span>
+              </div>
+              <span class="loop-preview-brace">}</span>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="mission-loop-preview">
-        <strong>Programa armado</strong>
-        <p>Repetir ${localState.repeatCount} veces: ${
-          (challenge.actionOptions || []).find((item) => item.id === localState.actionId)?.label || "-"
-        }</p>
-      </div>
-      <div class="mission-loop-track">
-        ${Array.from({ length: localState.repeatCount || 0 }, (_, index) => `
-          <div class="mission-loop-step" style="animation-delay:${index * 0.1}s;">
-            ${index + 1}
+          
+          <div class="mission-loop-track">
+            ${Array.from({ length: localState.repeatCount || 0 }, (_, index) => `
+              <div class="mission-loop-step ${localState.isRunning && localState.animationStep === index ? "active" : ""} ${localState.hasRun && localState.animationStep > index ? "done" : ""}" style="animation-delay:${index * 0.1}s;">
+                ${index + 1}
+              </div>
+            `).join("")}
           </div>
-        `).join("")}
+        </section>
       </div>
     `;
   }
@@ -1973,6 +2124,82 @@ export function renderMission() {
     }
 
     animationTimer = setTimeout(() => step(1), 260);
+  }
+
+  function runLoopSimulationAnimation() {
+    stopAnimation();
+    
+    localState = {
+      ...localState,
+      isRunning: true,
+      animationStep: 0,
+      hasRun: true,
+      isSuccess: false
+    };
+    draw();
+
+    const totalSteps = localState.repeatCount;
+    
+    function playStepSound(actionId) {
+      if (actionId === "forward") {
+        playStep();
+      } else if (actionId === "water") {
+        playSelect();
+      } else if (actionId === "spin") {
+        playTurn();
+      } else {
+        playSelect();
+      }
+    }
+
+    function animStep(stepIndex) {
+      localState = {
+        ...localState,
+        animationStep: stepIndex
+      };
+      playStepSound(localState.actionId);
+      draw();
+
+      if (stepIndex < totalSteps - 1) {
+        animationTimer = setTimeout(() => animStep(stepIndex + 1), 600);
+      } else {
+        const correct = missionModel.validate(localState);
+        localState = {
+          ...localState,
+          isRunning: false,
+          isSuccess: correct
+        };
+        draw();
+
+        animationTimer = setTimeout(() => {
+          if (correct) {
+            playGoalBurst();
+            const reward = completeMission(mission);
+            if (reward.awarded) playReward();
+
+            goToResult({
+              success: true,
+              title: reward.awarded ? "Muy bien" : "Misión repasada",
+              message: challenge.successMessage || "Superaste la misión.",
+              coins: reward.coins,
+              gems: reward.gems
+            });
+          } else {
+            playError();
+            goToResult({
+              success: false,
+              title: "Casi",
+              message: "El bucle no es correcto para este desafío. Revisá los parámetros e intentá otra vez.",
+              coins: 0,
+              gems: 0
+            });
+          }
+          window.renderApp();
+        }, 1000);
+      }
+    }
+
+    animationTimer = setTimeout(() => animStep(0), 400);
   }
 
   function draw() {
@@ -2093,6 +2320,12 @@ export function renderMission() {
     document.getElementById("validateMissionBtn")?.addEventListener("click", () => {
       unlockAudio();
       stopAnimation();
+
+      if (challenge.type === "loop-builder") {
+        runLoopSimulationAnimation();
+        return;
+      }
+
       const correct = missionModel.validate(localState);
 
       if (correct) {
