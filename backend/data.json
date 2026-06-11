@@ -7,6 +7,14 @@
       "teacher_name": "Profe Lucia",
       "teacher_email": "lucia@yoaprendo.demo",
       "notes": "Centro piloto para pensamiento computacional."
+    },
+    "inst-jairo": {
+      "id": "inst-jairo",
+      "name": "YoAprendo Org",
+      "code": "951147",
+      "teacher_name": "Jairo Rifran",
+      "teacher_email": "rifranjairo@gmail.com",
+      "notes": "Centro demo institucional."
     }
   },
   "teachers": {
@@ -17,6 +25,14 @@
       "email": "lucia@yoaprendo.demo",
       "code": "DOC-4A",
       "classroom_ids": ["class-4a"]
+    },
+    "teacher-jairo": {
+      "id": "teacher-jairo",
+      "institution_id": "inst-jairo",
+      "name": "Jairo Rifran",
+      "email": "rifranjairo@gmail.com",
+      "code": "DOC-JAIRO",
+      "classroom_ids": ["class-jairo"]
     }
   },
   "classrooms": {
@@ -37,9 +53,45 @@
       "group_code": "AULA-4B",
       "student_ids": ["stu-mila", "stu-valen"],
       "assigned_worlds": ["Secuencias", "Datos y creacion"]
+    },
+    "class-jairo": {
+      "id": "class-jairo",
+      "institution_id": "inst-jairo",
+      "name": "Grupo Demo",
+      "grade_label": "Multigrado",
+      "group_code": "AULA-JAIRO",
+      "student_ids": ["stu-jairo"],
+      "assigned_worlds": ["Secuencias", "Bucles", "Decisiones"]
     }
   },
   "students": {
+    "stu-jairo": {
+      "id": "stu-jairo",
+      "name": "Jairo",
+      "display_name": "Jairo",
+      "avatar": "Exploradora",
+      "classroom_id": "class-jairo",
+      "student_code": "estudiante",
+      "streak_days": 3,
+      "energy": 90,
+      "weekly_minutes": 35,
+      "attendance": "Activa",
+      "completed_missions": 6,
+      "total_missions": 28,
+      "strong_concept": "Secuencias",
+      "needs_support": "Bucles",
+      "autonomy": "Alta",
+      "badges": ["Exploradora", "Creadora"],
+      "focus_tip": "Hoy conviene seguir con una mision corta y sumar otra estrella.",
+      "next_mission": { "world": "Isla de los Bucles", "title": "Repite el camino", "number": 8 },
+      "concepts": [
+        { "title": "Secuencias", "completed": 5, "total": 7, "percent": 71 },
+        { "title": "Bucles", "completed": 1, "total": 7, "percent": 14 },
+        { "title": "Decisiones", "completed": 0, "total": 7, "percent": 0 },
+        { "title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0 }
+      ],
+      "teacher_message": "Le responde muy bien a desafios cortos y visuales."
+    },
     "stu-sofi": {
       "id": "stu-sofi",
       "name": "Sofi",

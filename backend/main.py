@@ -433,6 +433,100 @@ def ensure_subscription_rows(session: Session) -> None:
             )
 
 
+
+def ensure_custom_demo_users(session: Session) -> None:
+    # 1. Institution
+    inst = session.scalar(select(Institution).where(Institution.id == "inst-jairo"))
+    if not inst:
+        inst = Institution(
+            id="inst-jairo",
+            name="YoAprendo Org",
+            code="951147",
+            teacher_name="Jairo Rifran",
+            teacher_email="rifranjairo@gmail.com",
+            notes="Centro demo institucional."
+        )
+        session.add(inst)
+        session.flush()
+
+    # 2. Subscription
+    sub = session.scalar(select(InstitutionSubscription).where(InstitutionSubscription.institution_id == "inst-jairo"))
+    if not sub:
+        session.add(
+            InstitutionSubscription(
+                institution_id="inst-jairo",
+                plan_key="school",
+                status="active",
+                student_limit=300,
+                teacher_limit=99,
+                billing_email="rifranjairo@gmail.com",
+                billing_provider="manual",
+            )
+        )
+
+    # 3. InstitutionUser (Admin)
+    admin = session.scalar(select(InstitutionUser).where(InstitutionUser.email == "rifranjairo@gmail.com"))
+    if not admin:
+        session.add(
+            InstitutionUser(
+                id="user-jairo-admin",
+                institution_id="inst-jairo",
+                role="institution_admin",
+                name="Jairo Rifran",
+                email="rifranjairo@gmail.com",
+                access_code="951147",
+                status="active"
+            )
+        )
+
+    # 4. Classroom
+    classroom = session.scalar(select(Classroom).where(Classroom.id == "class-jairo"))
+    if not classroom:
+        classroom = Classroom(
+            id="class-jairo",
+            institution_id="inst-jairo",
+            name="Grupo Demo",
+            grade_label="Multigrado",
+            group_code="AULA-JAIRO",
+            assigned_worlds=["Secuencias", "Bucles", "Decisiones"]
+        )
+        session.add(classroom)
+        session.flush()
+
+    # 5. Student
+    student = session.scalar(select(Student).where(Student.student_code == "estudiante"))
+    if not student:
+        session.add(
+            Student(
+                id="stu-jairo",
+                classroom_id="class-jairo",
+                name="Jairo",
+                display_name="Jairo",
+                avatar="Exploradora",
+                student_code="estudiante",
+                streak_days=3,
+                energy=90,
+                weekly_minutes=35,
+                attendance="Activa",
+                completed_missions=6,
+                total_missions=28,
+                strong_concept="Secuencias",
+                needs_support="Bucles",
+                autonomy="Alta",
+                badges=["Exploradora", "Creadora"],
+                focus_tip="Hoy conviene seguir con una mision corta y sumar otra estrella.",
+                next_mission={"world": "Isla de los Bucles", "title": "Repite el camino", "number": 8},
+                concepts=[
+                    {"title": "Secuencias", "completed": 5, "total": 7, "percent": 71},
+                    {"title": "Bucles", "completed": 1, "total": 7, "percent": 14},
+                    {"title": "Decisiones", "completed": 0, "total": 7, "percent": 0},
+                    {"title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0}
+                ],
+                teacher_message="Le responde muy bien a desafios cortos y visuales."
+            )
+        )
+
+
 @app.on_event("startup")
 def init_database() -> None:
     Base.metadata.create_all(bind=engine)
@@ -440,6 +534,8 @@ def init_database() -> None:
         seed_database(session)
         remove_known_demo_data(session)
         ensure_subscription_rows(session)
+        ensure_custom_demo_users(session)
+
 
 
 def slugify(value: str) -> str:
