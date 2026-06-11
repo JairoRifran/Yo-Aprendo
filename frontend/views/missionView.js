@@ -1616,73 +1616,145 @@ function renderLoopSimulation(mission, challenge, localState) {
   `;
 }function renderMultipleChoiceSimulation(mission, challenge, localState) {
   if (mission.id === "4-2-1") {
-    const crabSvg = `
-      <svg class="crab-svg" viewBox="0 0 100 80">
-        <ellipse cx="50" cy="50" rx="28" ry="18" />
-        <circle cx="38" cy="25" r="4.5" fill="#fff" />
-        <circle cx="38" cy="25" r="2" fill="#000" />
-        <path d="M 38 30 L 38 36" stroke="#ef4444" stroke-width="2" />
-        
-        <circle cx="62" cy="25" r="4.5" fill="#fff" />
-        <circle cx="62" cy="25" r="2" fill="#000" />
-        <path d="M 62 30 L 62 36" stroke="#ef4444" stroke-width="2" />
-        
-        <path d="M 22 50 Q 12 55 16 65" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" />
-        <path d="M 25 60 Q 16 68 22 74" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" />
-        
-        <path d="M 78 50 Q 88 55 84 65" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" />
-        <path d="M 75 60 Q 84 68 78 74" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" />
-        
-        <path d="M 30 40 Q 15 30 24 16" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" fill="none" />
-        <path d="M 70 40 Q 85 30 76 16" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" fill="none" />
-        <path d="M 45 55 Q 50 60 55 55" stroke="#000" stroke-width="2" fill="none" />
+    const crabSvg = (color) => `
+      <svg class="crab-svg" viewBox="0 0 120 95">
+        <defs>
+          <radialGradient id="crabBody${color}" cx="50%" cy="40%">
+            <stop offset="0%" stop-color="${color === 'red' ? '#ff6b6b' : color === 'orange' ? '#ffad42' : '#ff8ec8'}" />
+            <stop offset="100%" stop-color="${color === 'red' ? '#c0392b' : color === 'orange' ? '#e67e22' : '#c0588c'}" />
+          </radialGradient>
+        </defs>
+        <ellipse cx="60" cy="55" rx="34" ry="22" fill="url(#crabBody${color})" stroke="${color === 'red' ? '#922b21' : color === 'orange' ? '#a55b14' : '#8c3e66'}" stroke-width="1.5"/>
+        <ellipse cx="60" cy="55" rx="28" ry="16" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <circle cx="44" cy="28" r="7" fill="#fff" stroke="#333" stroke-width="1"/>
+        <circle cx="44" cy="28" r="3.5" fill="#1a1a2e"/>
+        <circle cx="43" cy="27" r="1.2" fill="#fff"/>
+        <circle cx="76" cy="28" r="7" fill="#fff" stroke="#333" stroke-width="1"/>
+        <circle cx="76" cy="28" r="3.5" fill="#1a1a2e"/>
+        <circle cx="75" cy="27" r="1.2" fill="#fff"/>
+        <path d="M 44 35 L 44 40" stroke="${color === 'red' ? '#c0392b' : color === 'orange' ? '#d48a1d' : '#b04878'}" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M 76 35 L 76 40" stroke="${color === 'red' ? '#c0392b' : color === 'orange' ? '#d48a1d' : '#b04878'}" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M 26 55 Q 12 58 16 72" stroke="${color === 'red' ? '#e74c3c' : color === 'orange' ? '#f39c12' : '#e573a8'}" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M 28 66 Q 16 76 24 84" stroke="${color === 'red' ? '#e74c3c' : color === 'orange' ? '#f39c12' : '#e573a8'}" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M 94 55 Q 108 58 104 72" stroke="${color === 'red' ? '#e74c3c' : color === 'orange' ? '#f39c12' : '#e573a8'}" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M 92 66 Q 104 76 96 84" stroke="${color === 'red' ? '#e74c3c' : color === 'orange' ? '#f39c12' : '#e573a8'}" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M 35 42 Q 16 28 28 14" stroke="${color === 'red' ? '#e74c3c' : color === 'orange' ? '#f39c12' : '#e573a8'}" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+        <circle cx="28" cy="14" r="5" fill="${color === 'red' ? '#ff6b6b' : color === 'orange' ? '#ffad42' : '#ff8ec8'}"/>
+        <path d="M 85 42 Q 104 28 92 14" stroke="${color === 'red' ? '#e74c3c' : color === 'orange' ? '#f39c12' : '#e573a8'}" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+        <circle cx="92" cy="14" r="5" fill="${color === 'red' ? '#ff6b6b' : color === 'orange' ? '#ffad42' : '#ff8ec8'}"/>
+        <path d="M 50 62 Q 60 70 70 62" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
       </svg>
     `;
 
+    // Floating sparkles
+    const sparklesHtml = Array.from({ length: 12 }, (_, i) => {
+      const left = 5 + Math.random() * 90;
+      const top = 5 + Math.random() * 50;
+      const delay = Math.random() * 4;
+      const size = 2 + Math.random() * 4;
+      return `<div class="beach-sparkle" style="left:${left}%; top:${top}%; animation-delay:${delay}s; width:${size}px; height:${size}px;"></div>`;
+    }).join("");
+
+    // Animated clouds
+    const cloudsHtml = Array.from({ length: 4 }, (_, i) => {
+      const top = 5 + i * 12;
+      const delay = i * 8;
+      const scale = 0.6 + Math.random() * 0.8;
+      return `<div class="beach-cloud beach-cloud-${i}" style="top:${top}%; animation-delay:-${delay}s; transform:scale(${scale});"></div>`;
+    }).join("");
+
+    // Seagulls
+    const seagullsHtml = Array.from({ length: 3 }, (_, i) => {
+      const top = 8 + i * 10;
+      const delay = i * 5 + 2;
+      return `<div class="beach-seagull" style="top:${top}%; animation-delay:-${delay}s;"></div>`;
+    }).join("");
+
     return `
       <div class="beach-stage">
-        <div class="sea-shore-waves"></div>
-        <div class="beach-sands"></div>
-        
-        <!-- SVG Left Palm Tree -->
+        <div class="beach-sky"></div>
+        <div class="beach-sun"></div>
+        <div class="beach-sun-rays"></div>
+        ${cloudsHtml}
+        ${seagullsHtml}
+        ${sparklesHtml}
+
+        <div class="beach-ocean">
+          <div class="beach-wave beach-wave-1"></div>
+          <div class="beach-wave beach-wave-2"></div>
+          <div class="beach-wave beach-wave-3"></div>
+        </div>
+
+        <div class="beach-foam-line"></div>
+
+        <div class="beach-sands">
+          <div class="beach-sand-detail sand-shell-1">🐚</div>
+          <div class="beach-sand-detail sand-shell-2">⭐</div>
+          <div class="beach-sand-detail sand-shell-3">🐚</div>
+          <div class="beach-sand-detail sand-starfish">🌊</div>
+        </div>
+
         <div class="palm-tree palm-tree-left">
-          <svg viewBox="0 0 100 160" width="100%" height="100%">
-            <path class="palm-trunk" d="M 50 160 Q 40 100 48 40" stroke="#78350f" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <svg viewBox="0 0 120 220" width="100%" height="100%">
+            <path d="M 60 220 Q 50 150 52 60" stroke="#5d2f0e" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <path d="M 60 220 Q 50 150 52 60" stroke="#78350f" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <line x1="52" y1="80" x2="52" y2="85" stroke="#451a03" stroke-width="12" opacity="0.3"/>
+            <line x1="51" y1="100" x2="51" y2="105" stroke="#451a03" stroke-width="12" opacity="0.3"/>
+            <line x1="50" y1="120" x2="50" y2="125" stroke="#451a03" stroke-width="12" opacity="0.3"/>
             <g class="palm-leaves">
-              <path d="M 48 40 Q 20 20 10 35" fill="none"/>
-              <path d="M 48 40 Q 25 45 22 65" fill="none"/>
-              <path d="M 48 40 Q 55 15 72 20" fill="none"/>
-              <path d="M 48 40 Q 60 50 55 75" fill="none"/>
+              <path d="M 52 60 Q 10 30 -5 50" fill="#15803d" stroke="#166534" stroke-width="1"/>
+              <path d="M 52 60 Q 15 65 5 90" fill="#22c55e" stroke="#16a34a" stroke-width="1"/>
+              <path d="M 52 60 Q 70 20 95 30" fill="#15803d" stroke="#166534" stroke-width="1"/>
+              <path d="M 52 60 Q 80 70 75 100" fill="#22c55e" stroke="#16a34a" stroke-width="1"/>
+              <path d="M 52 60 Q 45 10 30 15" fill="#16a34a" stroke="#15803d" stroke-width="1"/>
             </g>
+            <circle cx="62" cy="65" r="5" fill="#92400e" stroke="#78350f"/>
+            <circle cx="55" cy="70" r="4.5" fill="#a16207" stroke="#78350f"/>
           </svg>
         </div>
 
-        <!-- SVG Right Palm Tree -->
         <div class="palm-tree palm-tree-right">
-          <svg viewBox="0 0 100 160" width="100%" height="100%">
-            <path class="palm-trunk" d="M 50 160 Q 40 100 48 40" stroke="#78350f" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <svg viewBox="0 0 120 220" width="100%" height="100%">
+            <path d="M 60 220 Q 65 150 58 60" stroke="#5d2f0e" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <path d="M 60 220 Q 65 150 58 60" stroke="#78350f" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <line x1="59" y1="80" x2="59" y2="85" stroke="#451a03" stroke-width="12" opacity="0.3"/>
+            <line x1="60" y1="100" x2="60" y2="105" stroke="#451a03" stroke-width="12" opacity="0.3"/>
             <g class="palm-leaves">
-              <path d="M 48 40 Q 20 20 10 35" fill="none"/>
-              <path d="M 48 40 Q 25 45 22 65" fill="none"/>
-              <path d="M 48 40 Q 55 15 72 20" fill="none"/>
-              <path d="M 48 40 Q 60 50 55 75" fill="none"/>
+              <path d="M 58 60 Q 20 30 5 50" fill="#15803d" stroke="#166534" stroke-width="1"/>
+              <path d="M 58 60 Q 25 65 15 90" fill="#22c55e" stroke="#16a34a" stroke-width="1"/>
+              <path d="M 58 60 Q 75 20 100 30" fill="#15803d" stroke="#166534" stroke-width="1"/>
+              <path d="M 58 60 Q 85 70 80 100" fill="#22c55e" stroke="#16a34a" stroke-width="1"/>
+              <path d="M 58 60 Q 50 10 35 15" fill="#16a34a" stroke="#15803d" stroke-width="1"/>
             </g>
+            <circle cx="50" cy="65" r="5" fill="#92400e" stroke="#78350f"/>
+            <circle cx="60" cy="72" r="4" fill="#a16207" stroke="#78350f"/>
           </svg>
         </div>
+
+        <div class="beach-ship-silhouette"></div>
 
         <div class="crabs-group">
           <div class="crab-wrapper crab-1">
-            ${crabSvg}
+            <div class="crab-shadow"></div>
+            ${crabSvg('red')}
             <span class="wood-sign">Cangrejo 1</span>
           </div>
           <div class="crab-wrapper crab-2">
-            ${crabSvg}
+            <div class="crab-shadow"></div>
+            ${crabSvg('orange')}
             <span class="wood-sign">Cangrejo 2</span>
           </div>
           <div class="crab-wrapper crab-3">
-            ${crabSvg}
+            <div class="crab-shadow"></div>
+            ${crabSvg('pink')}
             <span class="wood-sign">Cangrejo 3</span>
           </div>
+        </div>
+
+        <div class="beach-title-banner">
+          <span class="beach-title-icon">🦀</span>
+          <span>¡El Baile del Cangrejo!</span>
+          <span class="beach-title-icon">🎵</span>
         </div>
       </div>
     `;
