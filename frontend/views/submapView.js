@@ -204,16 +204,6 @@ export function renderSubmap() {
             <div class="submap-v2-scene-backdrop"></div>
             <div class="submap-v2-sunbeam"></div>
             <div class="submap-v2-ambient" aria-hidden="true">
-              <span class="submap-v2-cloud cloud-a"></span>
-              <span class="submap-v2-cloud cloud-b"></span>
-              <span class="submap-v2-cloud cloud-c"></span>
-              <span class="submap-v2-cloud cloud-d"></span>
-              <span class="submap-v2-sparkle sparkle-a"></span>
-              <span class="submap-v2-sparkle sparkle-b"></span>
-              <span class="submap-v2-sparkle sparkle-c"></span>
-              <span class="submap-v2-sparkle sparkle-d"></span>
-              <span class="submap-v2-sparkle sparkle-e"></span>
-              <span class="submap-v2-sparkle sparkle-f"></span>
               <span class="submap-v2-bird bird-a"></span>
               <span class="submap-v2-bird bird-b"></span>
               <span class="submap-v2-bird bird-c"></span>
