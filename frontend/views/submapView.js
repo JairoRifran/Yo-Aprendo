@@ -548,14 +548,6 @@ function initSubmapCanvas(worldId, nodes) {
 }
 
 function renderMapNode(node, isSelected, worldId) {
-  const isSequences = worldId === "world-sequences";
-  // La misión 1 (index 0) y todo el primer mundo deben mantener su arte de isla original
-  const useOriginal = isSequences || node.index === 0;
-
-  const artContent = useOriginal
-    ? `<img class="submap-v2-node-art" src="${node.art}" alt="" />`
-    : `<span class="submap-v2-node-art-wrap" aria-hidden="true">${renderIslandSvg(worldId, node.index, node.missionState)}</span>`;
-
   return `
     <div
       class="submap-v2-node ${getMissionStatusClass(node.missionState)} ${isSelected ? "is-selected" : ""}"
@@ -569,7 +561,9 @@ function renderMapNode(node, isSelected, worldId) {
       >
         <span class="submap-v2-node-aura" aria-hidden="true"></span>
         <span class="submap-v2-node-focus-ring" aria-hidden="true"></span>
-        ${artContent}
+        <span class="submap-v2-node-art-wrap" aria-hidden="true">
+          ${renderIslandSvg(worldId, node.index, node.missionState)}
+        </span>
         <span class="submap-v2-node-badge">${node.number || node.index + 1}</span>
         <span class="submap-v2-node-status">${getMissionStatusLabel(node.missionState)}</span>
         ${
@@ -594,46 +588,6 @@ export function renderSubmap() {
   const selectedNode =
     missionNodes.find((node) => node.id === selectedMission?.id) || missionNodes[0] || null;
   const guideCopy = getSubmapGuideCopy(world, selectedNode, worldProgress);
-
-  const isSequences = world.id === "world-sequences";
-  const backdropHtml = isSequences
-    ? `
-      <div class="submap-v2-scene-backdrop"></div>
-      <div class="submap-v2-sunbeam"></div>
-      <div class="submap-v2-ambient" aria-hidden="true">
-        <span class="submap-v2-cloud cloud-a"></span>
-        <span class="submap-v2-cloud cloud-b"></span>
-        <span class="submap-v2-cloud cloud-c"></span>
-        <span class="submap-v2-cloud cloud-d"></span>
-        <span class="submap-v2-sparkle sparkle-a"></span>
-        <span class="submap-v2-sparkle sparkle-b"></span>
-        <span class="submap-v2-sparkle sparkle-c"></span>
-        <span class="submap-v2-sparkle sparkle-d"></span>
-        <span class="submap-v2-sparkle sparkle-e"></span>
-        <span class="submap-v2-sparkle sparkle-f"></span>
-        <span class="submap-v2-bird bird-a"></span>
-        <span class="submap-v2-bird bird-b"></span>
-        <span class="submap-v2-bird bird-c"></span>
-        <span class="submap-v2-bird bird-d"></span>
-        <span class="submap-v2-bird bird-e"></span>
-        <span class="submap-v2-bird bird-f"></span>
-        <span class="submap-v2-bird bird-g"></span>
-        <span class="submap-v2-bird bird-h"></span>
-        <span class="submap-v2-glow glow-a"></span>
-        <span class="submap-v2-glow glow-b"></span>
-        <span class="submap-v2-glow glow-c"></span>
-        <span class="submap-v2-glow glow-d"></span>
-        <span class="submap-v2-ripple ripple-a"></span>
-        <span class="submap-v2-ripple ripple-b"></span>
-        <span class="submap-v2-ripple ripple-c"></span>
-        <span class="submap-v2-ripple ripple-d"></span>
-        <span class="submap-v2-ripple ripple-e"></span>
-        <span class="submap-v2-breeze breeze-a"></span>
-        <span class="submap-v2-breeze breeze-b"></span>
-        <span class="submap-v2-breeze breeze-c"></span>
-      </div>
-    `
-    : `<canvas id="submap-v2-canvas-bg" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></canvas>`;
 
   appShell.innerHTML = `
     <div class="submap-view-wrapper world-theme-${world.id}">
@@ -694,7 +648,7 @@ export function renderSubmap() {
         </aside>
         <section class="submap-v2-layout">
           <div class="submap-v2-stage">
-            ${backdropHtml}
+            <canvas id="submap-v2-canvas-bg" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></canvas>
 
             <div class="submap-v2-node-layer" style="position: absolute; inset: 0; z-index: 3;">
               ${missionNodes.map((node) => renderMapNode(node, node.id === selectedNode?.id, world.id)).join("")}
@@ -1065,7 +1019,5 @@ export function renderSubmap() {
   goHomeBtn?.addEventListener("click", onGoHome);
 
   updateSelectedMission(activeMissionId);
-  if (!isSequences) {
-    initSubmapCanvas(world.id, missionNodes);
-  }
+  initSubmapCanvas(world.id, missionNodes);
 }
