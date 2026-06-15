@@ -1380,6 +1380,15 @@ function getActionSvgIcon(actionId) {
 
 function renderLoopSimulation(mission, challenge, localState) {
   if (mission.id === "4-2-2") {
+    // Generate twinkling background stars
+    const starsHtml = Array.from({ length: 15 }, (_, i) => {
+      const top = Math.random() * 60;
+      const left = Math.random() * 95;
+      const size = 1 + Math.random() * 3;
+      const delay = Math.random() * 3;
+      return `<div class="walk-bg-star" style="top:${top}%; left:${left}%; width:${size}px; height:${size}px; animation-delay:${delay}s;"></div>`;
+    }).join("");
+
     const tilesHtml = Array.from({ length: 5 }, (_, i) => {
       const isStart = i === 0;
       const isGoal = i === 4;
@@ -1387,23 +1396,29 @@ function renderLoopSimulation(mission, challenge, localState) {
       
       let bubblesHtml = "";
       if (localState.isRunning && localState.animationStep === i) {
-        bubblesHtml = Array.from({ length: 4 }, (_, idx) => {
-          const drift = Math.random() * 20 - 10;
-          const delay = Math.random() * 0.5;
+        bubblesHtml = Array.from({ length: 5 }, (_, idx) => {
+          const drift = Math.random() * 24 - 12;
+          const delay = Math.random() * 0.4;
           return `<div class="bubble-particle" style="--x-drift: ${drift}px; animation-delay: ${delay}s; left: ${20 + idx * 8}px;"></div>`;
         }).join("");
       }
+
+      // Add cool runic icons on tiles
+      const runeIcons = ["🏠", "⚡", "🔮", "🌀", "👑"];
+      const rune = runeIcons[i] || "✦";
 
       return `
         <div class="loop-sim-tile ${isStart ? "start" : ""} ${isGoal ? "goal" : ""} ${hasRobot ? "has-robot" : ""}">
           ${isGoal ? `
             <div class="oyster-goal">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 22a10 10 0 0 0 10-10C22 5.4 12 2 12 2S2 5.4 2 12a10 10 0 0 0 10 10z"/>
                 <circle cx="12" cy="12" r="3" fill="#fff" stroke="#f2c35b" stroke-width="1.5"/>
               </svg>
             </div>
-          ` : ""}
+          ` : `
+            <span class="loop-sim-tile-rune">${rune}</span>
+          `}
           ${hasRobot ? '<img class="loop-sim-robot-sprite" src="./img/mission-robot-pirate.png" alt="Bit" />' : ""}
           <span class="loop-sim-tile-index">${i + 1}</span>
           ${bubblesHtml}
@@ -1413,6 +1428,17 @@ function renderLoopSimulation(mission, challenge, localState) {
 
     return `
       <div class="loop-sim-container loop-sim-walk">
+        <div class="walk-sky-bg">
+          <div class="walk-moon"></div>
+          <div class="walk-cloud walk-cloud-1"></div>
+          <div class="walk-cloud walk-cloud-2"></div>
+          ${starsHtml}
+        </div>
+        <div class="walk-ocean-waves">
+          <div class="walk-wave walk-wave-1"></div>
+          <div class="walk-wave walk-wave-2"></div>
+        </div>
+
         <div class="loop-sim-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M2 22v-3a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1437,9 +1463,10 @@ function renderLoopSimulation(mission, challenge, localState) {
       
       let rainHtml = "";
       if (isCurrent) {
-        rainHtml = Array.from({ length: 6 }, (_, idx) => {
+        rainHtml = Array.from({ length: 8 }, (_, idx) => {
           const delay = Math.random() * 0.4;
-          return `<div class="rain-particle" style="animation-delay: ${delay}s; left: ${15 + idx * 8}px;"></div>`;
+          const left = 10 + Math.random() * 24;
+          return `<div class="rain-particle" style="animation-delay: ${delay}s; left: ${left}px;"></div>`;
         }).join("");
       }
 
@@ -1459,16 +1486,16 @@ function renderLoopSimulation(mission, challenge, localState) {
             <path class="plant-leaf leaf-right" d="M 22 36 Q 34 32 36 24 Q 28 26 22 36" />
             ${isWatered ? `
               <g class="plant-flower">
-                <circle cx="22" cy="10" r="8" fill="#ec4899" />
-                <circle cx="22" cy="10" r="4" fill="#fbbf24" />
-                <circle cx="15" cy="5" r="5" fill="#f43f5e" />
-                <circle cx="29" cy="5" r="5" fill="#f43f5e" />
-                <circle cx="15" cy="15" r="5" fill="#f43f5e" />
-                <circle cx="29" cy="15" r="5" fill="#f43f5e" />
+                <circle cx="22" cy="10" r="9" fill="url(#flowerGradient-${i})" />
+                <circle cx="22" cy="10" r="4" fill="#fffbdf" />
+                <circle cx="13" cy="5" r="5" fill="#f43f5e" />
+                <circle cx="31" cy="5" r="5" fill="#f43f5e" />
+                <circle cx="13" cy="15" r="5" fill="#f43f5e" />
+                <circle cx="31" cy="15" r="5" fill="#f43f5e" />
               </g>
             ` : `
-              <g class="plant-bud" style="transform: scale(0.7); transform-origin: 22px 10px;">
-                <circle cx="22" cy="10" r="5" fill="#10b981" />
+              <g class="plant-bud" style="transform: scale(0.75); transform-origin: 22px 10px;">
+                <circle cx="22" cy="10" r="6" fill="#10b981" />
               </g>
             `}
           </svg>
@@ -1485,8 +1512,42 @@ function renderLoopSimulation(mission, challenge, localState) {
       `;
     }).join("");
 
+    // SVG Gradients definitions for the flowers
+    const gradientsHtml = Array.from({ length: 5 }, (_, idx) => {
+      const colors = [
+        ["#ec4899", "#f43f5e"], // pink
+        ["#a855f7", "#ec4899"], // purple
+        ["#3b82f6", "#06b6d4"], // blue
+        ["#fbbf24", "#f59e0b"], // yellow
+        ["#f97316", "#ef4444"]  // orange
+      ];
+      const [c1, c2] = colors[idx] || colors[0];
+      return `
+        <radialGradient id="flowerGradient-${idx}" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${c1}" />
+          <stop offset="100%" stop-color="${c2}" />
+        </radialGradient>
+      `;
+    }).join("");
+
+    // Hanging vines decoration
+    const vinesHtml = Array.from({ length: 3 }, (_, idx) => {
+      const left = 15 + idx * 30;
+      const delay = idx * 0.4;
+      return `<div class="greenhouse-vine" style="left:${left}%; animation-delay:${delay}s;">🌱🌿</div>`;
+    }).join("");
+
     return `
       <div class="loop-sim-container loop-sim-garden">
+        <svg style="position: absolute; width: 0; height: 0;">
+          <defs>${gradientsHtml}</defs>
+        </svg>
+
+        <div class="greenhouse-glass">
+          <div class="glass-pane"></div>
+          ${vinesHtml}
+        </div>
+
         <div class="loop-sim-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1509,9 +1570,11 @@ function renderLoopSimulation(mission, challenge, localState) {
       return `
         <div class="loop-sim-bulb ${isLit ? "lit" : ""}">
           <div class="bulb-glow-circle"></div>
+          <!-- Upgraded Glowing Vacuum Tube Crystal SVG -->
           <svg class="bulb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .6 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M9 18h6M10 22h4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 3h12v12a6 6 0 0 1-12 0V3z" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 21h6M12 15V9" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="9" r="2" fill="currentColor" opacity="0.3"/>
           </svg>
           <span class="loop-sim-bulb-index">${i + 1}</span>
         </div>
@@ -1521,8 +1584,20 @@ function renderLoopSimulation(mission, challenge, localState) {
     const rotation = localState.isRunning ? (localState.animationStep * 90) : (localState.repeatCount === 4 && localState.actionId === "spin" && localState.hasRun ? 360 : 0);
     const activeStep = localState.isRunning ? localState.animationStep : (localState.repeatCount === 4 && localState.actionId === "spin" && localState.hasRun ? 4 : 0);
     
+    // Generate steam particles
+    const steamParticles = Array.from({ length: 4 }, (_, idx) => {
+      const left = 20 + idx * 10;
+      const delay = idx * 0.8;
+      return `<div class="windmill-steam-puff" style="left:${left}px; animation-delay:${delay}s;"></div>`;
+    }).join("");
+
     return `
       <div class="loop-sim-container loop-sim-windmill">
+        <div class="windmill-industrial-bg">
+          <div class="industrial-cables"></div>
+          ${steamParticles}
+        </div>
+
         <div class="loop-sim-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1567,10 +1642,14 @@ function renderLoopSimulation(mission, challenge, localState) {
           <span class="node-glow"></span>
           ${isCurrent ? `
             <div class="guardian-drone">
+              <!-- Upgraded Futuristic Hover Drone SVG -->
               <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2">
-                <circle cx="12" cy="12" r="5"/>
-                <path d="M12 2v5M12 17v5M2 12h5M17 12h5" stroke-linecap="round"/>
+                <path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z" fill="#065f46" opacity="0.3"/>
+                <rect x="5" y="8" width="14" height="6" rx="2" fill="#10b981" stroke="#10b981"/>
+                <path d="M7 14l-2 4h14l-2-4" stroke-linecap="round"/>
+                <circle cx="12" cy="11" r="1.5" fill="#fff"/>
               </svg>
+              <div class="drone-laser-beam"></div>
             </div>
           ` : ""}
           <span class="node-index">${i + 1}</span>
@@ -1582,6 +1661,12 @@ function renderLoopSimulation(mission, challenge, localState) {
 
     return `
       <div class="loop-sim-container loop-sim-circuit">
+        <div class="temple-ruins-bg">
+          <div class="ruins-pillar pillar-left"></div>
+          <div class="ruins-pillar pillar-right"></div>
+          <div class="temple-energy-grid"></div>
+        </div>
+
         <div class="loop-sim-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/>
@@ -1593,7 +1678,11 @@ function renderLoopSimulation(mission, challenge, localState) {
           <div class="loop-sim-circuit-track">
             ${nodesHtml}
           </div>
-          <div class="temple-portal ${isAllActive ? "active" : ""}"></div>
+          <div class="temple-portal ${isAllActive ? "active" : ""}">
+            <div class="portal-core"></div>
+            <div class="portal-ring portal-ring-1"></div>
+            <div class="portal-ring portal-ring-2"></div>
+          </div>
         </div>
         <div class="loop-sim-status-msg">
           ${localState.isRunning ? `Patrullando tramo ${localState.animationStep + 1} de 4...` : (localState.hasRun ? (localState.isSuccess ? "¡Patrulla completada e iluminación del templo activada!" : "El circuito quedó incompleto.") : "Listo para patrullar.")}

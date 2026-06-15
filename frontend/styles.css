@@ -22547,7 +22547,6 @@ body.legal-page-body .legal-page {
   gap: 6px;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .mission-loop-hud-header #guidedBackToSubmapBtn:hover {
   transform: translateY(-2px) scale(1.04);
   background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%) !important;
@@ -22558,4 +22557,278 @@ body.legal-page-body .legal-page {
 
 .mission-loop-hud-header #guidedBackToSubmapBtn:active {
   transform: translateY(1px);
+}
+
+/* --- PRESTIGE ADDITIONS: WALK SIMULATION BACKGROUNDS & ASSETS --- */
+.loop-sim-walk {
+  overflow: hidden;
+  background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 60%, #030712 100%) !important;
+  position: relative;
+}
+
+.walk-sky-bg {
+  position: absolute;
+  inset: 0 0 60px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.walk-moon {
+  position: absolute;
+  top: 15%;
+  right: 15%;
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle at 30% 30%, #fffbeb 0%, #fef08a 60%, transparent 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 35px rgba(254, 240, 138, 0.45);
+  animation: moonGlowBeat 4s ease-in-out infinite alternate;
+}
+@keyframes moonGlowBeat {
+  0% { transform: scale(1); box-shadow: 0 0 25px rgba(254, 240, 138, 0.35); }
+  100% { transform: scale(1.08); box-shadow: 0 0 45px rgba(254, 240, 138, 0.6); }
+}
+
+.walk-bg-star {
+  position: absolute;
+  background: #ffffff;
+  border-radius: 50%;
+  animation: starTwinkleAnim 2s infinite alternate ease-in-out;
+}
+
+.walk-cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 30px;
+  filter: blur(8px);
+  pointer-events: none;
+}
+.walk-cloud-1 {
+  width: 120px;
+  height: 30px;
+  top: 10%;
+  left: -150px;
+  animation: walkCloudMove 45s linear infinite;
+}
+.walk-cloud-2 {
+  width: 180px;
+  height: 40px;
+  top: 30%;
+  left: -200px;
+  animation: walkCloudMove 60s linear infinite 15s;
+}
+@keyframes walkCloudMove {
+  0% { left: -200px; }
+  100% { left: 100%; }
+}
+
+.walk-ocean-waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80px;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.walk-wave {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 120px;
+  border-radius: 40%;
+  opacity: 0.65;
+}
+.walk-wave-1 {
+  bottom: -90px;
+  background: rgba(15, 23, 42, 0.85);
+  animation: waveScroll 10s infinite linear;
+}
+.walk-wave-2 {
+  bottom: -98px;
+  background: rgba(30, 27, 75, 0.9);
+  animation: waveScroll 8s infinite linear reverse;
+}
+@keyframes waveScroll {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loop-sim-tile-rune {
+  font-size: 24px;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.7));
+  animation: runeFloat 2.5s infinite alternate ease-in-out;
+}
+@keyframes runeFloat {
+  0% { transform: translateY(0); opacity: 0.75; }
+  100% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* --- PRESTIGE ADDITIONS: GARDEN greenhouse BACKGROUNDS --- */
+.loop-sim-garden {
+  background: linear-gradient(180deg, #142818 0%, #061e0e 70%, #020f07 100%) !important;
+  overflow: hidden;
+  position: relative;
+}
+
+.greenhouse-glass {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.glass-pane {
+  position: absolute;
+  inset: 0;
+  background-size: 80px 80px;
+  background-image: 
+    linear-gradient(45deg, rgba(52, 211, 153, 0.03) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(52, 211, 153, 0.03) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(52, 211, 153, 0.03) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(52, 211, 153, 0.03) 75%);
+}
+
+.greenhouse-vine {
+  position: absolute;
+  top: -10px;
+  font-size: 22px;
+  transform-origin: top center;
+  animation: vineSway 4s ease-in-out infinite alternate;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+}
+@keyframes vineSway {
+  0% { transform: rotate(-6deg); }
+  100% { transform: rotate(6deg); }
+}
+
+.plant-flower circle {
+  animation: flowerGlowPulse 2s infinite ease-in-out alternate;
+}
+@keyframes flowerGlowPulse {
+  0% { filter: drop-shadow(0 0 2px rgba(236, 72, 153, 0.4)); }
+  100% { filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.9)); }
+}
+
+/* --- PRESTIGE ADDITIONS: WINDMILL GENERATOR BACKGROUNDS --- */
+.loop-sim-windmill {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 70%, #020617 100%) !important;
+  overflow: hidden;
+  position: relative;
+}
+
+.windmill-industrial-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.industrial-cables {
+  position: absolute;
+  inset: 0;
+  background-size: 40px 40px;
+  background-image: linear-gradient(to bottom, rgba(255,255,255,0.01) 1px, transparent 1px);
+}
+
+.windmill-steam-puff {
+  position: absolute;
+  bottom: 15%;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  filter: blur(4px);
+  animation: steamRiseWindmill 3.5s infinite ease-out;
+  opacity: 0;
+}
+@keyframes steamRiseWindmill {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.5; }
+  80% { opacity: 0.2; }
+  100% { transform: translateY(-70px) scale(1.6); opacity: 0; }
+}
+
+/* --- PRESTIGE ADDITIONS: TEMPLE RUINS BACKGROUNDS --- */
+.loop-sim-circuit {
+  background: linear-gradient(180deg, #091e20 0%, #051416 70%, #010608 100%) !important;
+  overflow: hidden;
+  position: relative;
+}
+
+.temple-ruins-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ruins-pillar {
+  position: absolute;
+  bottom: 0;
+  width: 45px;
+  height: 80%;
+  background: linear-gradient(90deg, #111a1b 0%, #1c2e30 50%, #0d1415 100%);
+  border: 1px solid rgba(255,255,255,0.02);
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+}
+.pillar-left {
+  left: 6%;
+}
+.pillar-right {
+  right: 6%;
+}
+
+.temple-energy-grid {
+  position: absolute;
+  inset: 0;
+  background-size: 25px 25px;
+  background-image: 
+    radial-gradient(circle, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+}
+
+.drone-laser-beam {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 120px;
+  background: linear-gradient(to bottom, rgba(16, 185, 129, 0.8), transparent);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  animation: laserPulse 0.4s infinite alternate;
+}
+@keyframes laserPulse {
+  0% { opacity: 0.3; width: 1px; }
+  100% { opacity: 0.95; width: 3px; }
+}
+
+.portal-core {
+  position: absolute;
+  inset: 8px;
+  background: radial-gradient(circle, #38bdf8 0%, #0369a1 80%, #011b27 100%);
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+}
+
+.portal-ring {
+  position: absolute;
+  border: 2px solid rgba(89, 212, 255, 0.3);
+  border-radius: 50%;
+  z-index: 1;
+}
+.portal-ring-1 {
+  inset: 0;
+  animation: portalRingSpin 6s infinite linear;
+}
+.portal-ring-2 {
+  inset: -6px;
+  border-style: dashed;
+  animation: portalRingSpin 8s infinite linear reverse;
+}
+@keyframes portalRingSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
