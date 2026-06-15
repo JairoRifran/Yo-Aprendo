@@ -154,37 +154,130 @@ function renderIslandSvg(worldId, index, state) {
     `;
   } else if (worldId === "world-loops") {
     defs += `
-      <linearGradient id="grad-loop-metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#b45309" />
-        <stop offset="50%" stop-color="#78350f" />
-        <stop offset="100%" stop-color="#451a03" />
+      <linearGradient id="grad-loop-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fbbf24" />
+        <stop offset="50%" stop-color="#d97706" />
+        <stop offset="100%" stop-color="#fbbf24" />
       </linearGradient>
-      <linearGradient id="grad-loop-neon" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#c084fc" />
-        <stop offset="100%" stop-color="#8b5cf6" />
+      <linearGradient id="grad-loop-grass" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#34d399" />
+        <stop offset="100%" stop-color="#059669" />
       </linearGradient>
+      <linearGradient id="grad-loop-soil" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#5c3a21" />
+        <stop offset="100%" stop-color="#2d170b" />
+      </linearGradient>
+      <style>
+        @keyframes loopFloat {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-4px); }
+          100% { transform: translateY(0px); }
+        }
+        .floating-loop-logo {
+          transform-origin: 60px 52px;
+          animation: loopFloat 3s ease-in-out infinite;
+        }
+      </style>
     </defs>
     `;
 
+    // Base Floating Island Structure
     content += `
-      <ellipse cx="60" cy="90" rx="50" ry="15" fill="rgba(0,0,0,0.3)" />
-      <ellipse cx="60" cy="85" rx="52" ry="18" fill="url(#grad-loop-metal)" stroke="#d97706" stroke-width="2" />
-      <path d="M 10,85 L 8,82 L 12,82 Z M 110,85 L 112,82 L 108,82 Z M 60,67 L 57,65 L 63,65 Z M 60,103 L 63,105 L 57,105 Z" fill="#d97706" />
-      <path d="M 22,76 L 19,73 L 23,72 Z M 98,76 L 101,73 L 97,72 Z M 32,94 L 29,97 L 33,98 Z M 88,94 L 91,97 L 87,98 Z" fill="#d97706" />
-      <ellipse cx="60" cy="85" rx="36" ry="11" fill="#1e1b4b" stroke="url(#grad-loop-neon)" stroke-width="3" />
-      <g class="vertical-waterwheel" style="transform-origin: 60px 60px;">
-        <circle cx="60" cy="60" r="24" fill="none" stroke="#d97706" stroke-width="4" />
-        <circle cx="60" cy="60" r="16" fill="none" stroke="#b45309" stroke-width="2" />
-        <line x1="60" y1="36" x2="60" y2="84" stroke="#d97706" stroke-width="2.5" />
-        <line x1="36" y1="60" x2="84" y2="60" stroke="#d97706" stroke-width="2.5" />
-        <line x1="43" y1="43" x2="77" y2="77" stroke="#d97706" stroke-width="2" />
-        <line x1="43" y1="77" x2="77" y2="43" stroke="#d97706" stroke-width="2" />
-        <rect x="57" y="32" width="6" height="6" fill="#f59e0b" />
-        <rect x="57" y="82" width="6" height="6" fill="#f59e0b" />
-        <rect x="32" y="57" width="6" height="6" fill="#f59e0b" />
-        <rect x="82" y="57" width="6" height="6" fill="#f59e0b" />
+      <!-- Island base shadow -->
+      <ellipse cx="60" cy="85" rx="48" ry="16" fill="rgba(0,0,0,0.35)" />
+      
+      <!-- Soil thickness -->
+      <path d="M 14,80 Q 60,96 106,80 L 106,87 Q 60,103 14,87 Z" fill="url(#grad-loop-soil)" stroke="#1a0b05" stroke-width="1.5" />
+      
+      <!-- Grass layer -->
+      <ellipse cx="60" cy="80" rx="46" ry="14" fill="url(#grad-loop-grass)" stroke="#047857" stroke-width="1.5" />
+    `;
+
+    // Specific decorations by island index to match the mockup
+    if (index === 1) {
+      // Purple crystals at the base
+      content += `
+        <g filter="url(#glow-light)">
+          <polygon points="20,80 24,66 28,82" fill="#c084fc" opacity="0.9" />
+          <polygon points="26,82 30,70 34,84" fill="#a855f7" opacity="0.85" />
+          <polygon points="90,82 94,68 98,84" fill="#c084fc" opacity="0.9" />
+          <polygon points="85,83 88,72 91,84" fill="#a855f7" opacity="0.85" />
+        </g>
+      `;
+    } else if (index === 2) {
+      // Small stones and vegetation
+      content += `
+        <circle cx="24" cy="81" r="5" fill="#475569" stroke="#1e293b" stroke-width="1" />
+        <circle cx="29" cy="82" r="3.5" fill="#64748b" />
+        <circle cx="92" cy="81" r="4.5" fill="#475569" stroke="#1e293b" stroke-width="1" />
+        <circle cx="22" cy="78" r="3" fill="#10b981" opacity="0.8" />
+        <circle cx="95" cy="79" r="4" fill="#10b981" opacity="0.8" />
+      `;
+    } else if (index === 3) {
+      // Lighthouse on the right
+      content += `
+        <g class="lighthouse">
+          <rect x="80" y="46" width="10" height="26" fill="#f8fafc" stroke="#475569" stroke-width="1" />
+          <path d="M 80,70 L 90,70" stroke="#ef4444" stroke-width="4.5" />
+          <path d="M 80,56 L 90,56" stroke="#ef4444" stroke-width="4.5" />
+          <polygon points="78,46 92,46 85,38" fill="#334155" />
+          <circle cx="85" cy="42" r="3" fill="#fef08a" filter="url(#glow-light)" />
+        </g>
+      `;
+    } else if (index === 4) {
+      // Windmill on the left
+      content += `
+        <g class="windmill">
+          <polygon points="20,78 24,52 32,52 36,78" fill="#f1f5f9" stroke="#475569" stroke-width="1" />
+          <polygon points="22,52 34,52 28,45" fill="#7f1d1d" />
+          <g class="windmill-sails" style="transform-origin: 28px 52px; animation: portalRingSpin 8s linear infinite;">
+            <line x1="28" y1="52" x2="28" y2="30" stroke="#475569" stroke-width="1.8" />
+            <line x1="28" y1="52" x2="28" y2="74" stroke="#475569" stroke-width="1.8" />
+            <line x1="28" y1="52" x2="6" y2="52" stroke="#475569" stroke-width="1.8" />
+            <line x1="28" y1="52" x2="50" y2="52" stroke="#475569" stroke-width="1.8" />
+            <polygon points="28,30 32,30 32,40 28,40" fill="#cbd5e1" />
+            <polygon points="28,74 24,74 24,64 28,64" fill="#cbd5e1" />
+            <polygon points="6,52 6,56 16,56 16,52" fill="#cbd5e1" />
+            <polygon points="50,52 50,48 40,48 40,52" fill="#cbd5e1" />
+          </g>
+        </g>
+      `;
+    } else if (index === 5) {
+      // Cyan/Blue crystals at the base
+      content += `
+        <g filter="url(#glow-light)">
+          <polygon points="22,81 26,67 30,83" fill="#67e8f9" opacity="0.95" />
+          <polygon points="88,81 92,69 96,83" fill="#06b6d4" opacity="0.95" />
+        </g>
+      `;
+    } else if (index === 6) {
+      // Lighthouse on the left
+      content += `
+        <g class="lighthouse">
+          <rect x="30" y="46" width="10" height="26" fill="#f8fafc" stroke="#475569" stroke-width="1" />
+          <path d="M 30,70 L 40,70" stroke="#ef4444" stroke-width="4.5" />
+          <path d="M 30,56 L 40,56" stroke="#ef4444" stroke-width="4.5" />
+          <polygon points="28,46 42,46 35,38" fill="#334155" />
+          <circle cx="35" cy="42" r="3" fill="#fef08a" filter="url(#glow-light)" />
+        </g>
+      `;
+    }
+
+    // Portal Arch and Loop Symbol
+    content += `
+      <!-- Golden Arch -->
+      <circle cx="60" cy="52" r="23" fill="none" stroke="url(#grad-loop-gold)" stroke-width="4.5" filter="url(#glow-light)" />
+      
+      <!-- Inside Portal Arch Overlay -->
+      <circle cx="60" cy="52" r="21" fill="rgba(253, 224, 71, 0.08)" />
+
+      <!-- Loop Symbol -->
+      <g class="floating-loop-logo">
+        <path d="M 50,58 C 42,58 45,43 55,43 C 67,43 72,55 61,55 C 52,55 48,49 54,45 C 60,41 68,47 68,52 C 68,57 58,57 50,58" 
+              fill="none" stroke="#fef08a" stroke-width="4.5" stroke-linecap="round" filter="url(#glow-light)" />
+        <path d="M 50,58 C 42,58 45,43 55,43 C 67,43 72,55 61,55 C 52,55 48,49 54,45 C 60,41 68,47 68,52 C 68,57 58,57 50,58" 
+              fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
       </g>
-      <path d="M 20,83 C 20,93 100,93 100,83" fill="none" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="4,6" class="piping-glow" />
     `;
   } else if (worldId === "world-decisions") {
     defs += `
@@ -307,9 +400,9 @@ function initSubmapCanvas(worldId, nodes) {
   let waterBgGrad = ["#0c2548", "#041226"];
 
   if (worldId === "world-loops") {
-    primaryColor = "rgba(192, 132, 252, 0.45)";
-    secondaryColor = "rgba(251, 146, 60, 0.2)";
-    waterBgGrad = ["#1e1135", "#0a0418"];
+    primaryColor = "rgba(251, 191, 36, 0.72)";
+    secondaryColor = "rgba(253, 224, 71, 0.22)";
+    waterBgGrad = ["#0c0b24", "#03020c"];
   } else if (worldId === "world-decisions") {
     primaryColor = "rgba(16, 185, 129, 0.45)";
     secondaryColor = "rgba(139, 92, 246, 0.2)";
@@ -391,6 +484,44 @@ function initSubmapCanvas(worldId, nodes) {
       ctx.fill();
     }
     ctx.restore();
+
+    // Swirling Glowing Vortex for World Loops
+    if (worldId === "world-loops") {
+      ctx.save();
+      const vX = width * 0.46;
+      const vY = height * 0.54;
+      
+      // Center whirlpool radial glow
+      const radGrad = ctx.createRadialGradient(vX, vY, 0, vX, vY, 140);
+      radGrad.addColorStop(0, "rgba(6, 182, 212, 0.48)");
+      radGrad.addColorStop(0.3, "rgba(14, 116, 144, 0.25)");
+      radGrad.addColorStop(0.7, "rgba(30, 27, 75, 0.08)");
+      radGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = radGrad;
+      ctx.beginPath();
+      ctx.arc(vX, vY, 160, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Swirling spiral lines
+      ctx.strokeStyle = "rgba(34, 211, 238, 0.24)";
+      ctx.lineWidth = 1.8;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = "rgba(6, 182, 212, 0.72)";
+      
+      for (let j = 0; j < 4; j++) {
+        ctx.beginPath();
+        const startAngle = j * (Math.PI / 2) + time * 0.35;
+        for (let r = 0; r < 110; r += 2) {
+          const angle = startAngle + r * 0.065;
+          const x = vX + Math.cos(angle) * r * 1.4;
+          const y = vY + Math.sin(angle) * r * 0.46;
+          if (r === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
 
     ctx.save();
     ctx.shadowBlur = 10;
