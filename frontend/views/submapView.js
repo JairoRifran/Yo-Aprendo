@@ -143,242 +143,244 @@ export function renderSubmap() {
   const guideCopy = getSubmapGuideCopy(world, selectedNode, worldProgress);
 
   appShell.innerHTML = `
-    <header class="topbar submap-v2-topbar submap-v2-hidden-topbar">
-      <div class="topbar-left submap-v2-topbar-left">
-        <div class="pill level-pill submap-v2-level-pill">
-          <span class="mission-header-badge ui-icon-wrap">${uiIcon("trophy")}</span>
-          <span>Yo Aprendo</span>
-        </div>
-        <span class="mission-header-chevron" aria-hidden="true">${uiIcon("arrow-right")}</span>
-        <div class="pill title-pill mission-header-pill mission-header-pill-title submap-v2-title-pill">
-          <img class="submap-v2-pill-art" src="./img/start-island-treasure.png" alt="" />
-          <span>${world.title}</span>
-        </div>
-      </div>
-
-      <div class="topbar-right submap-v2-topbar-right">
-        <button class="pill nav-pill mission-header-pill" id="goHomeBtn" type="button">
-          <span class="mission-header-icon ui-icon-wrap">${uiIcon("home")}</span>
-          <span>Inicio</span>
-        </button>
-        <button class="pill nav-pill mission-header-pill" id="openDashboardBtn" type="button">
-          <span class="mission-header-icon ui-icon-wrap">${uiIcon("panels")}</span>
-          <span>Paneles</span>
-        </button>
-        <div class="pill currency-pill mission-header-pill">
-          <span class="currency-icon gold"></span>
-          <span>${appState.coins}</span>
-        </div>
-        <div class="pill currency-pill mission-header-pill">
-          <span class="currency-icon gems"></span>
-          <span>${appState.gems}</span>
-        </div>
-      </div>
-    </header>
-
-    <main class="submap-v2-screen submap-v2-fullscreen">
-      <aside class="mission-guided-side-card mission-guided-side-card-left submap-v2-hud-card submap-v2-hud-card-left" aria-label="Mundo actual">
-        <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span>
-        <span class="mission-guided-side-copy">
-          <strong>Yo Aprendo</strong>
-          <small>${world.title}</small>
-        </span>
-      </aside>
-      <aside class="mission-guided-side-card mission-guided-side-card-right submap-v2-hud-card submap-v2-hud-card-right" aria-label="Navegacion y premios">
-        <span class="mission-guided-wallet">
-          <span><i class="mission-guided-coin-icon" aria-hidden="true"></i><span>${appState.coins}</span></span>
-          <span><i class="mission-guided-gem-icon" aria-hidden="true"></i><span>${appState.gems}</span></span>
-        </span>
-        <button id="submapHudHomeBtn" type="button" aria-label="Inicio">
-          <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("home")}</span>
-          <small>Inicio</small>
-        </button>
-        <button id="submapHudDashboardBtn" type="button" aria-label="Paneles">
-          <span class="mission-guided-grid-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span>
-          <small>Paneles</small>
-        </button>
-      </aside>
-      <section class="submap-v2-layout">
-        <div class="submap-v2-stage">
-          <div class="submap-v2-scene-backdrop"></div>
-          <div class="submap-v2-sunbeam"></div>
-          <div class="submap-v2-ambient" aria-hidden="true">
-            <span class="submap-v2-bird bird-a"></span>
-            <span class="submap-v2-bird bird-b"></span>
-            <span class="submap-v2-bird bird-c"></span>
-            <span class="submap-v2-bird bird-d"></span>
-            <span class="submap-v2-bird bird-e"></span>
-            <span class="submap-v2-bird bird-f"></span>
-            <span class="submap-v2-bird bird-g"></span>
-            <span class="submap-v2-bird bird-h"></span>
-            <span class="submap-v2-glow glow-a"></span>
-            <span class="submap-v2-glow glow-b"></span>
-            <span class="submap-v2-glow glow-c"></span>
-            <span class="submap-v2-glow glow-d"></span>
-            <span class="submap-v2-ripple ripple-a"></span>
-            <span class="submap-v2-ripple ripple-b"></span>
-            <span class="submap-v2-ripple ripple-c"></span>
-            <span class="submap-v2-ripple ripple-d"></span>
-            <span class="submap-v2-ripple ripple-e"></span>
-            <span class="submap-v2-breeze breeze-a"></span>
-            <span class="submap-v2-breeze breeze-b"></span>
-            <span class="submap-v2-breeze breeze-c"></span>
+    <div class="submap-view-wrapper world-theme-${world.id}">
+      <header class="topbar submap-v2-topbar submap-v2-hidden-topbar">
+        <div class="topbar-left submap-v2-topbar-left">
+          <div class="pill level-pill submap-v2-level-pill">
+            <span class="mission-header-badge ui-icon-wrap">${uiIcon("trophy")}</span>
+            <span>Yo Aprendo</span>
           </div>
-
-          <div class="submap-v2-node-layer">
-            ${missionNodes.map((node) => renderMapNode(node, node.id === selectedNode?.id)).join("")}
-          </div>
-
-          <div class="submap-v2-stage-callout">
-            <span class="submap-v2-callout-icon">🧭</span>
-            <span>Explorá las mini islas y elegí tu próxima misión.</span>
+          <span class="mission-header-chevron" aria-hidden="true">${uiIcon("arrow-right")}</span>
+          <div class="pill title-pill mission-header-pill mission-header-pill-title submap-v2-title-pill">
+            <img class="submap-v2-pill-art" src="./img/start-island-treasure.png" alt="" />
+            <span>${world.title}</span>
           </div>
         </div>
 
-        <aside class="submap-v2-sidebar">
-          <section class="submap-v2-card submap-v2-world-card">
-            <div class="eyebrow">Mundo</div>
-            <div class="submap-v2-world-head">
-              <div>
-                <h1>${world.title}</h1>
-                <p>${world.description}</p>
-              </div>
-              <img class="submap-v2-world-art" src="./img/start-island-treasure.png" alt="" />
+        <div class="topbar-right submap-v2-topbar-right">
+          <button class="pill nav-pill mission-header-pill" id="goHomeBtn" type="button">
+            <span class="mission-header-icon ui-icon-wrap">${uiIcon("home")}</span>
+            <span>Inicio</span>
+          </button>
+          <button class="pill nav-pill mission-header-pill" id="openDashboardBtn" type="button">
+            <span class="mission-header-icon ui-icon-wrap">${uiIcon("panels")}</span>
+            <span>Paneles</span>
+          </button>
+          <div class="pill currency-pill mission-header-pill">
+            <span class="currency-icon gold"></span>
+            <span>${appState.coins}</span>
+          </div>
+          <div class="pill currency-pill mission-header-pill">
+            <span class="currency-icon gems"></span>
+            <span>${appState.gems}</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="submap-v2-screen submap-v2-fullscreen">
+        <aside class="mission-guided-side-card mission-guided-side-card-left submap-v2-hud-card submap-v2-hud-card-left" aria-label="Mundo actual">
+          <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("map")}</span>
+          <span class="mission-guided-side-copy">
+            <strong>Yo Aprendo</strong>
+            <small>${world.title}</small>
+          </span>
+        </aside>
+        <aside class="mission-guided-side-card mission-guided-side-card-right submap-v2-hud-card submap-v2-hud-card-right" aria-label="Navegacion y premios">
+          <span class="mission-guided-wallet">
+            <span><i class="mission-guided-coin-icon" aria-hidden="true"></i><span>${appState.coins}</span></span>
+            <span><i class="mission-guided-gem-icon" aria-hidden="true"></i><span>${appState.gems}</span></span>
+          </span>
+          <button id="submapHudHomeBtn" type="button" aria-label="Inicio">
+            <span class="mission-guided-map-icon ui-icon-wrap" aria-hidden="true">${uiIcon("home")}</span>
+            <small>Inicio</small>
+          </button>
+          <button id="submapHudDashboardBtn" type="button" aria-label="Paneles">
+            <span class="mission-guided-grid-icon ui-icon-wrap" aria-hidden="true">${uiIcon("panels")}</span>
+            <small>Paneles</small>
+          </button>
+        </aside>
+        <section class="submap-v2-layout">
+          <div class="submap-v2-stage">
+            <div class="submap-v2-scene-backdrop"></div>
+            <div class="submap-v2-sunbeam"></div>
+            <div class="submap-v2-ambient" aria-hidden="true">
+              <span class="submap-v2-bird bird-a"></span>
+              <span class="submap-v2-bird bird-b"></span>
+              <span class="submap-v2-bird bird-c"></span>
+              <span class="submap-v2-bird bird-d"></span>
+              <span class="submap-v2-bird bird-e"></span>
+              <span class="submap-v2-bird bird-f"></span>
+              <span class="submap-v2-bird bird-g"></span>
+              <span class="submap-v2-bird bird-h"></span>
+              <span class="submap-v2-glow glow-a"></span>
+              <span class="submap-v2-glow glow-b"></span>
+              <span class="submap-v2-glow glow-c"></span>
+              <span class="submap-v2-glow glow-d"></span>
+              <span class="submap-v2-ripple ripple-a"></span>
+              <span class="submap-v2-ripple ripple-b"></span>
+              <span class="submap-v2-ripple ripple-c"></span>
+              <span class="submap-v2-ripple ripple-d"></span>
+              <span class="submap-v2-ripple ripple-e"></span>
+              <span class="submap-v2-breeze breeze-a"></span>
+              <span class="submap-v2-breeze breeze-b"></span>
+              <span class="submap-v2-breeze breeze-c"></span>
             </div>
-            <div class="submap-v2-progress-chip">
-              <span>Progreso</span>
-              <strong>${worldProgress.completed}/${worldProgress.total}</strong>
+
+            <div class="submap-v2-node-layer">
+              ${missionNodes.map((node) => renderMapNode(node, node.id === selectedNode?.id)).join("")}
             </div>
-          </section>
 
-          <section class="submap-v2-guide-card" id="submapGuideCard">
-            <button
-              class="submap-v2-guide-robot-button"
-              id="submapGuideRobotBtn"
-              type="button"
-              aria-expanded="false"
-              aria-controls="submapGuideBubble"
-              aria-label="Abrir ayuda de Bit"
-            >
-              <img class="submap-v2-guide-robot" src="./img/mission-robot-pirate.png" alt="" />
-              <span>Bit</span>
-            </button>
+            <div class="submap-v2-stage-callout">
+              <span class="submap-v2-callout-icon">🧭</span>
+              <span>Explorá las mini islas y elegí tu próxima misión.</span>
+            </div>
+          </div>
 
-            <div class="submap-v2-guide-copy" id="submapGuideBubble" role="status" aria-live="polite">
-              <div class="submap-v2-guide-head">
+          <aside class="submap-v2-sidebar">
+            <section class="submap-v2-card submap-v2-world-card">
+              <div class="eyebrow">Mundo</div>
+              <div class="submap-v2-world-head">
                 <div>
-                  <div class="eyebrow">${guideCopy.title}</div>
-                  <h2 id="submapGuideTitle">¿Qué hago ahora?</h2>
+                  <h1>${world.title}</h1>
+                  <p>${world.description}</p>
                 </div>
-                <span class="submap-v2-guide-step" id="submapGuideStep">1/4</span>
+                <img class="submap-v2-world-art" src="./img/start-island-treasure.png" alt="" />
               </div>
-              <p id="submapGuideBody">${guideCopy.body}</p>
+              <div class="submap-v2-progress-chip">
+                <span>Progreso</span>
+                <strong>${worldProgress.completed}/${worldProgress.total}</strong>
+              </div>
+            </section>
 
-              <div class="submap-v2-dialog-mission" id="submapGuideMission">
+            <section class="submap-v2-guide-card" id="submapGuideCard">
+              <button
+                class="submap-v2-guide-robot-button"
+                id="submapGuideRobotBtn"
+                type="button"
+                aria-expanded="false"
+                aria-controls="submapGuideBubble"
+                aria-label="Abrir ayuda de Bit"
+              >
+                <img class="submap-v2-guide-robot" src="./img/mission-robot-pirate.png" alt="" />
+                <span>Bit</span>
+              </button>
+
+              <div class="submap-v2-guide-copy" id="submapGuideBubble" role="status" aria-live="polite">
+                <div class="submap-v2-guide-head">
+                  <div>
+                    <div class="eyebrow">${guideCopy.title}</div>
+                    <h2 id="submapGuideTitle">¿Qué hago ahora?</h2>
+                  </div>
+                  <span class="submap-v2-guide-step" id="submapGuideStep">1/4</span>
+                </div>
+                <p id="submapGuideBody">${guideCopy.body}</p>
+
+                <div class="submap-v2-dialog-mission" id="submapGuideMission">
+                  <div class="submap-v2-selected-number">${selectedNode?.number || 1}</div>
+                  <div class="submap-v2-selected-copy">
+                    <h3 id="submapDialogMissionTitle">${selectedNode?.title || "Elegí una misión"}</h3>
+                    <p id="submapDialogMissionDescription">
+                      ${selectedNode?.challenge?.prompt || "Haz click en una misión para viajar a su isla."}
+                    </p>
+                    <p class="submap-v2-selected-status" id="submapDialogMissionStatus">
+                      Estado: <strong>${selectedNode ? getMissionStatusLabel(selectedNode.missionState) : "-"}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="submap-v2-dialog-footer" id="submapGuideFooter">
+                  <div class="submap-v2-reward-grid" id="submapDialogRewardLine">
+                    <div class="submap-v2-reward-pill">
+                      <span class="currency-icon gold"></span>
+                      <strong>${selectedNode?.coins || 0}</strong>
+                    </div>
+                    <div class="submap-v2-reward-pill">
+                      <span class="currency-icon gems"></span>
+                      <strong>${selectedNode?.gems || 0}</strong>
+                    </div>
+                  </div>
+                  <div class="submap-v2-action-row">
+                    <button
+                      id="dialogEnterMissionBtn"
+                      class="btn btn-primary submap-v2-enter-btn"
+                      type="button"
+                      ${!selectedNode || selectedNode.missionState === "locked" ? "disabled" : ""}
+                    >
+                      Entrar a la misión
+                    </button>
+                    <button id="dialogBackToWorldMapBtn" class="btn btn-secondary submap-v2-back-btn" type="button">
+                      Volver
+                    </button>
+                  </div>
+                </div>
+
+                <button class="submap-v2-guide-next-btn" id="submapGuideNextBtn" type="button">
+                  Seguir leyendo
+                </button>
+              </div>
+            </section>
+
+            <section class="submap-v2-card submap-v2-selected-card ${selectedNode ? getMissionStatusClass(selectedNode.missionState) : ""}">
+              <div class="eyebrow">Misión seleccionada</div>
+              <div class="submap-v2-selected-body">
                 <div class="submap-v2-selected-number">${selectedNode?.number || 1}</div>
                 <div class="submap-v2-selected-copy">
-                  <h3 id="submapDialogMissionTitle">${selectedNode?.title || "Elegí una misión"}</h3>
-                  <p id="submapDialogMissionDescription">
-                    ${selectedNode?.challenge?.prompt || "Haz click en una misión para viajar a su isla."}
+                  <h2 id="submapMissionTitle">${selectedNode?.title || "Elegí una misión"}</h2>
+                  <p id="submapMissionDescription">
+                    ${selectedNode?.challenge?.prompt || "Hacé click en una misión para viajar a su isla."}
                   </p>
-                  <p class="submap-v2-selected-status" id="submapDialogMissionStatus">
+                  <p class="submap-v2-selected-status" id="submapMissionStatus">
                     Estado: <strong>${selectedNode ? getMissionStatusLabel(selectedNode.missionState) : "-"}</strong>
                   </p>
                 </div>
+                <img class="submap-v2-selected-robot" src="./img/mission-robot-pirate.png" alt="" />
               </div>
 
-              <div class="submap-v2-dialog-footer" id="submapGuideFooter">
-                <div class="submap-v2-reward-grid" id="submapDialogRewardLine">
-                  <div class="submap-v2-reward-pill">
-                    <span class="currency-icon gold"></span>
-                    <strong>${selectedNode?.coins || 0}</strong>
-                  </div>
-                  <div class="submap-v2-reward-pill">
-                    <span class="currency-icon gems"></span>
-                    <strong>${selectedNode?.gems || 0}</strong>
-                  </div>
+              <div class="submap-v2-action-row">
+                <button
+                  id="enterMissionBtn"
+                  class="btn btn-primary submap-v2-enter-btn"
+                  type="button"
+                  ${!selectedNode || selectedNode.missionState === "locked" ? "disabled" : ""}
+                >
+                  Entrar a la misión
+                </button>
+                <button id="backToWorldMapBtn" class="btn btn-secondary submap-v2-back-btn" type="button">
+                  Volver
+                </button>
+              </div>
+            </section>
+
+            <section class="submap-v2-card submap-v2-reward-card">
+              <div class="eyebrow">Recompensas</div>
+              <div class="submap-v2-reward-grid" id="submapRewardLine">
+                <div class="submap-v2-reward-pill">
+                  <span class="currency-icon gold"></span>
+                  <strong>${selectedNode?.coins || 0}</strong>
                 </div>
-                <div class="submap-v2-action-row">
-                  <button
-                    id="dialogEnterMissionBtn"
-                    class="btn btn-primary submap-v2-enter-btn"
-                    type="button"
-                    ${!selectedNode || selectedNode.missionState === "locked" ? "disabled" : ""}
-                  >
-                    Entrar a la misión
-                  </button>
-                  <button id="dialogBackToWorldMapBtn" class="btn btn-secondary submap-v2-back-btn" type="button">
-                    Volver
-                  </button>
+                <div class="submap-v2-reward-pill">
+                  <span class="currency-icon gems"></span>
+                  <strong>${selectedNode?.gems || 0}</strong>
                 </div>
               </div>
+            </section>
 
-              <button class="submap-v2-guide-next-btn" id="submapGuideNextBtn" type="button">
-                Seguir leyendo
-              </button>
-            </div>
-          </section>
-
-          <section class="submap-v2-card submap-v2-selected-card ${selectedNode ? getMissionStatusClass(selectedNode.missionState) : ""}">
-            <div class="eyebrow">Misión seleccionada</div>
-            <div class="submap-v2-selected-body">
-              <div class="submap-v2-selected-number">${selectedNode?.number || 1}</div>
-              <div class="submap-v2-selected-copy">
-                <h2 id="submapMissionTitle">${selectedNode?.title || "Elegí una misión"}</h2>
-                <p id="submapMissionDescription">
-                  ${selectedNode?.challenge?.prompt || "Hacé click en una misión para viajar a su isla."}
-                </p>
-                <p class="submap-v2-selected-status" id="submapMissionStatus">
-                  Estado: <strong>${selectedNode ? getMissionStatusLabel(selectedNode.missionState) : "-"}</strong>
-                </p>
+            <section class="submap-v2-card submap-v2-adventure-card">
+              <div class="eyebrow">Aventura</div>
+              <div class="submap-v2-adventure-body">
+                <div>
+                  <p>
+                    El bote llega al archipiélago y la ruta destaca la misión elegida para que
+                    el recorrido se sienta más claro y jugable.
+                  </p>
+                </div>
+                <img class="submap-v2-adventure-art" src="./img/barco.png" alt="" />
               </div>
-              <img class="submap-v2-selected-robot" src="./img/mission-robot-pirate.png" alt="" />
-            </div>
-
-            <div class="submap-v2-action-row">
-              <button
-                id="enterMissionBtn"
-                class="btn btn-primary submap-v2-enter-btn"
-                type="button"
-                ${!selectedNode || selectedNode.missionState === "locked" ? "disabled" : ""}
-              >
-                Entrar a la misión
-              </button>
-              <button id="backToWorldMapBtn" class="btn btn-secondary submap-v2-back-btn" type="button">
-                Volver
-              </button>
-            </div>
-          </section>
-
-          <section class="submap-v2-card submap-v2-reward-card">
-            <div class="eyebrow">Recompensas</div>
-            <div class="submap-v2-reward-grid" id="submapRewardLine">
-              <div class="submap-v2-reward-pill">
-                <span class="currency-icon gold"></span>
-                <strong>${selectedNode?.coins || 0}</strong>
-              </div>
-              <div class="submap-v2-reward-pill">
-                <span class="currency-icon gems"></span>
-                <strong>${selectedNode?.gems || 0}</strong>
-              </div>
-            </div>
-          </section>
-
-          <section class="submap-v2-card submap-v2-adventure-card">
-            <div class="eyebrow">Aventura</div>
-            <div class="submap-v2-adventure-body">
-              <div>
-                <p>
-                  El bote llega al archipiélago y la ruta destaca la misión elegida para que
-                  el recorrido se sienta más claro y jugable.
-                </p>
-              </div>
-              <img class="submap-v2-adventure-art" src="./img/barco.png" alt="" />
-            </div>
-          </section>
-        </aside>
-      </section>
-    </main>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
   `;
 
   const goHomeBtn = document.getElementById("submapHudHomeBtn") || document.getElementById("goHomeBtn");
