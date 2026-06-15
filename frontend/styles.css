@@ -23100,56 +23100,21 @@ body.legal-page-body .legal-page {
 
 /* World 2: Isla de los Bucles (Sunset Orange/Purple Theme) */
 .world-theme-world-loops .submap-v2-card,
-.world-theme-world-loops .submap-v2-guide-copy,
-.world-theme-world-loops .submap-v2-hud-card {
-  border: 2px solid #f59e0b !important;
-  border-radius: 12px !important;
-  background: 
-    radial-gradient(circle at 15% 15%, rgba(251, 146, 60, 0.12), transparent 40%),
-    linear-gradient(180deg, rgba(23, 16, 48, 0.88), rgba(13, 8, 30, 0.94)) !important;
+.world-theme-world-loops .submap-v2-guide-copy {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(251, 146, 60, 0.22), transparent 35%),
+    linear-gradient(180deg, rgba(53, 15, 92, 0.55), rgba(30, 8, 61, 0.65)) !important;
+  border-color: rgba(251, 146, 60, 0.55) !important;
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.6),
-    0 12px 32px rgba(0, 0, 0, 0.55),
-    0 0 18px rgba(245, 158, 11, 0.25) !important;
-  position: relative;
-  overflow: visible !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 18px rgba(251, 146, 60, 0.16),
+    0 12px 32px rgba(0, 0, 0, 0.35) !important;
 }
-
-.world-theme-world-loops .submap-v2-card::before,
-.world-theme-world-loops .submap-v2-guide-copy::before,
-.world-theme-world-loops .submap-v2-hud-card::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 14px;
-  border: 1px solid rgba(251, 191, 36, 0.45);
-  pointer-events: none;
-}
-
-.world-theme-world-loops .submap-v2-card::after,
-.world-theme-world-loops .submap-v2-guide-copy::after,
-.world-theme-world-loops .submap-v2-hud-card::after {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  background-image: 
-    linear-gradient(#f59e0b, #f59e0b),
-    linear-gradient(#f59e0b, #f59e0b),
-    linear-gradient(#f59e0b, #f59e0b),
-    linear-gradient(#f59e0b, #f59e0b);
-  background-size: 6px 6px;
-  background-position: 
-    top left,
-    top right,
-    bottom left,
-    bottom right;
-  background-repeat: no-repeat;
-  pointer-events: none;
-  border-radius: 0;
-  width: auto;
-  height: auto;
-  opacity: 1;
-  z-index: 5;
+.world-theme-world-loops .submap-v2-hud-card {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(251, 146, 60, 0.22), transparent 35%),
+    linear-gradient(180deg, rgba(53, 15, 92, 0.6), rgba(30, 8, 61, 0.68)) !important;
+  border-color: rgba(251, 146, 60, 0.85) !important;
 }
 
 /* World 3: Isla de las Decisiones (Mystic Night Theme) */
