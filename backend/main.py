@@ -1,13 +1,18 @@
 import json
 import os
+import base64
+import hashlib
+import hmac
+import secrets
+import time
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from statistics import mean
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text, create_engine, delete, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
@@ -162,15 +167,60 @@ class Guardian(Base):
     students: Mapped[list[Student]] = relationship(secondary=guardian_students, back_populates="guardians")
 
 
+class AuthCredential(Base):
+    __tablename__ = "auth_credentials"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    role: Mapped[str] = mapped_column(String(40), index=True, nullable=False)
+    entity_id: Mapped[str] = mapped_column(String(80), index=True, nullable=False)
+    institution_id: Mapped[str] = mapped_column(String(80), index=True, default="")
+    identifier: Mapped[str] = mapped_column(String(160), index=True, default="")
+    credential_lookup: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    credential_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), default="active", index=True)
+
+
+class RateLimitCounter(Base):
+    __tablename__ = "rate_limit_counters"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    window_started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    request_count: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class InstitutionLead(Base):
+    __tablename__ = "institution_leads"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    institution_name: Mapped[str] = mapped_column(String(160), nullable=False)
+    contact_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    email: Mapped[str] = mapped_column(String(160), index=True, nullable=False)
+    student_count: Mapped[str] = mapped_column(String(80), default="")
+    plan_key: Mapped[str] = mapped_column(String(40), default="school", index=True)
+    status: Mapped[str] = mapped_column(String(40), default="new", index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+
+def validate_plain_text(value: str) -> str:
+    clean = value.strip()
+    if any(char in clean for char in "<>"):
+        raise ValueError("No se permiten etiquetas HTML.")
+    if any(ord(char) < 32 and char not in "\t\n\r" for char in clean):
+        raise ValueError("El texto contiene caracteres no permitidos.")
+    return clean
+
+
 class LoginRequest(BaseModel):
     role: str
     name: str = ""
-    code: str = ""
+    code: str = Field(min_length=1, max_length=128)
 
 
 class ClassroomCreateRequest(BaseModel):
     name: str = Field(min_length=2, max_length=40)
     grade_label: str = Field(min_length=2, max_length=40)
+
+    _clean_name = field_validator("name", "grade_label")(validate_plain_text)
 
 
 class StudentCreateRequest(BaseModel):
@@ -179,6 +229,8 @@ class StudentCreateRequest(BaseModel):
     display_name: str = Field(default="")
     student_code: str = Field(default="")
 
+    _clean_student = field_validator("name", "display_name", "student_code")(validate_plain_text)
+
 
 class GuardianLinkRequest(BaseModel):
     student_id: str
@@ -186,15 +238,27 @@ class GuardianLinkRequest(BaseModel):
     guardian_code: str = Field(min_length=4, max_length=20)
     contact: str = Field(default="")
 
+    _clean_guardian = field_validator("guardian_name", "guardian_code", "contact")(validate_plain_text)
+
 
 class InstitutionRegisterRequest(BaseModel):
     institution_name: str = Field(min_length=2, max_length=160)
     institution_code: str = Field(min_length=4, max_length=40)
     admin_name: str = Field(min_length=2, max_length=120)
     admin_email: str = Field(min_length=5, max_length=160)
-    admin_access_code: str = Field(min_length=6, max_length=80)
+    admin_access_code: str = Field(min_length=10, max_length=80)
     department: str = Field(default="", max_length=80)
     billing_email: str = Field(default="", max_length=160)
+
+    _clean_institution = field_validator(
+        "institution_name",
+        "institution_code",
+        "admin_name",
+        "admin_email",
+        "admin_access_code",
+        "department",
+        "billing_email",
+    )(validate_plain_text)
 
 
 class InstitutionPlanRequestRequest(BaseModel):
@@ -204,16 +268,59 @@ class InstitutionPlanRequestRequest(BaseModel):
     email: str = Field(min_length=5, max_length=160)
     student_count: str = Field(default="", max_length=80)
 
+    _clean_plan_request = field_validator(
+        "institution_name", "contact_name", "email", "student_count"
+    )(validate_plain_text)
 
-app = FastAPI(title="YoAprendo API", version="0.3.0")
+
+IS_PRODUCTION = bool(os.getenv("VERCEL") or os.getenv("VERCEL_ENV") == "production")
+SESSION_COOKIE = "yoaprendo_session"
+SESSION_TTL_SECONDS = 8 * 60 * 60
+ALLOWED_ORIGINS = [
+    item.strip()
+    for item in os.getenv(
+        "ALLOWED_ORIGINS",
+        "https://yoaprendo.org,https://www.yoaprendo.org,http://127.0.0.1:4173,http://localhost:4173",
+    ).split(",")
+    if item.strip()
+]
+SESSION_SECRET = os.getenv("SESSION_SECRET") or os.getenv("PRODUCT_OWNER_PASSWORD")
+if not SESSION_SECRET and not IS_PRODUCTION:
+    SESSION_SECRET = "yoaprendo-local-development-only"
+
+app = FastAPI(
+    title="YoAprendo API",
+    version="0.4.0",
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None,
+    openapi_url=None if IS_PRODUCTION else "/openapi.json",
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "X-Requested-With"],
 )
+
+
+@app.middleware("http")
+async def security_middleware(request: Request, call_next):
+    origin = request.headers.get("origin")
+    if request.method not in {"GET", "HEAD", "OPTIONS"} and origin and origin not in ALLOWED_ORIGINS:
+        return Response(status_code=403, content="Origen no permitido.")
+
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, private"
+        response.headers["Pragma"] = "no-cache"
+    return response
 
 
 @contextmanager
@@ -227,6 +334,195 @@ def db_session():
         raise
     finally:
         session.close()
+
+
+def require_session_secret() -> str:
+    if not SESSION_SECRET:
+        raise HTTPException(status_code=503, detail="La autenticacion no esta configurada.")
+    return SESSION_SECRET
+
+
+def normalize_identifier(value: str) -> str:
+    return value.strip().casefold()
+
+
+def credential_lookup(code: str) -> str:
+    return hashlib.sha256(code.strip().encode("utf-8")).hexdigest()
+
+
+def hash_credential(code: str) -> str:
+    salt = secrets.token_bytes(16)
+    digest = hashlib.pbkdf2_hmac("sha256", code.encode("utf-8"), salt, 310_000)
+    return "pbkdf2_sha256$310000$" + base64.urlsafe_b64encode(salt).decode() + "$" + base64.urlsafe_b64encode(digest).decode()
+
+
+def verify_credential(code: str, encoded: str) -> bool:
+    try:
+        algorithm, iterations, salt_value, digest_value = encoded.split("$", 3)
+        if algorithm != "pbkdf2_sha256":
+            return False
+        salt = base64.urlsafe_b64decode(salt_value.encode())
+        expected = base64.urlsafe_b64decode(digest_value.encode())
+        actual = hashlib.pbkdf2_hmac("sha256", code.encode("utf-8"), salt, int(iterations))
+        return hmac.compare_digest(actual, expected)
+    except (ValueError, TypeError):
+        return False
+
+
+def create_credential(
+    session: Session,
+    role: str,
+    entity_id: str,
+    code: str,
+    identifier: str = "",
+    institution_id: str = "",
+    allow_conflict: bool = False,
+) -> AuthCredential | None:
+    lookup = credential_lookup(code)
+    existing = session.scalar(select(AuthCredential).where(AuthCredential.credential_lookup == lookup))
+    if existing:
+        if existing.role == role and existing.entity_id == entity_id:
+            return existing
+        if allow_conflict:
+            return None
+        raise HTTPException(status_code=409, detail="Ese codigo de acceso ya esta en uso.")
+    credential = AuthCredential(
+        id=unique_id(session, AuthCredential, "cred", f"{role}-{entity_id}"),
+        role=role,
+        entity_id=entity_id,
+        institution_id=institution_id,
+        identifier=normalize_identifier(identifier),
+        credential_lookup=lookup,
+        credential_hash=hash_credential(code),
+    )
+    session.add(credential)
+    return credential
+
+
+def find_credential(session: Session, role: str, code: str) -> AuthCredential | None:
+    if not code.strip():
+        return None
+    lookup = credential_lookup(code)
+    credential = session.scalar(
+        select(AuthCredential).where(
+            AuthCredential.role == role,
+            AuthCredential.credential_lookup == lookup,
+            AuthCredential.status == "active",
+        )
+    )
+    if not credential or not verify_credential(code, credential.credential_hash):
+        return None
+    return credential
+
+
+def sign_session(payload: dict) -> str:
+    raw = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    encoded = base64.urlsafe_b64encode(raw).decode().rstrip("=")
+    signature = hmac.new(require_session_secret().encode(), encoded.encode(), hashlib.sha256).digest()
+    return encoded + "." + base64.urlsafe_b64encode(signature).decode().rstrip("=")
+
+
+def read_session_token(token: str) -> dict | None:
+    try:
+        encoded, provided_signature = token.split(".", 1)
+        expected = hmac.new(require_session_secret().encode(), encoded.encode(), hashlib.sha256).digest()
+        provided = base64.urlsafe_b64decode(provided_signature + "=" * (-len(provided_signature) % 4))
+        if not hmac.compare_digest(expected, provided):
+            return None
+        raw = base64.urlsafe_b64decode(encoded + "=" * (-len(encoded) % 4))
+        payload = json.loads(raw)
+        if int(payload.get("exp", 0)) < int(time.time()):
+            return None
+        return payload
+    except (ValueError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def session_payload(role: str, entity_id: str, display_name: str, institution_id: str = "") -> dict:
+    now = int(time.time())
+    return {
+        "role": role,
+        "entity_id": entity_id,
+        "display_name": display_name,
+        "institution_id": institution_id,
+        "iat": now,
+        "exp": now + SESSION_TTL_SECONDS,
+        "nonce": secrets.token_urlsafe(12),
+    }
+
+
+def set_session_cookie(response: Response, session_data: dict) -> None:
+    response.set_cookie(
+        SESSION_COOKIE,
+        sign_session(session_data),
+        max_age=SESSION_TTL_SECONDS,
+        httponly=True,
+        secure=IS_PRODUCTION,
+        samesite="lax",
+        path="/",
+    )
+
+
+def get_current_session(request: Request) -> dict:
+    token = request.cookies.get(SESSION_COOKIE, "")
+    payload = read_session_token(token) if token else None
+    if not payload:
+        raise HTTPException(status_code=401, detail="Inicia sesion para continuar.")
+    return payload
+
+
+def authorize(
+    current: dict,
+    roles: set[str],
+    entity_id: str | None = None,
+    institution_id: str | None = None,
+) -> None:
+    if current.get("role") == "owner":
+        return
+    if current.get("role") not in roles:
+        raise HTTPException(status_code=403, detail="No tienes permiso para realizar esta accion.")
+    if entity_id is not None and current.get("entity_id") != entity_id:
+        raise HTTPException(status_code=403, detail="No tienes acceso a este registro.")
+    if institution_id is not None and current.get("institution_id") != institution_id:
+        raise HTTPException(status_code=403, detail="No tienes acceso a esta institucion.")
+
+
+def enforce_rate_limit(request: Request, bucket: str, limit: int, window_seconds: int) -> None:
+    forwarded = request.headers.get("x-forwarded-for", "")
+    client_ip = forwarded.split(",")[0].strip() or (request.client.host if request.client else "unknown")
+    private_key = hmac.new(
+        require_session_secret().encode(),
+        f"{bucket}:{client_ip}".encode(),
+        hashlib.sha256,
+    ).hexdigest()
+    counter_id = private_key[:80]
+    now = datetime.now(timezone.utc)
+    with db_session() as session:
+        counter = session.scalar(
+            select(RateLimitCounter)
+            .where(RateLimitCounter.id == counter_id)
+            .with_for_update()
+        )
+        if not counter:
+            session.add(
+                RateLimitCounter(
+                    id=counter_id,
+                    window_started_at=now,
+                    request_count=1,
+                )
+            )
+            return
+
+        started = counter.window_started_at
+        if started.tzinfo is None:
+            started = started.replace(tzinfo=timezone.utc)
+        if (now - started).total_seconds() >= window_seconds:
+            counter.window_started_at = now
+            counter.request_count = 1
+            return
+        if counter.request_count >= limit:
+            raise HTTPException(status_code=429, detail="Demasiados intentos. Intenta nuevamente mas tarde.")
+        counter.request_count += 1
 
 
 def load_seed() -> dict:
@@ -410,6 +706,7 @@ def remove_known_demo_data(session: Session) -> None:
 
     session.execute(delete(InstitutionUser).where(InstitutionUser.institution_id.in_(demo_institution_ids)))
     session.execute(delete(InstitutionSubscription).where(InstitutionSubscription.institution_id.in_(demo_institution_ids)))
+    session.execute(delete(AuthCredential).where(AuthCredential.institution_id.in_(demo_institution_ids)))
     session.execute(delete(Institution).where(Institution.id.in_(demo_institution_ids)))
 
 
@@ -434,107 +731,143 @@ def ensure_subscription_rows(session: Session) -> None:
 
 
 
-def ensure_custom_demo_users(session: Session) -> None:
-    # 1. Institution
-    inst = session.scalar(select(Institution).where(Institution.id == "inst-jairo"))
-    if not inst:
-        inst = Institution(
-            id="inst-jairo",
-            name="YoAprendo Org",
-            code="951147",
-            teacher_name="Jairo Rifran",
-            teacher_email="rifranjairo@gmail.com",
-            notes="Centro demo institucional."
-        )
-        session.add(inst)
-        session.flush()
+def remove_custom_demo_users(session: Session) -> None:
+    demo_student = session.get(Student, "stu-jairo")
+    demo_classroom = session.get(Classroom, "class-jairo")
+    demo_institution = session.get(Institution, "inst-jairo")
+    if demo_student:
+        session.execute(delete(guardian_students).where(guardian_students.c.student_id == demo_student.id))
+        session.delete(demo_student)
+    if demo_classroom:
+        session.execute(delete(teacher_classrooms).where(teacher_classrooms.c.classroom_id == demo_classroom.id))
+        session.delete(demo_classroom)
+    if demo_institution:
+        session.execute(delete(AuthCredential).where(AuthCredential.institution_id == demo_institution.id))
+        session.execute(delete(InstitutionUser).where(InstitutionUser.institution_id == demo_institution.id))
+        session.execute(delete(InstitutionSubscription).where(InstitutionSubscription.institution_id == demo_institution.id))
+        session.delete(demo_institution)
 
-    # 2. Subscription
-    sub = session.scalar(select(InstitutionSubscription).where(InstitutionSubscription.institution_id == "inst-jairo"))
-    if not sub:
-        session.add(
-            InstitutionSubscription(
-                institution_id="inst-jairo",
-                plan_key="school",
-                status="active",
-                student_limit=300,
-                teacher_limit=99,
-                billing_email="rifranjairo@gmail.com",
-                billing_provider="manual",
+
+def migrate_credentials(session: Session) -> None:
+    for admin in session.scalars(select(InstitutionUser)).all():
+        existing = session.scalar(
+            select(AuthCredential).where(
+                AuthCredential.role == "institution",
+                AuthCredential.entity_id == admin.institution_id,
             )
         )
+        if not existing and admin.access_code and not admin.access_code.startswith("protected-"):
+            create_credential(
+                session,
+                "institution",
+                admin.institution_id,
+                admin.access_code,
+                admin.email,
+                admin.institution_id,
+                allow_conflict=True,
+            )
+            admin.access_code = f"protected-{secrets.token_urlsafe(18)}"
 
-    # 3. InstitutionUser (Admin)
-    admin = session.scalar(select(InstitutionUser).where(InstitutionUser.email == "rifranjairo@gmail.com"))
-    if not admin:
-        session.add(
-            InstitutionUser(
-                id="user-jairo-admin",
-                institution_id="inst-jairo",
-                role="institution_admin",
-                name="Jairo Rifran",
-                email="rifranjairo@gmail.com",
-                access_code="951147",
-                status="active"
+    for teacher in session.scalars(select(Teacher)).all():
+        existing = session.scalar(
+            select(AuthCredential).where(AuthCredential.role == "teacher", AuthCredential.entity_id == teacher.id)
+        )
+        if not existing and teacher.code and not teacher.code.startswith("protected-"):
+            create_credential(
+                session,
+                "teacher",
+                teacher.id,
+                teacher.code,
+                teacher.email,
+                teacher.institution_id,
+                allow_conflict=True,
+            )
+            teacher.code = f"protected-{secrets.token_urlsafe(12)}"
+
+    for student in session.scalars(select(Student)).all():
+        existing = session.scalar(
+            select(AuthCredential).where(AuthCredential.role == "student", AuthCredential.entity_id == student.id)
+        )
+        if not existing and student.student_code and not student.student_code.startswith("protected-"):
+            create_credential(
+                session,
+                "student",
+                student.id,
+                student.student_code,
+                student.name,
+                student.classroom.institution_id,
+                allow_conflict=True,
+            )
+            student.student_code = f"protected-{secrets.token_urlsafe(12)}"
+
+    for guardian in session.scalars(select(Guardian)).all():
+        existing = session.scalar(
+            select(AuthCredential).where(AuthCredential.role == "parent", AuthCredential.entity_id == guardian.id)
+        )
+        institution_ids = {
+            student.classroom.institution_id for student in guardian.students if student.classroom
+        }
+        institution_id = next(iter(institution_ids), "")
+        if not existing and guardian.code and not guardian.code.startswith("protected-"):
+            create_credential(
+                session,
+                "parent",
+                guardian.id,
+                guardian.code,
+                guardian.name,
+                institution_id,
+                allow_conflict=True,
+            )
+            guardian.code = f"protected-{secrets.token_urlsafe(12)}"
+
+
+def migrate_legacy_leads(session: Session) -> None:
+    legacy_institutions = [
+        institution
+        for institution in session.scalars(select(Institution)).all()
+        if institution.subscription and institution.subscription.status == "lead"
+    ]
+    for institution in legacy_institutions:
+        existing = session.scalar(
+            select(InstitutionLead).where(
+                InstitutionLead.email == institution.teacher_email,
+                InstitutionLead.institution_name == institution.name,
             )
         )
-
-    # 4. Classroom
-    classroom = session.scalar(select(Classroom).where(Classroom.id == "class-jairo"))
-    if not classroom:
-        classroom = Classroom(
-            id="class-jairo",
-            institution_id="inst-jairo",
-            name="Grupo Demo",
-            grade_label="Multigrado",
-            group_code="AULA-JAIRO",
-            assigned_worlds=["Secuencias", "Bucles", "Decisiones"]
-        )
-        session.add(classroom)
-        session.flush()
-
-    # 5. Student
-    student = session.scalar(select(Student).where(Student.student_code == "estudiante"))
-    if not student:
-        session.add(
-            Student(
-                id="stu-jairo",
-                classroom_id="class-jairo",
-                name="Jairo",
-                display_name="Jairo",
-                avatar="Exploradora",
-                student_code="estudiante",
-                streak_days=3,
-                energy=90,
-                weekly_minutes=35,
-                attendance="Activa",
-                completed_missions=6,
-                total_missions=28,
-                strong_concept="Secuencias",
-                needs_support="Bucles",
-                autonomy="Alta",
-                badges=["Exploradora", "Creadora"],
-                focus_tip="Hoy conviene seguir con una mision corta y sumar otra estrella.",
-                next_mission={"world": "Isla de los Bucles", "title": "Repite el camino", "number": 8},
-                concepts=[
-                    {"title": "Secuencias", "completed": 5, "total": 7, "percent": 71},
-                    {"title": "Bucles", "completed": 1, "total": 7, "percent": 14},
-                    {"title": "Decisiones", "completed": 0, "total": 7, "percent": 0},
-                    {"title": "Datos y creacion", "completed": 0, "total": 7, "percent": 0}
-                ],
-                teacher_message="Le responde muy bien a desafios cortos y visuales."
+        if not existing:
+            session.add(
+                InstitutionLead(
+                    id=unique_id(session, InstitutionLead, "lead", institution.name),
+                    institution_name=institution.name,
+                    contact_name=institution.teacher_name,
+                    email=institution.teacher_email,
+                    student_count=institution.notes,
+                    plan_key=institution.subscription.plan_key,
+                    status="new",
+                )
             )
-        )
+        if not institution.classrooms and not institution.teachers:
+            session.execute(delete(AuthCredential).where(AuthCredential.institution_id == institution.id))
+            session.execute(delete(InstitutionUser).where(InstitutionUser.institution_id == institution.id))
+            session.execute(delete(InstitutionSubscription).where(InstitutionSubscription.institution_id == institution.id))
+            session.delete(institution)
 
 
 @app.on_event("startup")
 def init_database() -> None:
     Base.metadata.create_all(bind=engine)
     with db_session() as session:
+        session.execute(
+            delete(RateLimitCounter).where(
+                RateLimitCounter.window_started_at < datetime.now(timezone.utc) - timedelta(days=7)
+            )
+        )
         seed_database(session)
         remove_known_demo_data(session)
+        remove_custom_demo_users(session)
+        migrate_legacy_leads(session)
         ensure_subscription_rows(session)
-        ensure_custom_demo_users(session)
+        migrate_credentials(session)
 
 
 
@@ -575,16 +908,6 @@ def unique_student_code(session: Session, value: str) -> str:
     return candidate
 
 
-def unique_institution_code(session: Session, value: str) -> str:
-    base = value.upper().replace(" ", "")[:18] or "INST"
-    candidate = base
-    suffix = 1
-    while session.scalar(select(Institution).where(Institution.code == candidate)):
-        suffix += 1
-        candidate = f"{base}-{suffix}"
-    return candidate
-
-
 def get_classroom(session: Session, classroom_id: str) -> Classroom:
     classroom = session.get(Classroom, classroom_id)
     if not classroom:
@@ -617,7 +940,7 @@ def student_summary(student: Student) -> dict:
         "display_name": student.display_name,
         "grade_label": student.classroom.grade_label,
         "classroom_name": student.classroom.name,
-        "student_code": student.student_code,
+        "student_code": "Acceso protegido",
         "completed_missions": student.completed_missions,
         "total_missions": student.total_missions,
         "progress_percent": student_percent(student),
@@ -667,7 +990,11 @@ def institution_dashboard(session: Session, institution_id: str) -> dict:
 
     classrooms = institution.classrooms
     students = [student for classroom in classrooms for student in classroom.students]
-    guardians = session.scalars(select(Guardian)).all()
+    guardians = [
+        guardian
+        for guardian in session.scalars(select(Guardian)).all()
+        if any(student.classroom.institution_id == institution_id for student in guardian.students)
+    ]
 
     concept_names = ["Secuencias", "Bucles", "Decisiones", "Datos y creacion"]
     concept_overview = []
@@ -736,7 +1063,7 @@ def teacher_dashboard(session: Session, teacher_id: str) -> dict:
             "institution_id": teacher.institution_id,
             "name": teacher.name,
             "email": teacher.email,
-            "code": teacher.code,
+            "code": "Acceso protegido",
             "classroom_ids": [classroom.id for classroom in classrooms],
         },
         "institution": {
@@ -770,6 +1097,7 @@ def teacher_dashboard(session: Session, teacher_id: str) -> dict:
 
 def owner_dashboard(session: Session) -> dict:
     institutions = session.scalars(select(Institution)).all()
+    leads = session.scalars(select(InstitutionLead).order_by(InstitutionLead.created_at.desc())).all()
     classrooms = session.scalars(select(Classroom)).all()
     students = session.scalars(select(Student)).all()
     teachers = session.scalars(select(Teacher)).all()
@@ -839,7 +1167,7 @@ def owner_dashboard(session: Session) -> dict:
             "weekly_minutes": sum(student.weekly_minutes for student in students),
             "at_risk_students": sum(1 for student in students if student.attendance != "Activa"),
             "expansion_candidates": len(expansion_candidates),
-            "commercial_leads": sum(1 for institution in institutions if institution.subscription and institution.subscription.status == "lead"),
+            "commercial_leads": len(leads),
         },
         "plan_breakdown": plan_counts,
         "funnel": {
@@ -866,15 +1194,14 @@ def owner_dashboard(session: Session) -> dict:
             "institutions": institution_rows,
             "leads": [
                 {
-                    "name": institution.name,
-                    "contact": institution.teacher_name,
-                    "email": institution.teacher_email,
-                    "plan": institution.subscription.plan_key if institution.subscription else "school",
-                    "status": institution.subscription.status if institution.subscription else "lead",
-                    "notes": institution.notes,
+                    "name": lead.institution_name,
+                    "contact": lead.contact_name,
+                    "email": lead.email,
+                    "plan": lead.plan_key,
+                    "status": lead.status,
+                    "notes": f"Alumnos estimados: {lead.student_count or 'Sin dato'}",
                 }
-                for institution in institutions
-                if institution.subscription and institution.subscription.status == "lead"
+                for lead in leads
             ],
             "students": [
                 {
@@ -955,7 +1282,7 @@ def guardian_payload(guardian: Guardian) -> dict:
     return {
         "id": guardian.id,
         "name": guardian.name,
-        "code": guardian.code,
+        "code": "Acceso protegido",
         "student_ids": [student.id for student in guardian.students],
         "contact": guardian.contact,
     }
@@ -1007,103 +1334,97 @@ def student_dashboard(session: Session, student_id: str) -> dict:
 
 
 def resolve_login(session: Session, payload: LoginRequest) -> dict:
-    role = payload.role.lower()
-    code = payload.code.strip().lower()
-    name = payload.name.strip().lower()
-    owner_email = os.getenv("PRODUCT_OWNER_EMAIL", "rifranjairo@gmail.com").lower()
+    role = payload.role.strip().lower()
+    code = payload.code.strip()
+    name = normalize_identifier(payload.name)
+    owner_email = normalize_identifier(os.getenv("PRODUCT_OWNER_EMAIL", "rifranjairo@gmail.com"))
     owner_password = os.getenv("PRODUCT_OWNER_PASSWORD", "")
-    owner_code = os.getenv("PRODUCT_OWNER_CODE", "").lower()
 
     if role in {"owner", "platform_admin"}:
-        password_matches = bool(owner_password) and name == owner_email and payload.code.strip() == owner_password
-        legacy_code_matches = bool(owner_code) and code == owner_code
-        if not password_matches and not legacy_code_matches:
-            raise HTTPException(status_code=404, detail="Owner access not found")
+        password_matches = (
+            bool(owner_password)
+            and name == owner_email
+            and hmac.compare_digest(code, owner_password)
+        )
+        if not password_matches:
+            raise HTTPException(status_code=401, detail="Credenciales invalidas.")
         return {
             "role": "owner",
             "display_name": "Jairo Rifran",
             "entity_id": "owner",
             "redirect_view": "dashboard",
+            "institution_id": "",
             "context": {"scope": "platform"},
         }
 
+    if role not in {"student", "parent", "teacher", "institution"}:
+        raise HTTPException(status_code=400, detail="Rol no soportado.")
+
+    credential = find_credential(session, role, code)
+    if not credential:
+        raise HTTPException(status_code=401, detail="Credenciales invalidas.")
+    if role == "institution" and credential.identifier and name != credential.identifier:
+        raise HTTPException(status_code=401, detail="Credenciales invalidas.")
+
     if role == "student":
-        student = session.scalars(select(Student)).all()
-        match = next((item for item in student if item.student_code.lower() == code or item.name.lower() == name), None)
-        if not match:
-            raise HTTPException(status_code=404, detail="Student access not found")
+        match = get_student(session, credential.entity_id)
         return {
             "role": "student",
             "display_name": match.display_name,
             "entity_id": match.id,
             "redirect_view": "world-map",
+            "institution_id": match.classroom.institution_id,
             "context": {"classroom_name": match.classroom.name, "grade_label": match.classroom.grade_label},
         }
 
     if role == "parent":
-        guardians = session.scalars(select(Guardian)).all()
-        match = next((item for item in guardians if item.code.lower() == code or item.name.lower() == name), None)
-        if not match:
-            raise HTTPException(status_code=404, detail="Guardian access not found")
+        match = get_guardian(session, credential.entity_id)
         return {
             "role": "parent",
             "display_name": match.name,
             "entity_id": match.id,
             "redirect_view": "dashboard",
+            "institution_id": credential.institution_id,
             "context": {"children_count": len(match.students)},
         }
 
     if role == "institution":
-        admins = session.scalars(select(InstitutionUser).where(InstitutionUser.role == "institution_admin")).all()
-        admin_match = next(
-            (item for item in admins if item.access_code.lower() == code or item.email.lower() == name),
-            None,
-        )
-        if admin_match:
-            return {
-                "role": "institution",
-                "display_name": admin_match.institution.name,
-                "entity_id": admin_match.institution_id,
-                "redirect_view": "dashboard",
-                "context": {
-                    "admin_name": admin_match.name,
-                    "plan": admin_match.institution.subscription.plan_key if admin_match.institution.subscription else "trial",
-                },
-            }
-
-        institutions = session.scalars(select(Institution)).all()
-        match = next((item for item in institutions if item.code.lower() == code or item.name.lower() == name), None)
+        match = session.get(Institution, credential.entity_id)
         if not match:
-            raise HTTPException(status_code=404, detail="Institution access not found")
+            raise HTTPException(status_code=401, detail="Credenciales invalidas.")
         return {
             "role": "institution",
             "display_name": match.name,
             "entity_id": match.id,
             "redirect_view": "dashboard",
-            "context": {"teacher_name": match.teacher_name},
+            "institution_id": match.id,
+            "context": {
+                "teacher_name": match.teacher_name,
+                "plan": match.subscription.plan_key if match.subscription else "trial",
+            },
         }
 
     if role == "teacher":
-        teachers = session.scalars(select(Teacher)).all()
-        match = next((item for item in teachers if item.code.lower() == code or item.name.lower() == name), None)
+        match = session.get(Teacher, credential.entity_id)
         if not match:
-            raise HTTPException(status_code=404, detail="Teacher access not found")
+            raise HTTPException(status_code=401, detail="Credenciales invalidas.")
         return {
             "role": "teacher",
             "display_name": match.name,
             "entity_id": match.id,
             "redirect_view": "dashboard",
+            "institution_id": match.institution_id,
             "context": {"institution_name": match.institution.name},
         }
 
-    raise HTTPException(status_code=400, detail="Unsupported role")
+    raise HTTPException(status_code=400, detail="Rol no soportado.")
 
 
 @app.get("/api/health")
 def health():
     with db_session() as session:
-        institution_count = session.query(Institution).count()
-    return {"ok": True, "database": "connected", "institutions": institution_count}
+        session.execute(select(1))
+    return {"ok": True}
 
 
 @app.get("/api/plans")
@@ -1136,18 +1457,23 @@ def plans():
 
 
 @app.post("/api/institutions/register")
-def register_institution(payload: InstitutionRegisterRequest):
+def register_institution(payload: InstitutionRegisterRequest, request: Request, response: Response):
+    enforce_rate_limit(request, "institution-register", 5, 60 * 60)
     with db_session() as session:
         institution_code = payload.institution_code.strip()
         admin_email = payload.admin_email.strip().lower()
         admin_access_code = payload.admin_access_code.strip()
 
         if session.scalar(select(Institution).where(Institution.code == institution_code)):
-            raise HTTPException(status_code=409, detail="Ya existe una institucion con ese codigo.")
+            raise HTTPException(status_code=409, detail="No pudimos registrar esos datos.")
         if session.scalar(select(InstitutionUser).where(InstitutionUser.email == admin_email)):
-            raise HTTPException(status_code=409, detail="Ya existe un administrador con ese email.")
-        if session.scalar(select(InstitutionUser).where(InstitutionUser.access_code == admin_access_code)):
-            raise HTTPException(status_code=409, detail="Ese codigo de administrador ya esta en uso.")
+            raise HTTPException(status_code=409, detail="No pudimos registrar esos datos.")
+        if session.scalar(
+            select(AuthCredential).where(
+                AuthCredential.credential_lookup == credential_lookup(admin_access_code)
+            )
+        ):
+            raise HTTPException(status_code=409, detail="No pudimos registrar esos datos.")
 
         institution_id = unique_id(session, Institution, "inst", payload.institution_name)
         institution = Institution(
@@ -1170,26 +1496,41 @@ def register_institution(payload: InstitutionRegisterRequest):
                 role="institution_admin",
                 name=payload.admin_name.strip(),
                 email=admin_email,
-                access_code=admin_access_code,
+                access_code=f"protected-{secrets.token_urlsafe(18)}",
             )
+        )
+        create_credential(
+            session,
+            "institution",
+            institution_id,
+            admin_access_code,
+            admin_email,
+            institution_id,
         )
         session.flush()
 
-        return {
+        result = {
             "ok": True,
             "session": {
                 "role": "institution",
                 "display_name": institution.name,
                 "entity_id": institution.id,
                 "redirect_view": "dashboard",
+                "institution_id": institution.id,
                 "context": {"admin_name": payload.admin_name.strip(), "plan": "trial"},
             },
             "subscription": subscription_payload(institution, 0, 0),
         }
+        set_session_cookie(
+            response,
+            session_payload("institution", institution.id, institution.name, institution.id),
+        )
+        return result
 
 
 @app.post("/api/institutions/plan-request")
-def request_institution_plan(payload: InstitutionPlanRequestRequest):
+def request_institution_plan(payload: InstitutionPlanRequestRequest, request: Request):
+    enforce_rate_limit(request, "plan-request", 10, 60 * 60)
     with db_session() as session:
         plan_key = payload.plan_key.strip().lower()
         if plan_key not in {"school", "enterprise"}:
@@ -1198,116 +1539,136 @@ def request_institution_plan(payload: InstitutionPlanRequestRequest):
         contact_email = payload.email.strip().lower()
         institution_name = payload.institution_name.strip()
         existing = session.scalar(
-            select(Institution).where(
-                Institution.teacher_email == contact_email,
-                Institution.name == institution_name,
+            select(InstitutionLead).where(
+                InstitutionLead.email == contact_email,
+                InstitutionLead.institution_name == institution_name,
             )
         )
         if existing:
-            if existing.subscription:
-                existing.subscription.plan_key = plan_key
-                existing.subscription.status = "lead"
-            existing.teacher_name = payload.contact_name.strip()
-            existing.notes = (
-                f"Solicitud comercial: {plan_key}. "
-                f"Contacto: {payload.contact_name.strip()}. "
-                f"Alumnos estimados: {payload.student_count.strip() or 'Sin dato'}."
-            )
+            existing.plan_key = plan_key
+            existing.contact_name = payload.contact_name.strip()
+            existing.student_count = payload.student_count.strip()
+            existing.status = "new"
+            existing.created_at = datetime.now(timezone.utc)
             session.flush()
             return {
                 "ok": True,
                 "lead": {
                     "id": existing.id,
-                    "name": existing.name,
+                    "name": existing.institution_name,
                     "plan": plan_key,
-                    "status": "lead",
+                    "status": "new",
                 },
             }
 
-        institution_id = unique_id(session, Institution, "lead", institution_name)
-        institution = Institution(
-            id=institution_id,
-            name=institution_name,
-            code=unique_institution_code(session, f"LEAD-{institution_name}"),
-            teacher_name=payload.contact_name.strip(),
-            teacher_email=contact_email,
-            notes=(
-                f"Solicitud comercial: {plan_key}. "
-                f"Contacto: {payload.contact_name.strip()}. "
-                f"Alumnos estimados: {payload.student_count.strip() or 'Sin dato'}."
-            ),
+        lead = InstitutionLead(
+            id=unique_id(session, InstitutionLead, "lead", institution_name),
+            institution_name=institution_name,
+            contact_name=payload.contact_name.strip(),
+            email=contact_email,
+            student_count=payload.student_count.strip(),
+            plan_key=plan_key,
+            status="new",
         )
-        session.add(institution)
-        session.flush()
-
-        subscription = default_subscription(institution_id, contact_email)
-        subscription.plan_key = plan_key
-        subscription.status = "lead"
-        subscription.student_limit = 300 if plan_key == "school" else 999999
-        subscription.teacher_limit = 999
-        session.add(subscription)
+        session.add(lead)
         session.flush()
 
         return {
             "ok": True,
             "lead": {
-                "id": institution.id,
-                "name": institution.name,
+                "id": lead.id,
+                "name": lead.institution_name,
                 "plan": plan_key,
-                "status": "lead",
+                "status": "new",
             },
         }
 
 
-@app.get("/api/access/demo")
-def access_demo():
+@app.post("/api/access/login")
+def access_login(payload: LoginRequest, request: Request, response: Response):
+    enforce_rate_limit(request, "login", 10, 5 * 60)
+    with db_session() as session:
+        result = resolve_login(session, payload)
+        token_payload = session_payload(
+            result["role"],
+            result["entity_id"],
+            result["display_name"],
+            result.get("institution_id", ""),
+        )
+        set_session_cookie(response, token_payload)
+        return result
+
+
+@app.get("/api/access/session")
+def access_session(current: dict = Depends(get_current_session)):
     return {
-        "student": {"name": "", "code": ""},
-        "parent": {"name": "", "code": ""},
-        "teacher": {"name": "", "code": ""},
-        "institution": {"name": "", "code": ""},
-        "owner": {"name": "rifranjairo@gmail.com", "code": ""},
+        "role": current["role"],
+        "entity_id": current["entity_id"],
+        "display_name": current["display_name"],
+        "institution_id": current.get("institution_id", ""),
     }
 
 
-@app.post("/api/access/login")
-def access_login(payload: LoginRequest):
-    with db_session() as session:
-        return resolve_login(session, payload)
+@app.post("/api/access/logout")
+def access_logout(response: Response):
+    response.delete_cookie(SESSION_COOKIE, path="/", secure=IS_PRODUCTION, samesite="lax")
+    return {"ok": True}
 
 
 @app.get("/api/dashboard/student/{student_id}")
-def get_student_dashboard(student_id: str):
+def get_student_dashboard(student_id: str, current: dict = Depends(get_current_session)):
     with db_session() as session:
+        student = get_student(session, student_id)
+        if current.get("role") == "student":
+            authorize(current, {"student"}, entity_id=student_id)
+        elif current.get("role") in {"teacher", "institution"}:
+            authorize(current, {"teacher", "institution"}, institution_id=student.classroom.institution_id)
+        else:
+            authorize(current, {"owner"})
         return student_dashboard(session, student_id)
 
 
 @app.get("/api/dashboard/parent/{guardian_id}")
-def get_parent_dashboard(guardian_id: str):
+def get_parent_dashboard(guardian_id: str, current: dict = Depends(get_current_session)):
+    authorize(current, {"parent"}, entity_id=guardian_id)
     with db_session() as session:
         return guardian_dashboard(session, guardian_id)
 
 
 @app.get("/api/dashboard/institution/{institution_id}")
-def get_institution_dashboard(institution_id: str):
+def get_institution_dashboard(institution_id: str, current: dict = Depends(get_current_session)):
+    authorize(current, {"institution"}, institution_id=institution_id)
     with db_session() as session:
         return institution_dashboard(session, institution_id)
 
 
 @app.get("/api/dashboard/teacher/{teacher_id}")
-def get_teacher_dashboard(teacher_id: str):
+def get_teacher_dashboard(teacher_id: str, current: dict = Depends(get_current_session)):
     with db_session() as session:
+        teacher = session.get(Teacher, teacher_id)
+        if not teacher:
+            raise HTTPException(status_code=404, detail="Teacher not found")
+        if current.get("role") == "teacher":
+            authorize(current, {"teacher"}, entity_id=teacher_id)
+        else:
+            authorize(current, {"institution"}, institution_id=teacher.institution_id)
         return teacher_dashboard(session, teacher_id)
 
 
 @app.get("/api/dashboard/owner/{owner_id}")
-def get_owner_dashboard(owner_id: str):
+def get_owner_dashboard(owner_id: str, current: dict = Depends(get_current_session)):
+    authorize(current, {"owner"})
     with db_session() as session:
         return owner_dashboard(session)
 
 
 @app.post("/api/institutions/{institution_id}/classrooms")
-def create_classroom(institution_id: str, payload: ClassroomCreateRequest):
+def create_classroom(
+    institution_id: str,
+    payload: ClassroomCreateRequest,
+    current: dict = Depends(get_current_session),
+):
+    authorize(current, {"institution"}, institution_id=institution_id)
     with db_session() as session:
         institution = session.get(Institution, institution_id)
         if not institution:
@@ -1327,9 +1688,18 @@ def create_classroom(institution_id: str, payload: ClassroomCreateRequest):
 
 
 @app.post("/api/classrooms/{classroom_id}/students")
-def create_student(classroom_id: str, payload: StudentCreateRequest):
+def create_student(
+    classroom_id: str,
+    payload: StudentCreateRequest,
+    current: dict = Depends(get_current_session),
+):
     with db_session() as session:
         classroom = get_classroom(session, classroom_id)
+        authorize(current, {"institution", "teacher"}, institution_id=classroom.institution_id)
+        if current.get("role") == "teacher":
+            teacher = session.get(Teacher, current["entity_id"])
+            if not teacher or classroom not in teacher.classrooms:
+                raise HTTPException(status_code=403, detail="No tienes acceso a este grupo.")
         subscription = classroom.institution.subscription
         current_students = sum(len(item.students) for item in classroom.institution.classrooms)
         if subscription and subscription.plan_key != "enterprise" and current_students >= subscription.student_limit:
@@ -1338,16 +1708,14 @@ def create_student(classroom_id: str, payload: StudentCreateRequest):
                 detail="El plan actual alcanzo el limite de alumnos. Actualiza el plan para sumar mas estudiantes.",
             )
         student_name = payload.name.strip()
+        access_code = payload.student_code.strip() or secrets.token_urlsafe(8)
         student = Student(
             id=unique_id(session, Student, "stu", student_name),
             classroom_id=classroom.id,
             name=student_name,
             display_name=payload.display_name.strip() or student_name,
             avatar="Nuevo tripulante",
-            student_code=unique_student_code(
-                session,
-                payload.student_code.strip() or f"{student_name[:3].upper()}-{classroom.name.replace(' ', '')}",
-            ),
+            student_code=f"protected-{secrets.token_urlsafe(12)}",
             streak_days=0,
             energy=70,
             weekly_minutes=0,
@@ -1370,29 +1738,58 @@ def create_student(classroom_id: str, payload: StudentCreateRequest):
         )
         session.add(student)
         session.flush()
-        return {"ok": True, "student": student_summary(student)}
+        create_credential(
+            session,
+            "student",
+            student.id,
+            access_code,
+            student.name,
+            classroom.institution_id,
+        )
+        session.flush()
+        return {"ok": True, "student": student_summary(student), "access_code": access_code}
 
 
 @app.post("/api/students/{student_id}/guardians")
-def link_guardian(student_id: str, payload: GuardianLinkRequest):
+def link_guardian(
+    student_id: str,
+    payload: GuardianLinkRequest,
+    current: dict = Depends(get_current_session),
+):
     with db_session() as session:
         student = get_student(session, student_id)
+        authorize(current, {"institution", "teacher"}, institution_id=student.classroom.institution_id)
+        if current.get("role") == "teacher":
+            teacher = session.get(Teacher, current["entity_id"])
+            if not teacher or student.classroom not in teacher.classrooms:
+                raise HTTPException(status_code=403, detail="No tienes acceso a este alumno.")
         guardian_code = payload.guardian_code.strip()
-        guardians = session.scalars(select(Guardian)).all()
-        guardian = next((item for item in guardians if item.code.lower() == guardian_code.lower()), None)
+        existing_credential = find_credential(session, "parent", guardian_code)
+        guardian = session.get(Guardian, existing_credential.entity_id) if existing_credential else None
 
         if guardian is None:
             guardian_name = payload.guardian_name.strip()
             guardian = Guardian(
                 id=unique_id(session, Guardian, "guardian", guardian_name),
                 name=guardian_name,
-                code=guardian_code,
+                code=f"protected-{secrets.token_urlsafe(12)}",
                 contact=payload.contact.strip(),
             )
             session.add(guardian)
+            session.flush()
+            create_credential(
+                session,
+                "parent",
+                guardian.id,
+                guardian_code,
+                guardian_name,
+                student.classroom.institution_id,
+            )
+        elif existing_credential and existing_credential.institution_id != student.classroom.institution_id:
+            raise HTTPException(status_code=409, detail="Ese acceso familiar pertenece a otra institucion.")
 
         if student not in guardian.students:
             guardian.students.append(student)
 
         session.flush()
-        return {"ok": True, "guardian": guardian_payload(guardian)}
+        return {"ok": True, "guardian": guardian_payload(guardian), "access_code": guardian_code}

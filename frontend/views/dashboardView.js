@@ -7,7 +7,8 @@ import {
   createClassroom,
   createStudent,
   fetchDashboardByRole,
-  linkGuardian
+  linkGuardian,
+  logoutSession
 } from "../utils/api.js";
 import {
   unlockAudio,
@@ -81,9 +82,7 @@ async function ensureDashboardData() {
   const role = appState.selectedDashboardRole || appState.currentUserRole || "student";
   const session = appState.session && appState.session.role === role
     ? appState.session
-    : role === "owner"
-      ? { role: "owner", entity_id: "owner", display_name: "Jairo Rifran" }
-      : null;
+    : null;
 
   if (!session) {
     throw new Error("Inicia sesion con un acceso real para ver este panel.");
@@ -1317,9 +1316,14 @@ function bindCommonEvents(role) {
     window.renderApp();
   });
 
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
+  document.getElementById("logoutBtn")?.addEventListener("click", async () => {
     unlockAudio();
     playUiClick();
+    try {
+      await logoutSession();
+    } catch {
+      // Clear local state even if the session already expired.
+    }
     appState.currentUserRole = null;
     appState.currentUserName = "";
     appState.currentAccessCode = "";
@@ -1330,6 +1334,10 @@ function bindCommonEvents(role) {
     appState.selectedDashboardModule = "";
     appState.selectedDashboardRole = "student";
     clearSession();
+    if (role === "owner") {
+      window.location.href = "/dashboard-producto";
+      return;
+    }
     goToStart();
     window.renderApp();
   });
@@ -1361,12 +1369,13 @@ function bindInstitutionActions(data) {
     unlockAudio();
     playSelect();
     const form = new FormData(event.currentTarget);
-    await createStudent(form.get("classroom_id"), {
+    const result = await createStudent(form.get("classroom_id"), {
       classroom_id: form.get("classroom_id"),
       name: form.get("name"),
       display_name: form.get("display_name"),
       student_code: form.get("student_code")
     });
+    window.alert(`Código de acceso del alumno: ${result.access_code}\nGuárdalo ahora: no volverá a mostrarse.`);
     appState.dashboardData = null;
     window.renderApp();
   });
@@ -1376,12 +1385,13 @@ function bindInstitutionActions(data) {
     unlockAudio();
     playSelect();
     const form = new FormData(event.currentTarget);
-    await linkGuardian(form.get("student_id"), {
+    const result = await linkGuardian(form.get("student_id"), {
       student_id: form.get("student_id"),
       guardian_name: form.get("guardian_name"),
       guardian_code: form.get("guardian_code"),
       contact: form.get("contact")
     });
+    window.alert(`Código de acceso familiar: ${result.access_code}\nGuárdalo ahora: no volverá a mostrarse.`);
     appState.dashboardData = null;
     window.renderApp();
   });

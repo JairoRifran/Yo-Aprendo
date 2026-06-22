@@ -1,6 +1,7 @@
 import { grade4Data } from "./data/grade4.js";
 import { appState } from "./state/appState.js";
 import { loadProgress, loadSession } from "./utils/storage.js";
+import { fetchCurrentSession } from "./utils/api.js";
 import { goToDashboard, goToStart, goToSubmap } from "./utils/navigation.js";
 import { renderSubmap } from "./views/submapView.js";
 import { renderMission } from "./views/missionView.js";
@@ -42,10 +43,19 @@ syncWalletWithProgress();
 if (savedSession) {
   appState.currentUserRole = savedSession.currentUserRole || appState.currentUserRole;
   appState.currentUserName = savedSession.currentUserName || appState.currentUserName;
-  appState.currentAccessCode = savedSession.currentAccessCode || appState.currentAccessCode;
   appState.selectedDashboardRole = savedSession.selectedDashboardRole || appState.selectedDashboardRole;
   appState.startAccessMode = savedSession.startAccessMode || appState.startAccessMode;
-  appState.session = savedSession.session || appState.session;
+  try {
+    appState.session = await fetchCurrentSession();
+    appState.currentUserRole = appState.session.role;
+    appState.currentUserName = appState.session.display_name;
+    appState.selectedDashboardRole = appState.session.role;
+  } catch {
+    appState.session = null;
+    appState.currentUserRole = null;
+    appState.currentUserName = "";
+    appState.selectedDashboardRole = "student";
+  }
 }
 
 let animationFrameId = null;

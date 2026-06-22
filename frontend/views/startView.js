@@ -148,8 +148,9 @@ function renderLoginPanel(meta, currentName, currentCode) {
         <input
           id="startCodeInput"
           class="start-input"
-          type="${meta.codeType || "text"}"
+          type="${meta.codeType || "password"}"
           maxlength="40"
+          autocomplete="current-password"
           value="${currentCode}"
           placeholder="${meta.codePlaceholder}"
         />
@@ -191,7 +192,7 @@ function renderInstitutionRegisterPanel() {
         <input id="adminEmailInput" class="start-input" name="admin_email" type="email" maxlength="160" placeholder="admin@centro.edu.uy" required />
 
         <label class="start-field-label" for="adminCodeInput">Clave de administrador</label>
-        <input id="adminCodeInput" class="start-input" name="admin_access_code" type="text" maxlength="80" placeholder="Minimo 6 caracteres" required />
+        <input id="adminCodeInput" class="start-input" name="admin_access_code" type="password" minlength="10" maxlength="80" autocomplete="new-password" placeholder="Minimo 10 caracteres" required />
 
         <label class="start-field-label" for="departmentInput">Departamento</label>
         <input id="departmentInput" class="start-input" name="department" type="text" maxlength="80" placeholder="Montevideo, Canelones..." />
@@ -622,7 +623,7 @@ export function renderStart() {
       appState.currentUserRole = session.role;
       appState.selectedDashboardRole = session.role;
       appState.currentUserName = session.display_name;
-      appState.currentAccessCode = form.get("admin_access_code");
+      appState.currentAccessCode = "";
       appState.session = session;
       appState.dashboardData = null;
       appState.dashboardError = "";
@@ -630,7 +631,6 @@ export function renderStart() {
       saveSession({
         currentUserRole: appState.currentUserRole,
         currentUserName: appState.currentUserName,
-        currentAccessCode: appState.currentAccessCode,
         selectedDashboardRole: appState.selectedDashboardRole,
         startAccessMode: appState.startAccessMode,
         session: appState.session
@@ -666,14 +666,13 @@ export function renderStart() {
       appState.currentUserRole = session.role;
       appState.selectedDashboardRole = session.role;
       appState.currentUserName = session.display_name;
-      appState.currentAccessCode = session.role === "owner" ? "" : code;
+      appState.currentAccessCode = "";
       appState.session = session;
       appState.dashboardData = null;
       appState.dashboardError = "";
       saveSession({
         currentUserRole: appState.currentUserRole,
         currentUserName: appState.currentUserName,
-        currentAccessCode: appState.currentAccessCode,
         selectedDashboardRole: appState.selectedDashboardRole,
         startAccessMode: appState.startAccessMode,
         session: appState.session
