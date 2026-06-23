@@ -8855,6 +8855,19 @@ body::before {
   background: linear-gradient(180deg, rgba(226, 255, 244, 0.92), rgba(240, 251, 255, 0.9));
 }
 
+.institution-billing-status {
+  margin: 0 0 18px;
+}
+
+.institution-billing-status p {
+  margin: 4px 0 0;
+}
+
+.institution-plan-cta:disabled {
+  cursor: default;
+  opacity: 0.68;
+}
+
 .institution-plan-signal strong,
 .institution-plan-proof strong {
   display: block;

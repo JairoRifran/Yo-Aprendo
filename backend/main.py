@@ -5,10 +5,14 @@ import hashlib
 import hmac
 import secrets
 import time
+import urllib.error
+import urllib.request
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 from statistics import mean
+from urllib.parse import urlparse
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -84,6 +88,42 @@ class InstitutionSubscription(Base):
     trial_ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     institution: Mapped[Institution] = relationship(back_populates="subscription")
+
+
+class BillingPayment(Base):
+    __tablename__ = "billing_payments"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    institution_id: Mapped[str] = mapped_column(
+        ForeignKey("institutions.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    provider: Mapped[str] = mapped_column(String(40), default="dlocal_go", index=True)
+    provider_payment_id: Mapped[str | None] = mapped_column(
+        String(160),
+        unique=True,
+        index=True,
+        nullable=True,
+    )
+    plan_key: Mapped[str] = mapped_column(String(40), default="school", index=True)
+    status: Mapped[str] = mapped_column(String(40), default="created", index=True)
+    amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), default="USD")
+    country: Mapped[str] = mapped_column(String(2), default="UY")
+    checkout_url: Mapped[str] = mapped_column(Text, default="")
+    access_starts_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    access_ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    provider_status_detail: Mapped[str] = mapped_column(String(240), default="")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        index=True,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
 
 
 class InstitutionUser(Base):
@@ -273,6 +313,13 @@ class InstitutionPlanRequestRequest(BaseModel):
     )(validate_plain_text)
 
 
+class BillingCheckoutRequest(BaseModel):
+    plan_key: str = Field(default="school", max_length=40)
+    country: str = Field(default="UY", min_length=2, max_length=2)
+
+    _clean_billing = field_validator("plan_key", "country")(validate_plain_text)
+
+
 IS_PRODUCTION = bool(os.getenv("VERCEL") or os.getenv("VERCEL_ENV") == "production")
 SESSION_COOKIE = "yoaprendo_session"
 SESSION_TTL_SECONDS = 8 * 60 * 60
@@ -287,6 +334,19 @@ ALLOWED_ORIGINS = [
 SESSION_SECRET = os.getenv("SESSION_SECRET") or os.getenv("PRODUCT_OWNER_PASSWORD")
 if not SESSION_SECRET and not IS_PRODUCTION:
     SESSION_SECRET = "yoaprendo-local-development-only"
+DLOCAL_API_KEY = os.getenv("DLOCAL_API_KEY", "").strip()
+DLOCAL_SECRET_KEY = os.getenv("DLOCAL_SECRET_KEY", "").strip()
+DLOCAL_API_BASE = os.getenv(
+    "DLOCAL_API_BASE",
+    "https://api.dlocalgo.com" if IS_PRODUCTION else "https://api-sbx.dlocalgo.com",
+).rstrip("/")
+PUBLIC_APP_URL = os.getenv(
+    "PUBLIC_APP_URL",
+    "https://yoaprendo.org" if IS_PRODUCTION else "http://127.0.0.1:4173",
+).rstrip("/")
+DLOCAL_SCHOOL_PRICE_RAW = os.getenv("DLOCAL_SCHOOL_PRICE_USD", "").strip()
+DLOCAL_SCHOOL_PRICE_USD = DLOCAL_SCHOOL_PRICE_RAW or "49.00"
+DLOCAL_REQUEST_TIMEOUT_SECONDS = 12
 
 app = FastAPI(
     title="YoAprendo API",
@@ -541,6 +601,241 @@ def default_subscription(institution_id: str, billing_email: str = "") -> Instit
         billing_provider="manual",
         trial_ends_at=datetime.now(timezone.utc) + timedelta(days=90),
     )
+
+
+def aware_datetime(value: datetime | None) -> datetime | None:
+    if value is None or value.tzinfo is not None:
+        return value
+    return value.replace(tzinfo=timezone.utc)
+
+
+def school_price_cents() -> int:
+    try:
+        amount = Decimal(DLOCAL_SCHOOL_PRICE_USD).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    except InvalidOperation as exc:
+        raise HTTPException(status_code=503, detail="El precio del Plan Escuela no esta configurado.") from exc
+    if amount <= 0:
+        raise HTTPException(status_code=503, detail="El precio del Plan Escuela no esta configurado.")
+    return int(amount * 100)
+
+
+def billing_is_configured() -> bool:
+    return bool(DLOCAL_API_KEY and DLOCAL_SECRET_KEY and DLOCAL_SCHOOL_PRICE_RAW)
+
+
+def latest_billing_payment(session: Session, institution_id: str) -> BillingPayment | None:
+    return session.scalar(
+        select(BillingPayment)
+        .where(BillingPayment.institution_id == institution_id)
+        .order_by(BillingPayment.created_at.desc())
+        .limit(1)
+    )
+
+
+def institution_access_state(session: Session, institution: Institution) -> dict:
+    now = datetime.now(timezone.utc)
+    subscription = institution.subscription or default_subscription(institution.id, institution.teacher_email)
+    trial_ends_at = aware_datetime(subscription.trial_ends_at)
+    latest_payment = latest_billing_payment(session, institution.id)
+    active_paid_payment = session.scalar(
+        select(BillingPayment)
+        .where(
+            BillingPayment.institution_id == institution.id,
+            BillingPayment.status == "paid",
+            BillingPayment.access_ends_at > now,
+        )
+        .order_by(BillingPayment.access_ends_at.desc())
+        .limit(1)
+    )
+    paid_until = aware_datetime(active_paid_payment.access_ends_at) if active_paid_payment else None
+
+    if subscription.status in {"refunded", "chargeback"}:
+        allowed = False
+        reason = subscription.status
+    elif subscription.plan_key == "enterprise" and subscription.status == "active":
+        allowed = True
+        reason = "enterprise_active"
+    elif active_paid_payment and paid_until and paid_until > now:
+        allowed = True
+        reason = "paid"
+    elif trial_ends_at and trial_ends_at > now:
+        allowed = True
+        reason = "trial"
+    else:
+        allowed = False
+        reason = "payment_required"
+
+    return {
+        "allowed": allowed,
+        "reason": reason,
+        "paid_until": paid_until,
+        "latest_payment": latest_payment,
+    }
+
+
+def require_learning_access(session: Session, institution_id: str) -> None:
+    institution = session.get(Institution, institution_id)
+    if not institution:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    if not institution_access_state(session, institution)["allowed"]:
+        raise HTTPException(
+            status_code=402,
+            detail="La suscripcion de la institucion requiere un pago para continuar.",
+        )
+
+
+def dlocal_authorization() -> str:
+    if not DLOCAL_API_KEY or not DLOCAL_SECRET_KEY:
+        raise HTTPException(status_code=503, detail="Los pagos todavia no estan configurados.")
+    return f"Bearer {DLOCAL_API_KEY}:{DLOCAL_SECRET_KEY}"
+
+
+def dlocal_request(method: str, path: str, payload: dict | None = None) -> dict:
+    body = json.dumps(payload, separators=(",", ":")).encode("utf-8") if payload is not None else None
+    request = urllib.request.Request(
+        f"{DLOCAL_API_BASE}{path}",
+        data=body,
+        method=method,
+        headers={
+            "Authorization": dlocal_authorization(),
+            "Content-Type": "application/json",
+            "User-Agent": "YoAprendo/1.0",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=DLOCAL_REQUEST_TIMEOUT_SECONDS) as response:
+            response_body = response.read()
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="No pudimos comunicarnos con el proveedor de pagos. Intenta nuevamente.",
+        ) from exc
+
+    try:
+        result = json.loads(response_body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=502, detail="El proveedor de pagos devolvio una respuesta invalida.") from exc
+    if not isinstance(result, dict):
+        raise HTTPException(status_code=502, detail="El proveedor de pagos devolvio una respuesta invalida.")
+    return result
+
+
+def valid_dlocal_checkout_url(value: str) -> bool:
+    parsed = urlparse(value)
+    hostname = (parsed.hostname or "").lower()
+    return parsed.scheme == "https" and (
+        hostname == "checkout.dlocalgo.com"
+        or hostname == "checkout-sbx.dlocalgo.com"
+        or hostname.endswith(".dlocalgo.com")
+    )
+
+
+def amount_to_cents(value: object) -> int:
+    try:
+        return int(Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) * 100)
+    except (InvalidOperation, ValueError, TypeError) as exc:
+        raise HTTPException(status_code=409, detail="El monto informado por el proveedor no coincide.") from exc
+
+
+def apply_dlocal_payment_status(
+    session: Session,
+    payment: BillingPayment,
+    provider_payment: dict,
+) -> BillingPayment:
+    provider_id = str(provider_payment.get("id", "")).strip()
+    order_id = str(provider_payment.get("order_id", "")).strip()
+    currency = str(provider_payment.get("currency", "")).strip().upper()
+    provider_status = str(provider_payment.get("status", "")).strip().upper()
+
+    if not provider_id or provider_id != payment.provider_payment_id:
+        payment.status = "review"
+        raise HTTPException(status_code=409, detail="La referencia del pago no coincide.")
+    if order_id and order_id != payment.id:
+        payment.status = "review"
+        raise HTTPException(status_code=409, detail="La orden del pago no coincide.")
+    if currency != payment.currency or amount_to_cents(provider_payment.get("amount")) != payment.amount_cents:
+        payment.status = "review"
+        raise HTTPException(status_code=409, detail="Los datos economicos del pago no coinciden.")
+
+    previous_status = payment.status
+    normalized_statuses = {
+        "PAID": "paid",
+        "PENDING": "pending",
+        "CREATED": "pending",
+        "REJECTED": "rejected",
+        "DECLINED": "rejected",
+        "CANCELLED": "cancelled",
+        "CANCELED": "cancelled",
+        "EXPIRED": "expired",
+        "REFUNDED": "refunded",
+        "CHARGEBACK": "chargeback",
+    }
+    payment.provider_status_detail = str(
+        provider_payment.get("status_detail") or provider_payment.get("status_details") or ""
+    )[:240]
+    payment.updated_at = datetime.now(timezone.utc)
+    normalized_status = normalized_statuses.get(provider_status)
+    if not normalized_status:
+        payment.status = previous_status if previous_status == "paid" else "review"
+        session.flush()
+        return payment
+    payment.status = normalized_status
+
+    institution = session.get(Institution, payment.institution_id)
+    if not institution or not institution.subscription:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    subscription = institution.subscription
+    subscription.billing_provider = "dlocal_go"
+    subscription.billing_customer_id = provider_id
+
+    if payment.status == "paid":
+        if previous_status != "paid" or not payment.access_ends_at:
+            previous_paid = session.scalar(
+                select(BillingPayment)
+                .where(
+                    BillingPayment.institution_id == payment.institution_id,
+                    BillingPayment.id != payment.id,
+                    BillingPayment.status == "paid",
+                )
+                .order_by(BillingPayment.access_ends_at.desc())
+                .limit(1)
+            )
+            previous_end = aware_datetime(previous_paid.access_ends_at) if previous_paid else None
+            payment.access_starts_at = max(
+                datetime.now(timezone.utc),
+                previous_end or datetime.now(timezone.utc),
+            )
+            payment.access_ends_at = payment.access_starts_at + timedelta(days=30)
+        subscription.plan_key = payment.plan_key
+        subscription.status = "active"
+        subscription.student_limit = 300
+        subscription.teacher_limit = 999
+    elif payment.status in {"refunded", "chargeback"}:
+        payment.access_ends_at = datetime.now(timezone.utc)
+        subscription.status = payment.status
+    elif payment.status in {"rejected", "cancelled", "expired", "review"}:
+        if subscription.status != "active":
+            subscription.status = "payment_failed"
+    elif payment.status == "pending" and subscription.status != "active":
+        subscription.status = "payment_pending"
+
+    session.flush()
+    return payment
+
+
+def billing_payment_payload(payment: BillingPayment | None) -> dict | None:
+    if not payment:
+        return None
+    return {
+        "id": payment.id,
+        "plan_key": payment.plan_key,
+        "status": payment.status,
+        "amount": f"{payment.amount_cents / 100:.2f}",
+        "currency": payment.currency,
+        "checkout_url": payment.checkout_url if payment.status in {"created", "pending"} else "",
+        "access_ends_at": aware_datetime(payment.access_ends_at).isoformat() if payment.access_ends_at else None,
+        "created_at": aware_datetime(payment.created_at).isoformat(),
+    }
 
 
 def seed_database(session: Session) -> None:
@@ -968,18 +1263,36 @@ def classroom_summary(classroom: Classroom) -> dict:
     }
 
 
-def subscription_payload(institution: Institution, student_count: int, teacher_count: int) -> dict:
+def subscription_payload(
+    session: Session,
+    institution: Institution,
+    student_count: int,
+    teacher_count: int,
+) -> dict:
     subscription = institution.subscription or default_subscription(institution.id, institution.teacher_email)
+    access = institution_access_state(session, institution)
+    latest_payment = access["latest_payment"]
+    effective_status = subscription.status
+    if not access["allowed"] and effective_status == "trialing":
+        effective_status = "trial_expired"
     return {
         "plan_key": subscription.plan_key,
-        "status": subscription.status,
+        "status": effective_status,
         "student_limit": subscription.student_limit,
         "teacher_limit": subscription.teacher_limit,
         "student_count": student_count,
         "teacher_count": teacher_count,
         "trial_ends_at": subscription.trial_ends_at.isoformat() if subscription.trial_ends_at else None,
-        "can_add_students": student_count < subscription.student_limit or subscription.plan_key == "enterprise",
-        "can_add_teachers": teacher_count < subscription.teacher_limit or subscription.plan_key == "enterprise",
+        "access_allowed": access["allowed"],
+        "access_reason": access["reason"],
+        "can_add_students": access["allowed"]
+        and (student_count < subscription.student_limit or subscription.plan_key == "enterprise"),
+        "can_add_teachers": access["allowed"]
+        and (teacher_count < subscription.teacher_limit or subscription.plan_key == "enterprise"),
+        "latest_payment": billing_payment_payload(latest_payment),
+        "school_price": f"{school_price_cents() / 100:.2f}",
+        "school_currency": "USD",
+        "billing_configured": billing_is_configured(),
     }
 
 
@@ -1028,7 +1341,7 @@ def institution_dashboard(session: Session, institution_id: str) -> dict:
             "avg_weekly_minutes": round(mean(student.weekly_minutes for student in students)) if students else 0,
             "avg_completion": round(mean(student_percent(student) for student in students)) if students else 0,
         },
-        "subscription": subscription_payload(institution, len(students), len(institution.teachers)),
+        "subscription": subscription_payload(session, institution, len(students), len(institution.teachers)),
         "classrooms": [classroom_summary(classroom) for classroom in classrooms],
         "students": [student_summary(student) for student in students],
         "guardians": [guardian_payload(guardian) for guardian in guardians],
@@ -1102,6 +1415,9 @@ def owner_dashboard(session: Session) -> dict:
     students = session.scalars(select(Student)).all()
     teachers = session.scalars(select(Teacher)).all()
     guardians = session.scalars(select(Guardian)).all()
+    payments = session.scalars(
+        select(BillingPayment).order_by(BillingPayment.created_at.desc())
+    ).all()
 
     plan_counts = {"trial": 0, "school": 0, "enterprise": 0}
     institution_rows = []
@@ -1168,6 +1484,8 @@ def owner_dashboard(session: Session) -> dict:
             "at_risk_students": sum(1 for student in students if student.attendance != "Activa"),
             "expansion_candidates": len(expansion_candidates),
             "commercial_leads": len(leads),
+            "payments": len(payments),
+            "paid_revenue_usd": f"{sum(item.amount_cents for item in payments if item.status == 'paid') / 100:.2f}",
         },
         "plan_breakdown": plan_counts,
         "funnel": {
@@ -1202,6 +1520,22 @@ def owner_dashboard(session: Session) -> dict:
                     "notes": f"Alumnos estimados: {lead.student_count or 'Sin dato'}",
                 }
                 for lead in leads
+            ],
+            "payments": [
+                {
+                    "id": payment.id,
+                    "institution": session.get(Institution, payment.institution_id).name
+                    if session.get(Institution, payment.institution_id)
+                    else payment.institution_id,
+                    "plan": payment.plan_key,
+                    "status": payment.status,
+                    "amount": f"{payment.amount_cents / 100:.2f} {payment.currency}",
+                    "created_at": aware_datetime(payment.created_at).isoformat(),
+                    "access_ends_at": aware_datetime(payment.access_ends_at).isoformat()
+                    if payment.access_ends_at
+                    else "",
+                }
+                for payment in payments
             ],
             "students": [
                 {
@@ -1365,6 +1699,8 @@ def resolve_login(session: Session, payload: LoginRequest) -> dict:
         raise HTTPException(status_code=401, detail="Credenciales invalidas.")
     if role == "institution" and credential.identifier and name != credential.identifier:
         raise HTTPException(status_code=401, detail="Credenciales invalidas.")
+    if role in {"student", "parent", "teacher"}:
+        require_learning_access(session, credential.institution_id)
 
     if role == "student":
         match = get_student(session, credential.entity_id)
@@ -1441,7 +1777,7 @@ def plans():
             {
                 "key": "school",
                 "name": "Escuela",
-                "price": "USD 49-99/mes",
+                "price": f"USD {school_price_cents() / 100:.2f} / 30 dias",
                 "student_limit": 300,
                 "teacher_limit": 999,
             },
@@ -1454,6 +1790,165 @@ def plans():
             },
         ]
     }
+
+
+@app.post("/api/institutions/{institution_id}/billing/checkout")
+def create_billing_checkout(
+    institution_id: str,
+    payload: BillingCheckoutRequest,
+    request: Request,
+    current: dict = Depends(get_current_session),
+):
+    authorize(current, {"institution"}, institution_id=institution_id)
+    enforce_rate_limit(request, "billing-checkout", 8, 10 * 60)
+    if not billing_is_configured():
+        raise HTTPException(status_code=503, detail="Los pagos todavia no estan configurados.")
+
+    plan_key = payload.plan_key.strip().lower()
+    country = payload.country.strip().upper()
+    if plan_key != "school":
+        raise HTTPException(status_code=400, detail="Ese plan requiere coordinacion comercial.")
+    if not country.isalpha() or len(country) != 2:
+        raise HTTPException(status_code=400, detail="Selecciona un pais valido.")
+
+    with db_session() as session:
+        institution = session.get(Institution, institution_id)
+        if not institution or not institution.subscription:
+            raise HTTPException(status_code=404, detail="Institution not found")
+
+        existing = session.scalar(
+            select(BillingPayment)
+            .where(
+                BillingPayment.institution_id == institution_id,
+                BillingPayment.status.in_(["created", "pending"]),
+                BillingPayment.created_at > datetime.now(timezone.utc) - timedelta(hours=24),
+            )
+            .order_by(BillingPayment.created_at.desc())
+            .limit(1)
+        )
+        if existing and existing.checkout_url:
+            return {
+                "ok": True,
+                "checkout_url": existing.checkout_url,
+                "payment": billing_payment_payload(existing),
+            }
+
+        amount_cents = school_price_cents()
+        payment = BillingPayment(
+            id=unique_id(session, BillingPayment, "pay", f"{institution_id}-{secrets.token_hex(8)}"),
+            institution_id=institution_id,
+            plan_key="school",
+            status="created",
+            amount_cents=amount_cents,
+            currency="USD",
+            country=country,
+        )
+        session.add(payment)
+        session.flush()
+
+        provider_payment = dlocal_request(
+            "POST",
+            "/v1/payments",
+            {
+                "currency": payment.currency,
+                "amount": payment.amount_cents / 100,
+                "country": payment.country,
+                "order_id": payment.id,
+                "description": "Yo Aprendo - Plan Escuela por 30 dias",
+                "payer": {
+                    "id": institution.id,
+                    "name": institution.teacher_name or institution.name,
+                    "email": institution.subscription.billing_email or institution.teacher_email,
+                    "user_reference": institution.id,
+                },
+                "success_url": f"{PUBLIC_APP_URL}/producto?billing=success",
+                "back_url": f"{PUBLIC_APP_URL}/producto?billing=cancelled",
+                "notification_url": f"{PUBLIC_APP_URL}/api/billing/dlocal/webhook",
+                "expiration_type": "HOURS",
+                "expiration_value": 24,
+            },
+        )
+
+        provider_id = str(provider_payment.get("id", "")).strip()
+        checkout_url = str(provider_payment.get("redirect_url", "")).strip()
+        if not provider_id or not valid_dlocal_checkout_url(checkout_url):
+            raise HTTPException(status_code=502, detail="El proveedor no devolvio un checkout seguro.")
+        payment.provider_payment_id = provider_id
+        payment.checkout_url = checkout_url
+        apply_dlocal_payment_status(session, payment, provider_payment)
+
+        return {
+            "ok": True,
+            "checkout_url": checkout_url,
+            "payment": billing_payment_payload(payment),
+        }
+
+
+@app.get("/api/institutions/{institution_id}/billing/status")
+def get_billing_status(
+    institution_id: str,
+    request: Request,
+    current: dict = Depends(get_current_session),
+):
+    authorize(current, {"institution"}, institution_id=institution_id)
+    enforce_rate_limit(request, "billing-status", 30, 60)
+    with db_session() as session:
+        institution = session.get(Institution, institution_id)
+        if not institution:
+            raise HTTPException(status_code=404, detail="Institution not found")
+        payment = latest_billing_payment(session, institution_id)
+        if payment and payment.provider_payment_id and payment.status in {"created", "pending"}:
+            provider_payment = dlocal_request("GET", f"/v1/payments/{payment.provider_payment_id}")
+            apply_dlocal_payment_status(session, payment, provider_payment)
+        students = sum(len(classroom.students) for classroom in institution.classrooms)
+        return {
+            "ok": True,
+            "subscription": subscription_payload(session, institution, students, len(institution.teachers)),
+        }
+
+
+@app.post("/api/billing/dlocal/webhook")
+async def dlocal_billing_webhook(request: Request):
+    content_length = request.headers.get("content-length", "0")
+    if content_length.isdigit() and int(content_length) > 4096:
+        raise HTTPException(status_code=413, detail="Payload demasiado grande.")
+    raw_body = await request.body()
+    if not raw_body or len(raw_body) > 4096:
+        raise HTTPException(status_code=400, detail="Notificacion invalida.")
+
+    provided_header = request.headers.get("authorization", "")
+    prefix = "V2-HMAC-SHA256, Signature:"
+    if not provided_header.startswith(prefix):
+        raise HTTPException(status_code=401, detail="Firma invalida.")
+    provided_signature = provided_header[len(prefix):].strip().lower()
+    expected_signature = hmac.new(
+        DLOCAL_SECRET_KEY.encode("utf-8"),
+        DLOCAL_API_KEY.encode("utf-8") + raw_body,
+        hashlib.sha256,
+    ).hexdigest()
+    if not DLOCAL_API_KEY or not DLOCAL_SECRET_KEY or not hmac.compare_digest(
+        expected_signature,
+        provided_signature,
+    ):
+        raise HTTPException(status_code=401, detail="Firma invalida.")
+
+    try:
+        notification = json.loads(raw_body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=400, detail="Notificacion invalida.") from exc
+    provider_payment_id = str(notification.get("payment_id", "")).strip()
+    if not provider_payment_id or len(provider_payment_id) > 160:
+        raise HTTPException(status_code=400, detail="Notificacion invalida.")
+
+    with db_session() as session:
+        payment = session.scalar(
+            select(BillingPayment).where(BillingPayment.provider_payment_id == provider_payment_id)
+        )
+        if not payment:
+            return {"ok": True}
+        provider_payment = dlocal_request("GET", f"/v1/payments/{provider_payment_id}")
+        apply_dlocal_payment_status(session, payment, provider_payment)
+        return {"ok": True}
 
 
 @app.post("/api/institutions/register")
@@ -1519,7 +2014,7 @@ def register_institution(payload: InstitutionRegisterRequest, request: Request, 
                 "institution_id": institution.id,
                 "context": {"admin_name": payload.admin_name.strip(), "plan": "trial"},
             },
-            "subscription": subscription_payload(institution, 0, 0),
+            "subscription": subscription_payload(session, institution, 0, 0),
         }
         set_session_cookie(
             response,
@@ -1625,6 +2120,8 @@ def get_student_dashboard(student_id: str, current: dict = Depends(get_current_s
             authorize(current, {"teacher", "institution"}, institution_id=student.classroom.institution_id)
         else:
             authorize(current, {"owner"})
+        if current.get("role") != "owner":
+            require_learning_access(session, student.classroom.institution_id)
         return student_dashboard(session, student_id)
 
 
@@ -1632,6 +2129,7 @@ def get_student_dashboard(student_id: str, current: dict = Depends(get_current_s
 def get_parent_dashboard(guardian_id: str, current: dict = Depends(get_current_session)):
     authorize(current, {"parent"}, entity_id=guardian_id)
     with db_session() as session:
+        require_learning_access(session, current.get("institution_id", ""))
         return guardian_dashboard(session, guardian_id)
 
 
@@ -1652,6 +2150,8 @@ def get_teacher_dashboard(teacher_id: str, current: dict = Depends(get_current_s
             authorize(current, {"teacher"}, entity_id=teacher_id)
         else:
             authorize(current, {"institution"}, institution_id=teacher.institution_id)
+        if current.get("role") != "owner":
+            require_learning_access(session, teacher.institution_id)
         return teacher_dashboard(session, teacher_id)
 
 
@@ -1673,6 +2173,7 @@ def create_classroom(
         institution = session.get(Institution, institution_id)
         if not institution:
             raise HTTPException(status_code=404, detail="Institution not found")
+        require_learning_access(session, institution_id)
 
         classroom = Classroom(
             id=unique_id(session, Classroom, "class", payload.name),
@@ -1696,6 +2197,7 @@ def create_student(
     with db_session() as session:
         classroom = get_classroom(session, classroom_id)
         authorize(current, {"institution", "teacher"}, institution_id=classroom.institution_id)
+        require_learning_access(session, classroom.institution_id)
         if current.get("role") == "teacher":
             teacher = session.get(Teacher, current["entity_id"])
             if not teacher or classroom not in teacher.classrooms:
@@ -1759,6 +2261,7 @@ def link_guardian(
     with db_session() as session:
         student = get_student(session, student_id)
         authorize(current, {"institution", "teacher"}, institution_id=student.classroom.institution_id)
+        require_learning_access(session, student.classroom.institution_id)
         if current.get("role") == "teacher":
             teacher = session.get(Teacher, current["entity_id"])
             if not teacher or student.classroom not in teacher.classrooms:

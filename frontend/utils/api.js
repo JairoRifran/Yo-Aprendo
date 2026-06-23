@@ -68,6 +68,29 @@ export async function requestInstitutionPlan(payload) {
   return await readJson(response);
 }
 
+export async function createBillingCheckout(institutionId, payload = {}) {
+  const response = await fetch(
+    `${API_BASE}/institutions/${encodeURIComponent(institutionId)}/billing/checkout`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify(payload)
+    }
+  );
+  return await readJson(response);
+}
+
+export async function fetchBillingStatus(institutionId) {
+  const response = await fetch(
+    `${API_BASE}/institutions/${encodeURIComponent(institutionId)}/billing/status`,
+    { credentials: "include" }
+  );
+  return await readJson(response);
+}
+
 export async function fetchDashboardByRole(role, entityId) {
   const response = await fetch(
     `${API_BASE}/dashboard/${encodeURIComponent(role)}/${encodeURIComponent(entityId)}`,

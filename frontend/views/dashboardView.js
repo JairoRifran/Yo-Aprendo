@@ -4,11 +4,14 @@ import { goToStart, goToWorldMap } from "../utils/navigation.js";
 import { clearSession } from "../utils/storage.js";
 import { getMissionState, getWorldProgress, isMissionCompleted } from "../utils/progress.js";
 import {
+  createBillingCheckout,
   createClassroom,
   createStudent,
+  fetchBillingStatus,
   fetchDashboardByRole,
   linkGuardian,
-  logoutSession
+  logoutSession,
+  requestInstitutionPlan
 } from "../utils/api.js";
 import {
   unlockAudio,
@@ -364,6 +367,7 @@ function ownerModules() {
     { id: "overview", icon: "progress", label: "Resumen ejecutivo", hint: "Adopcion, planes y evidencia" },
     { id: "institutions", icon: "groups", label: "Instituciones", hint: "Centros, plan y traccion" },
     { id: "leads", icon: "badge", label: "Solicitudes", hint: "Planes, compras y convenios" },
+    { id: "payments", icon: "timer", label: "Pagos", hint: "Cobros, estados y vigencia" },
     { id: "students", icon: "students", label: "Alumnos", hint: "Usuarios cargados por aula" },
     { id: "active", icon: "today", label: "Actividad", hint: "Uso real y recurrencia" },
     { id: "progress", icon: "progress", label: "Aprendizajes", hint: "Avance por concepto" },
@@ -464,7 +468,17 @@ function renderRoleWorkspace(role, data, content) {
   `;
 }
 
-function renderInstitutionPlanCard({ name, badge, price, audience, features, cta, tone = "" }) {
+function renderInstitutionPlanCard({
+  name,
+  badge,
+  price,
+  audience,
+  features,
+  cta,
+  tone = "",
+  action = "",
+  disabled = false
+}) {
   return `
     <article class="institution-plan-card ${tone}">
       ${badge ? `<span class="institution-plan-badge">${badge}</span>` : ""}
@@ -476,7 +490,12 @@ function renderInstitutionPlanCard({ name, badge, price, audience, features, cta
       <ul>
         ${features.map((item) => `<li>${item}</li>`).join("")}
       </ul>
-      <button class="btn ${tone === "recommended" ? "btn-primary" : "btn-secondary"} institution-plan-cta" type="button">${cta}</button>
+      <button
+        class="btn ${tone === "recommended" ? "btn-primary" : "btn-secondary"} institution-plan-cta"
+        type="button"
+        ${action ? `data-billing-action="${action}"` : ""}
+        ${disabled ? "disabled" : ""}
+      >${cta}</button>
     </article>
   `;
 }
@@ -508,6 +527,20 @@ function ownerMetricConfig(metric) {
         item.plan,
         item.status,
         item.notes || "-"
+      ])
+    },
+    payments: {
+      title: "Pagos",
+      subtitle: "Transacciones de dLocal Go, estado de cobro y vigencia habilitada.",
+      columns: ["Orden", "Institucion", "Plan", "Estado", "Monto", "Creado", "Acceso hasta"],
+      rows: (data) => (data.details?.payments || []).map((item) => [
+        item.id,
+        item.institution,
+        item.plan,
+        item.status,
+        item.amount,
+        item.created_at,
+        item.access_ends_at || "-"
       ])
     },
     students: {
@@ -976,6 +1009,34 @@ function renderInstitutionPanel(data) {
     can_add_students: true
   };
   const studentLimitLabel = subscription.plan_key === "enterprise" ? "sin limite" : subscription.student_limit;
+  const payment = subscription.latest_payment;
+  const planName = subscription.plan_key === "trial"
+    ? "Piloto"
+    : subscription.plan_key === "school"
+      ? "Plan Escuela"
+      : "Red educativa";
+  const statusCopy = {
+    active: ["Plan activo", `El acceso esta habilitado${payment?.access_ends_at ? ` hasta ${new Date(payment.access_ends_at).toLocaleDateString("es-UY")}` : ""}.`],
+    payment_pending: ["Pago pendiente", "Confirmaremos el acceso cuando dLocal Go informe el pago."],
+    payment_failed: ["Pago no completado", "Podes retomar el checkout o iniciar un nuevo pago sin perder los datos del centro."],
+    trial_expired: ["Piloto finalizado", "El panel sigue disponible. Activa el Plan Escuela para recuperar el acceso educativo."],
+    refunded: ["Pago reembolsado", "El acceso educativo esta pausado mientras revisamos el estado del cobro."],
+    chargeback: ["Pago desconocido", "El acceso educativo esta pausado por un contracargo."],
+    trialing: ["Piloto activo", "Tu equipo puede trabajar normalmente durante el periodo de prueba."]
+  };
+  const [statusTitle, statusMessage] = statusCopy[subscription.status] || [
+    "Estado de la cuenta",
+    "Revisa la vigencia del plan antes de realizar nuevas altas."
+  ];
+  const statusTone = subscription.access_allowed ? "good" : "warn";
+  const billingReady = subscription.billing_configured !== false;
+  const schoolCta = !billingReady
+    ? "Pago online en configuracion"
+    : payment?.status === "pending"
+      ? "Continuar pago"
+      : subscription.status === "active"
+        ? "Renovar 30 dias"
+        : "Activar Plan Escuela";
 
   return `
     <section class="dashboard-role-panel">
@@ -995,7 +1056,7 @@ function renderInstitutionPanel(data) {
         <div class="institution-plan-hero">
           <div>
             <div class="eyebrow">Mi plan</div>
-            <h2>${subscription.plan_key === "trial" ? "Piloto activo" : subscription.plan_key}</h2>
+            <h2>${planName}</h2>
             <p>Converti el piloto en una implementacion estable con más grupos, más evidencia pedagógica y reportes listos para direccion o referentes institucionales.</p>
           </div>
           <div class="institution-plan-meter">
@@ -1003,6 +1064,11 @@ function renderInstitutionPanel(data) {
             <strong>${subscription.student_count} / ${studentLimitLabel}</strong>
             <small>alumnos habilitados</small>
           </div>
+        </div>
+
+        <div class="dashboard-alert ${statusTone} institution-billing-status" role="status">
+          <strong>${statusTitle}</strong>
+          <p>${statusMessage}</p>
         </div>
 
         <div class="institution-plan-signal">
@@ -1020,17 +1086,20 @@ function renderInstitutionPanel(data) {
             price: "90 días gratis",
             audience: "Para validar Yo Aprendo en una escuela o grupo inicial.",
             features: ["Hasta 50 alumnos", "2 docentes", "Seguimiento institucional", "Soporte de activacion"],
-            cta: "Continuar piloto",
-            tone: "current"
+            cta: subscription.plan_key === "trial" ? "Plan actual" : "Piloto finalizado",
+            tone: "current",
+            disabled: true
           })}
           ${renderInstitutionPlanCard({
             name: "Escuela",
             badge: "Mas elegido",
-            price: "Plan mensual",
-            audience: "Para centros que ya quieren operar con varios grupos.",
+            price: `${subscription.school_currency} ${subscription.school_price} / 30 dias`,
+            audience: "Para centros que quieren continuidad, mas capacidad y acceso estable para toda la comunidad.",
             features: ["Hasta 300 alumnos", "Docentes por aula", "Familias vinculadas", "Metricas para direccion"],
-            cta: "Solicitar Plan Escuela",
-            tone: "recommended"
+            cta: schoolCta,
+            tone: "recommended",
+            action: billingReady ? "school" : "",
+            disabled: !billingReady
           })}
           ${renderInstitutionPlanCard({
             name: "Red educativa",
@@ -1039,7 +1108,8 @@ function renderInstitutionPanel(data) {
             audience: "Para Ceibal, redes, inspecciones o despliegues con SSO.",
             features: ["Multiples instituciones", "Reportes agregados", "Integracion institucional", "Acompanamiento de adopción"],
             cta: "Hablar por convenio",
-            tone: "enterprise"
+            tone: "enterprise",
+            action: "enterprise"
           })}
         </div>
 
@@ -1048,7 +1118,11 @@ function renderInstitutionPanel(data) {
             <strong>Por que avanzar ahora</strong>
             <p>Cuando el piloto pasa a uso semanal, el valor deja de estar en probar la herramienta y pasa a ordenar adopción, seguimiento y evidencia para tomar decisiones.</p>
           </div>
-          <button class="btn btn-primary" type="button">Quiero ampliar mi plan</button>
+          <button
+            class="btn btn-primary"
+            type="button"
+            ${billingReady ? 'data-billing-action="school"' : "disabled"}
+          >${schoolCta}</button>
         </div>
       </article>
 
@@ -1213,6 +1287,7 @@ function renderOwnerPanel(data) {
         <div class="owner-kpi-strip">
           <div><span>Instituciones</span><strong>${summary.institutions}</strong></div>
           <div><span>Solicitudes</span><strong>${summary.commercial_leads || 0}</strong></div>
+          <div><span>Pagos</span><strong>${summary.payments || 0}</strong></div>
           <div><span>Alumnos</span><strong>${summary.students}</strong></div>
           <div><span>Activos</span><strong>${summary.active_students}</strong></div>
           <div><span>Avance</span><strong>${summary.avg_completion}%</strong></div>
@@ -1227,6 +1302,7 @@ function renderOwnerPanel(data) {
                   <div class="dashboard-grid dashboard-grid-4 owner-stat-grid">
                     ${renderOwnerMetricCard("groups", "Instituciones", summary.institutions, "Centros y leads registrados en la plataforma.", "institutions")}
                     ${renderOwnerMetricCard("badge", "Solicitudes", summary.commercial_leads || 0, "Pedidos de plan escuela o convenio a seguir.", "leads")}
+                    ${renderOwnerMetricCard("timer", "Pagos", summary.payments || 0, `Cobros registrados. USD ${summary.paid_revenue_usd || "0.00"} confirmados.`, "payments")}
                     ${renderOwnerMetricCard("students", "Alumnos", summary.students, "Usuarios de aprendizaje cargados.", "students")}
                     ${renderOwnerMetricCard("today", "Activos", summary.active_students, "Alumnos con estado activo.", "active")}
                     ${renderOwnerMetricCard("progress", "Avance promedio", `${summary.avg_completion}%`, "Progreso agregado de misiones.", "progress")}
@@ -1344,6 +1420,62 @@ function bindCommonEvents(role) {
 }
 
 function bindInstitutionActions(data) {
+  const billingReturn = new URLSearchParams(window.location.search).get("billing");
+  if (billingReturn) {
+    window.history.replaceState({}, "", window.location.pathname);
+    if (billingReturn === "success") {
+      void fetchBillingStatus(data.institution.id)
+        .then((result) => {
+          appState.dashboardData = {
+            ...data,
+            subscription: result.subscription
+          };
+          window.renderApp();
+        })
+        .catch((error) => window.alert(error.message));
+    }
+  }
+
+  if (!data.subscription?.access_allowed) {
+    document
+      .querySelectorAll("#createClassroomForm input, #createClassroomForm button, #createStudentForm input, #createStudentForm select, #createStudentForm button, #linkGuardianForm input, #linkGuardianForm select, #linkGuardianForm button")
+      .forEach((node) => {
+        node.disabled = true;
+      });
+  }
+
+  document.querySelectorAll("[data-billing-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const action = button.getAttribute("data-billing-action");
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = action === "school" ? "Abriendo pago..." : "Enviando solicitud...";
+      try {
+        if (action === "school") {
+          const result = await createBillingCheckout(data.institution.id, {
+            plan_key: "school",
+            country: "UY"
+          });
+          window.location.assign(result.checkout_url);
+          return;
+        }
+        await requestInstitutionPlan({
+          plan_key: "enterprise",
+          institution_name: data.institution.name,
+          contact_name: data.teacher.name,
+          email: data.teacher.email,
+          student_count: String(data.summary.student_count)
+        });
+        window.alert("Solicitud recibida. La propuesta se preparara con el alcance de tu red y quedara visible para el owner.");
+      } catch (error) {
+        window.alert(error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    });
+  });
+
   document.querySelectorAll(".dashboard-input, .dashboard-form-grid button").forEach((node) => {
     node.addEventListener("mouseenter", () => {
       unlockAudio();
