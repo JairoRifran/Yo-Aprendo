@@ -91,6 +91,36 @@ export async function fetchBillingStatus(institutionId) {
   return await readJson(response);
 }
 
+export async function updateInstitutionFamilyAccess(institutionId, enabled) {
+  const response = await fetch(
+    `${API_BASE}/institutions/${encodeURIComponent(institutionId)}/family-access`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ enabled })
+    }
+  );
+  return await readJson(response);
+}
+
+export async function updateGuardianAccess(institutionId, guardianId, enabled) {
+  const response = await fetch(
+    `${API_BASE}/institutions/${encodeURIComponent(institutionId)}/guardians/${encodeURIComponent(guardianId)}/access`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ enabled })
+    }
+  );
+  return await readJson(response);
+}
+
 export async function fetchDashboardByRole(role, entityId) {
   const response = await fetch(
     `${API_BASE}/dashboard/${encodeURIComponent(role)}/${encodeURIComponent(entityId)}`,

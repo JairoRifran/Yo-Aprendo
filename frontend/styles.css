@@ -8985,8 +8985,282 @@ body::before {
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(232, 248, 255, 0.92));
 }
 
+.institution-billing-head,
+.institution-family-head,
+.institution-billing-actions,
+.institution-payment-history-head,
+.institution-family-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.institution-billing-head p,
+.institution-family-head p {
+  max-width: 720px;
+  margin: 6px 0 0;
+}
+
+.institution-billing-pill {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 1000;
+}
+
+.institution-billing-pill.active {
+  color: #0d654e;
+  background: #d8fff1;
+}
+
+.institution-billing-pill.inactive {
+  color: #8a3f28;
+  background: #ffeadf;
+}
+
+.institution-billing-summary,
+.institution-family-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.institution-billing-summary > div,
+.institution-family-summary > div {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(141, 199, 231, 0.35);
+  border-radius: 8px;
+  background: #f6fbff;
+}
+
+.institution-billing-summary span,
+.institution-family-summary span {
+  display: block;
+  color: #6b88a2;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.institution-billing-summary strong,
+.institution-family-summary strong {
+  display: block;
+  margin-top: 6px;
+  color: #123a5e;
+  font-size: 18px;
+}
+
+.institution-family-summary {
+  grid-template-columns: 180px 220px minmax(0, 1fr);
+}
+
+.institution-family-summary p {
+  align-self: center;
+  margin: 0;
+  color: #557796;
+}
+
+.institution-billing-actions {
+  justify-content: flex-start;
+  padding: 16px 0 20px;
+  border-bottom: 1px solid rgba(141, 199, 231, 0.3);
+}
+
+.institution-billing-actions span {
+  color: #557796;
+  font-size: 13px;
+}
+
+.institution-payment-history {
+  padding-top: 20px;
+}
+
+.institution-payment-history-head span,
+.institution-payment-history-head small {
+  display: block;
+  margin-top: 3px;
+  color: #6b88a2;
+}
+
+.institution-payment-table {
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(141, 199, 231, 0.35);
+  border-radius: 8px;
+}
+
+.institution-payment-row {
+  display: grid;
+  grid-template-columns: 110px minmax(150px, 1.4fr) 110px 100px 110px 80px;
+  gap: 12px;
+  align-items: center;
+  min-width: 760px;
+  padding: 12px 14px;
+  color: #4f7191;
+  border-top: 1px solid rgba(141, 199, 231, 0.24);
+}
+
+.institution-payment-row-head {
+  color: #123a5e;
+  font-size: 12px;
+  font-weight: 1000;
+  text-transform: uppercase;
+  border-top: 0;
+  background: #edf7ff;
+}
+
+.payment-status {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #315b7d;
+  font-size: 11px;
+  background: #e7f2fb;
+}
+
+.payment-status-paid {
+  color: #0d654e;
+  background: #d8fff1;
+}
+
+.payment-status-rejected,
+.payment-status-expired,
+.payment-status-refunded,
+.payment-status-chargeback {
+  color: #8a3f28;
+  background: #ffeadf;
+}
+
+.payment-status-pending,
+.payment-status-created,
+.payment-status-review {
+  color: #79570d;
+  background: #fff2bd;
+}
+
+.institution-payment-link {
+  padding: 0;
+  border: 0;
+  color: #087ec3;
+  font: inherit;
+  font-weight: 900;
+  background: transparent;
+  cursor: pointer;
+}
+
+.institution-payment-empty {
+  margin-top: 14px;
+  padding: 20px;
+  border: 1px dashed rgba(111, 177, 219, 0.5);
+  border-radius: 8px;
+  text-align: center;
+  background: #f8fcff;
+}
+
+.institution-payment-empty p {
+  margin: 5px 0 0;
+}
+
+.institution-access-toggle {
+  display: inline-grid;
+  grid-template-columns: 42px auto;
+  align-items: center;
+  gap: 5px 10px;
+  cursor: pointer;
+}
+
+.institution-access-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.institution-access-toggle > span {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  grid-row: 1 / span 2;
+  border-radius: 999px;
+  background: #b8cad8;
+  transition: background 160ms ease;
+}
+
+.institution-access-toggle > span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 5px rgba(15, 55, 85, 0.22);
+  transition: transform 160ms ease;
+}
+
+.institution-access-toggle input:checked + span {
+  background: #24c795;
+}
+
+.institution-access-toggle input:checked + span::after {
+  transform: translateX(18px);
+}
+
+.institution-access-toggle input:focus-visible + span {
+  outline: 3px solid rgba(13, 126, 195, 0.28);
+  outline-offset: 2px;
+}
+
+.institution-access-toggle b {
+  color: #123a5e;
+  font-size: 13px;
+}
+
+.institution-access-toggle.compact {
+  flex: 0 0 auto;
+}
+
+.institution-family-list {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.institution-family-row {
+  padding: 14px;
+  border: 1px solid rgba(141, 199, 231, 0.35);
+  border-radius: 8px;
+  background: #f8fcff;
+}
+
+.institution-family-row strong,
+.institution-family-row span,
+.institution-family-row small {
+  display: block;
+}
+
+.institution-family-row span,
+.institution-family-row small {
+  margin-top: 3px;
+  color: #6b88a2;
+}
+
+.institution-family-create {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(141, 199, 231, 0.3);
+}
+
 .dashboard-card[id] {
   scroll-margin-top: 110px;
+}
+
+.dashboard-grid.dashboard-grid-single {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .dashboard-action-item strong {
@@ -9112,6 +9386,18 @@ body::before {
   .institution-plan-card.recommended {
     transform: none;
   }
+
+  .institution-billing-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .institution-family-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .institution-family-summary p {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 680px) {
@@ -9136,6 +9422,53 @@ body::before {
   .institution-plan-proof {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .institution-billing-head,
+  .institution-family-head,
+  .institution-billing-actions,
+  .institution-payment-history-head,
+  .institution-family-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .institution-billing-summary,
+  .institution-family-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .institution-family-summary p {
+    grid-column: auto;
+  }
+
+  .institution-payment-table {
+    overflow: visible;
+    border: 0;
+  }
+
+  .institution-payment-row {
+    min-width: 0;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    margin-top: 10px;
+    border: 1px solid rgba(141, 199, 231, 0.35);
+    border-radius: 8px;
+    background: #f8fcff;
+  }
+
+  .institution-payment-row-head {
+    display: none;
+  }
+
+  .institution-payment-row span::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: #6b88a2;
+    font-size: 10px;
+    font-weight: 1000;
+    text-transform: uppercase;
   }
 }
 

@@ -11,7 +11,9 @@ import {
   fetchDashboardByRole,
   linkGuardian,
   logoutSession,
-  requestInstitutionPlan
+  requestInstitutionPlan,
+  updateGuardianAccess,
+  updateInstitutionFamilyAccess
 } from "../utils/api.js";
 import {
   unlockAudio,
@@ -400,6 +402,7 @@ function roleModules(role) {
     institution: [
       { id: "institution-overview", icon: "school", label: "Resumen institucional", hint: "Centro, plan y uso" },
       { id: "institution-plan", icon: "badge", label: "Mi plan", hint: "Planes y upgrade" },
+      { id: "institution-billing", icon: "timer", label: "Mis pagos", hint: "Cobros y vigencia" },
       { id: "institution-groups", icon: "users", label: "Grupos", hint: "Estructura escolar" },
       { id: "institution-student-register", icon: "user", label: "Alumnos", hint: "Registro y accesos" },
       { id: "institution-guardian-access", icon: "heart", label: "Familias", hint: "Invitaciones" },
@@ -498,6 +501,17 @@ function renderInstitutionPlanCard({
       >${cta}</button>
     </article>
   `;
+}
+
+function validatedCheckoutUrl(value) {
+  try {
+    const decoded = String(value || "").replaceAll("&amp;", "&");
+    const url = new URL(decoded);
+    if (url.protocol !== "https:" || !url.hostname.endsWith(".dlocalgo.com")) return "";
+    return url.toString();
+  } catch {
+    return "";
+  }
 }
 
 function ownerMetricConfig(metric) {
@@ -1030,6 +1044,12 @@ function renderInstitutionPanel(data) {
   ];
   const statusTone = subscription.access_allowed ? "good" : "warn";
   const billingReady = subscription.billing_configured !== false;
+  const billing = data.billing || { payments: [], auto_renew: false, billing_email: "" };
+  const familyAccess = data.family_access || {
+    enabled: true,
+    active_count: data.guardians?.length || 0,
+    total_count: data.guardians?.length || 0
+  };
   const schoolCta = !billingReady
     ? "Pago online en configuracion"
     : payment?.status === "pending"
@@ -1037,6 +1057,20 @@ function renderInstitutionPanel(data) {
       : subscription.status === "active"
         ? "Renovar 30 dias"
         : "Activar Plan Escuela";
+  const paymentStatusLabel = {
+    created: "Creado",
+    pending: "Pendiente",
+    paid: "Pagado",
+    rejected: "Rechazado",
+    cancelled: "Cancelado",
+    expired: "Vencido",
+    refunded: "Reembolsado",
+    chargeback: "Contracargo",
+    review: "En revision"
+  };
+  const formatBillingDate = (value) => value
+    ? new Date(value).toLocaleDateString("es-UY", { day: "2-digit", month: "2-digit", year: "numeric" })
+    : "-";
 
   return `
     <section class="dashboard-role-panel">
@@ -1126,6 +1160,93 @@ function renderInstitutionPanel(data) {
         </div>
       </article>
 
+      <article class="dashboard-card institution-billing-card" id="institution-billing">
+        <div class="institution-billing-head">
+          <div>
+            <div class="eyebrow">Mis pagos</div>
+            <h2>Facturacion y vigencia</h2>
+            <p>Consulta tus cobros, retoma pagos pendientes y renueva el acceso del centro desde un solo lugar.</p>
+          </div>
+          <span class="institution-billing-pill ${subscription.access_allowed ? "active" : "inactive"}">
+            ${subscription.access_allowed ? "Acceso habilitado" : "Pago requerido"}
+          </span>
+        </div>
+
+        <div class="institution-billing-summary">
+          <div>
+            <span>Plan actual</span>
+            <strong>${planName}</strong>
+          </div>
+          <div>
+            <span>Vigencia</span>
+            <strong>${payment?.access_ends_at ? formatBillingDate(payment.access_ends_at) : subscription.status === "trialing" ? formatBillingDate(subscription.trial_ends_at) : "Sin vigencia"}</strong>
+          </div>
+          <div>
+            <span>Importe</span>
+            <strong>${subscription.school_currency} ${subscription.school_price}</strong>
+          </div>
+          <div>
+            <span>Renovacion</span>
+            <strong>${billing.auto_renew ? "Automatica" : "Manual"}</strong>
+          </div>
+        </div>
+
+        <div class="institution-billing-actions">
+          <button
+            class="btn btn-primary"
+            type="button"
+            ${billingReady ? 'data-billing-action="school"' : "disabled"}
+          >${schoolCta}</button>
+          <button class="btn btn-secondary" type="button" data-billing-refresh>
+            Actualizar estado
+          </button>
+          <span>Los pagos no se renuevan automaticamente. Cada cobro habilita 30 dias y las renovaciones anticipadas acumulan vigencia.</span>
+        </div>
+
+        <div class="institution-payment-history">
+          <div class="institution-payment-history-head">
+            <div>
+              <strong>Historial de pagos</strong>
+              <span>${billing.payments.length} ${billing.payments.length === 1 ? "movimiento" : "movimientos"}</span>
+            </div>
+            <small>${billing.billing_email ? `Facturacion: ${billing.billing_email}` : "Email de facturacion no informado"}</small>
+          </div>
+          ${
+            billing.payments.length
+              ? `
+                <div class="institution-payment-table">
+                  <div class="institution-payment-row institution-payment-row-head">
+                    <span>Fecha</span>
+                    <span>Referencia</span>
+                    <span>Estado</span>
+                    <span>Importe</span>
+                    <span>Vigencia</span>
+                    <span>Accion</span>
+                  </div>
+                  ${billing.payments.map((item) => `
+                    <div class="institution-payment-row">
+                      <span data-label="Fecha">${formatBillingDate(item.created_at)}</span>
+                      <span data-label="Referencia">${item.id}</span>
+                      <span data-label="Estado"><b class="payment-status payment-status-${item.status}">${paymentStatusLabel[item.status] || item.status}</b></span>
+                      <span data-label="Importe">${item.currency} ${item.amount}</span>
+                      <span data-label="Vigencia">${formatBillingDate(item.access_ends_at)}</span>
+                      <span data-label="Accion">
+                        ${item.checkout_url ? `<button class="institution-payment-link" type="button" data-payment-resume="${item.id}">Retomar</button>` : "-"}
+                      </span>
+                    </div>
+                  `).join("")}
+                </div>
+              `
+              : `
+                <div class="institution-payment-empty">
+                  <strong>Todavia no hay pagos registrados</strong>
+                  <p>Cuando actives o renueves el Plan Escuela, cada movimiento aparecera aqui con su estado y vigencia.</p>
+                </div>
+              `
+          }
+        </div>
+      </article>
+
       <div class="dashboard-grid dashboard-grid-2">
         ${renderGuideCard(
           "institution",
@@ -1202,7 +1323,49 @@ function renderInstitutionPanel(data) {
       </div>
 
       <div class="dashboard-grid dashboard-grid-2">
-        <article class="dashboard-card" id="institution-guardian-access">
+        <article class="dashboard-card institution-family-card" id="institution-guardian-access">
+          <div class="institution-family-head">
+            <div>
+              <div class="eyebrow">Acceso de familias</div>
+              <h2>Permisos familiares</h2>
+              <p>Activa o pausa el acceso general y controla cada familia sin eliminar sus vinculos.</p>
+            </div>
+            <label class="institution-access-toggle">
+              <input type="checkbox" data-family-global-toggle ${familyAccess.enabled ? "checked" : ""} />
+              <span aria-hidden="true"></span>
+              <b>${familyAccess.enabled ? "Acceso general activo" : "Acceso general pausado"}</b>
+            </label>
+          </div>
+          <div class="institution-family-summary">
+            <div><span>Familias vinculadas</span><strong>${familyAccess.total_count}</strong></div>
+            <div><span>Accesos individuales activos</span><strong>${familyAccess.active_count}</strong></div>
+            <p>${familyAccess.enabled ? "Los accesos individuales activos pueden ingresar normalmente." : "Ninguna familia puede ingresar hasta que reactives el acceso general."}</p>
+          </div>
+          <div class="institution-family-list">
+            ${
+              data.guardians.length
+                ? data.guardians.map((guardian) => `
+                    <div class="institution-family-row">
+                      <div>
+                        <strong>${guardian.name}</strong>
+                        <span>${guardian.student_names?.join(", ") || "Sin alumnos vinculados"}</span>
+                        <small>${guardian.contact || "Sin contacto informado"}</small>
+                      </div>
+                      <label class="institution-access-toggle compact">
+                        <input type="checkbox" data-guardian-access="${guardian.id}" ${guardian.access_enabled ? "checked" : ""} />
+                        <span aria-hidden="true"></span>
+                        <b>${guardian.access_enabled ? "Activo" : "Pausado"}</b>
+                      </label>
+                    </div>
+                  `).join("")
+                : `
+                    <div class="institution-payment-empty">
+                      <strong>No hay accesos familiares creados</strong>
+                      <p>Vincula una familia a un alumno para que pueda consultar su avance.</p>
+                    </div>
+                  `
+            }
+          </div>
           <div class="eyebrow">Vinculo con familias</div>
           <h2>Crear acceso de observación</h2>
           <form id="linkGuardianForm" class="dashboard-form-grid dashboard-form-grid-compact">
@@ -1428,7 +1591,8 @@ function bindInstitutionActions(data) {
         .then((result) => {
           appState.dashboardData = {
             ...data,
-            subscription: result.subscription
+            subscription: result.subscription,
+            billing: result.billing || data.billing
           };
           window.renderApp();
         })
@@ -1456,7 +1620,9 @@ function bindInstitutionActions(data) {
             plan_key: "school",
             country: "UY"
           });
-          window.location.assign(result.checkout_url);
+          const checkoutUrl = validatedCheckoutUrl(result.checkout_url);
+          if (!checkoutUrl) throw new Error("El proveedor no devolvio un checkout valido.");
+          window.location.assign(checkoutUrl);
           return;
         }
         await requestInstitutionPlan({
@@ -1472,6 +1638,65 @@ function bindInstitutionActions(data) {
       } finally {
         button.disabled = false;
         button.textContent = originalText;
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-payment-resume]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const paymentId = button.getAttribute("data-payment-resume");
+      const payment = data.billing?.payments?.find((item) => item.id === paymentId);
+      const checkoutUrl = validatedCheckoutUrl(payment?.checkout_url);
+      if (checkoutUrl) window.location.assign(checkoutUrl);
+    });
+  });
+
+  document.querySelector("[data-billing-refresh]")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = "Actualizando...";
+    try {
+      const result = await fetchBillingStatus(data.institution.id);
+      appState.dashboardData = {
+        ...data,
+        subscription: result.subscription,
+        billing: result.billing || data.billing
+      };
+      window.renderApp();
+    } catch (error) {
+      window.alert(error.message);
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  });
+
+  document.querySelector("[data-family-global-toggle]")?.addEventListener("change", async (event) => {
+    const input = event.currentTarget;
+    input.disabled = true;
+    try {
+      await updateInstitutionFamilyAccess(data.institution.id, input.checked);
+      appState.dashboardData = null;
+      await window.renderApp();
+    } catch (error) {
+      input.checked = !input.checked;
+      input.disabled = false;
+      window.alert(error.message);
+    }
+  });
+
+  document.querySelectorAll("[data-guardian-access]").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const guardianId = input.getAttribute("data-guardian-access");
+      input.disabled = true;
+      try {
+        await updateGuardianAccess(data.institution.id, guardianId, input.checked);
+        appState.dashboardData = null;
+        await window.renderApp();
+      } catch (error) {
+        input.checked = !input.checked;
+        input.disabled = false;
+        window.alert(error.message);
       }
     });
   });
@@ -1579,6 +1804,9 @@ function applyDashboardModuleVisibility() {
   contentRoot.querySelectorAll(".dashboard-module-hidden").forEach((child) => {
     child.classList.remove("dashboard-module-hidden");
   });
+  contentRoot.querySelectorAll(".dashboard-grid-single").forEach((grid) => {
+    grid.classList.remove("dashboard-grid-single");
+  });
 
   if (isOverview) {
     contentBlocks.forEach((block) => {
@@ -1603,6 +1831,7 @@ function applyDashboardModuleVisibility() {
   if (target) {
     const parentGrid = target.parentElement;
     if (parentGrid && parentGrid.classList.contains("dashboard-grid")) {
+      parentGrid.classList.add("dashboard-grid-single");
       Array.from(parentGrid.children).forEach((sibling) => {
         sibling.classList.toggle("dashboard-module-hidden", sibling !== target);
       });

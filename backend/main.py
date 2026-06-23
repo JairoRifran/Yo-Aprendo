@@ -90,6 +90,20 @@ class InstitutionSubscription(Base):
     institution: Mapped[Institution] = relationship(back_populates="subscription")
 
 
+class InstitutionAccessPolicy(Base):
+    __tablename__ = "institution_access_policies"
+
+    institution_id: Mapped[str] = mapped_column(
+        ForeignKey("institutions.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    family_access_enabled: Mapped[int] = mapped_column(Integer, default=1)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+
 class BillingPayment(Base):
     __tablename__ = "billing_payments"
 
@@ -318,6 +332,10 @@ class BillingCheckoutRequest(BaseModel):
     country: str = Field(default="UY", min_length=2, max_length=2)
 
     _clean_billing = field_validator("plan_key", "country")(validate_plain_text)
+
+
+class FamilyAccessUpdateRequest(BaseModel):
+    enabled: bool
 
 
 IS_PRODUCTION = bool(os.getenv("VERCEL") or os.getenv("VERCEL_ENV") == "production")
@@ -684,6 +702,39 @@ def require_learning_access(session: Session, institution_id: str) -> None:
         )
 
 
+def institution_access_policy(session: Session, institution_id: str) -> InstitutionAccessPolicy:
+    policy = session.get(InstitutionAccessPolicy, institution_id)
+    if policy:
+        return policy
+    policy = InstitutionAccessPolicy(institution_id=institution_id, family_access_enabled=1)
+    session.add(policy)
+    session.flush()
+    return policy
+
+
+def guardian_credential(session: Session, guardian_id: str) -> AuthCredential | None:
+    return session.scalar(
+        select(AuthCredential).where(
+            AuthCredential.role == "parent",
+            AuthCredential.entity_id == guardian_id,
+        )
+    )
+
+
+def require_family_access(
+    session: Session,
+    institution_id: str,
+    guardian_id: str,
+) -> None:
+    policy = institution_access_policy(session, institution_id)
+    credential = guardian_credential(session, guardian_id)
+    if not policy.family_access_enabled or not credential or credential.status != "active":
+        raise HTTPException(
+            status_code=403,
+            detail="El acceso familiar esta desactivado por la institucion.",
+        )
+
+
 def dlocal_authorization() -> str:
     if not DLOCAL_API_KEY or not DLOCAL_SECRET_KEY:
         raise HTTPException(status_code=503, detail="Los pagos todavia no estan configurados.")
@@ -836,6 +887,15 @@ def billing_payment_payload(payment: BillingPayment | None) -> dict | None:
         "access_ends_at": aware_datetime(payment.access_ends_at).isoformat() if payment.access_ends_at else None,
         "created_at": aware_datetime(payment.created_at).isoformat(),
     }
+
+
+def billing_history_payload(session: Session, institution_id: str) -> list[dict]:
+    payments = session.scalars(
+        select(BillingPayment)
+        .where(BillingPayment.institution_id == institution_id)
+        .order_by(BillingPayment.created_at.desc())
+    ).all()
+    return [billing_payment_payload(payment) for payment in payments]
 
 
 def seed_database(session: Session) -> None:
@@ -1010,6 +1070,8 @@ def ensure_subscription_rows(session: Session) -> None:
     for institution in institutions:
         if institution.subscription is None:
             session.add(default_subscription(institution.id, institution.teacher_email))
+        if session.get(InstitutionAccessPolicy, institution.id) is None:
+            session.add(InstitutionAccessPolicy(institution_id=institution.id))
         if institution.subscription and institution.subscription.status == "lead":
             continue
         if not institution.users:
@@ -1308,6 +1370,8 @@ def institution_dashboard(session: Session, institution_id: str) -> dict:
         for guardian in session.scalars(select(Guardian)).all()
         if any(student.classroom.institution_id == institution_id for student in guardian.students)
     ]
+    access_policy = institution_access_policy(session, institution_id)
+    guardian_rows = [guardian_payload(session, guardian) for guardian in guardians]
 
     concept_names = ["Secuencias", "Bucles", "Decisiones", "Datos y creacion"]
     concept_overview = []
@@ -1342,9 +1406,20 @@ def institution_dashboard(session: Session, institution_id: str) -> dict:
             "avg_completion": round(mean(student_percent(student) for student in students)) if students else 0,
         },
         "subscription": subscription_payload(session, institution, len(students), len(institution.teachers)),
+        "billing": {
+            "payments": billing_history_payload(session, institution_id),
+            "provider": institution.subscription.billing_provider if institution.subscription else "manual",
+            "billing_email": institution.subscription.billing_email if institution.subscription else "",
+            "auto_renew": False,
+        },
+        "family_access": {
+            "enabled": bool(access_policy.family_access_enabled),
+            "active_count": sum(1 for guardian in guardian_rows if guardian["access_enabled"]),
+            "total_count": len(guardians),
+        },
         "classrooms": [classroom_summary(classroom) for classroom in classrooms],
         "students": [student_summary(student) for student in students],
-        "guardians": [guardian_payload(guardian) for guardian in guardians],
+        "guardians": guardian_rows,
         "concept_overview": concept_overview,
         "alerts": [
             {
@@ -1612,13 +1687,17 @@ def owner_dashboard(session: Session) -> dict:
     }
 
 
-def guardian_payload(guardian: Guardian) -> dict:
+def guardian_payload(session: Session, guardian: Guardian) -> dict:
+    credential = guardian_credential(session, guardian.id)
     return {
         "id": guardian.id,
         "name": guardian.name,
         "code": "Acceso protegido",
         "student_ids": [student.id for student in guardian.students],
+        "student_names": [student.display_name for student in guardian.students],
         "contact": guardian.contact,
+        "status": credential.status if credential else "inactive",
+        "access_enabled": bool(credential and credential.status == "active"),
     }
 
 
@@ -1629,7 +1708,7 @@ def guardian_dashboard(session: Session, guardian_id: str) -> dict:
     selected_student = children[0] if children else None
 
     return {
-        "guardian": guardian_payload(guardian),
+        "guardian": guardian_payload(session, guardian),
         "summary": {
             "children_count": len(children),
             "weekly_minutes": sum(student.weekly_minutes for student in children),
@@ -1715,6 +1794,7 @@ def resolve_login(session: Session, payload: LoginRequest) -> dict:
 
     if role == "parent":
         match = get_guardian(session, credential.entity_id)
+        require_family_access(session, credential.institution_id, match.id)
         return {
             "role": "parent",
             "display_name": match.name,
@@ -1904,6 +1984,64 @@ def get_billing_status(
         return {
             "ok": True,
             "subscription": subscription_payload(session, institution, students, len(institution.teachers)),
+            "billing": {
+                "payments": billing_history_payload(session, institution_id),
+                "provider": institution.subscription.billing_provider if institution.subscription else "manual",
+                "billing_email": institution.subscription.billing_email if institution.subscription else "",
+                "auto_renew": False,
+            },
+        }
+
+
+@app.post("/api/institutions/{institution_id}/family-access")
+def update_institution_family_access(
+    institution_id: str,
+    payload: FamilyAccessUpdateRequest,
+    current: dict = Depends(get_current_session),
+):
+    authorize(current, {"institution"}, institution_id=institution_id)
+    with db_session() as session:
+        if not session.get(Institution, institution_id):
+            raise HTTPException(status_code=404, detail="Institution not found")
+        policy = institution_access_policy(session, institution_id)
+        policy.family_access_enabled = 1 if payload.enabled else 0
+        policy.updated_at = datetime.now(timezone.utc)
+        session.flush()
+        return {
+            "ok": True,
+            "family_access": {
+                "enabled": bool(policy.family_access_enabled),
+            },
+        }
+
+
+@app.post("/api/institutions/{institution_id}/guardians/{guardian_id}/access")
+def update_guardian_access(
+    institution_id: str,
+    guardian_id: str,
+    payload: FamilyAccessUpdateRequest,
+    current: dict = Depends(get_current_session),
+):
+    authorize(current, {"institution"}, institution_id=institution_id)
+    with db_session() as session:
+        guardian = session.get(Guardian, guardian_id)
+        credential = guardian_credential(session, guardian_id)
+        belongs_to_institution = bool(
+            guardian
+            and credential
+            and credential.institution_id == institution_id
+            and any(
+                student.classroom.institution_id == institution_id
+                for student in guardian.students
+            )
+        )
+        if not belongs_to_institution:
+            raise HTTPException(status_code=404, detail="Acceso familiar no encontrado.")
+        credential.status = "active" if payload.enabled else "disabled"
+        session.flush()
+        return {
+            "ok": True,
+            "guardian": guardian_payload(session, guardian),
         }
 
 
@@ -2130,6 +2268,7 @@ def get_parent_dashboard(guardian_id: str, current: dict = Depends(get_current_s
     authorize(current, {"parent"}, entity_id=guardian_id)
     with db_session() as session:
         require_learning_access(session, current.get("institution_id", ""))
+        require_family_access(session, current.get("institution_id", ""), guardian_id)
         return guardian_dashboard(session, guardian_id)
 
 
@@ -2267,7 +2406,17 @@ def link_guardian(
             if not teacher or student.classroom not in teacher.classrooms:
                 raise HTTPException(status_code=403, detail="No tienes acceso a este alumno.")
         guardian_code = payload.guardian_code.strip()
-        existing_credential = find_credential(session, "parent", guardian_code)
+        existing_credential = session.scalar(
+            select(AuthCredential).where(
+                AuthCredential.role == "parent",
+                AuthCredential.credential_lookup == credential_lookup(guardian_code),
+            )
+        )
+        if existing_credential and not verify_credential(
+            guardian_code,
+            existing_credential.credential_hash,
+        ):
+            existing_credential = None
         guardian = session.get(Guardian, existing_credential.entity_id) if existing_credential else None
 
         if guardian is None:
@@ -2295,4 +2444,8 @@ def link_guardian(
             guardian.students.append(student)
 
         session.flush()
-        return {"ok": True, "guardian": guardian_payload(guardian), "access_code": guardian_code}
+        return {
+            "ok": True,
+            "guardian": guardian_payload(session, guardian),
+            "access_code": guardian_code,
+        }
