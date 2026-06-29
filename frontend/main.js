@@ -2,7 +2,7 @@ import { grade4Data } from "./data/grade4.js";
 import { appState } from "./state/appState.js";
 import { loadProgress, loadSession } from "./utils/storage.js";
 import { fetchCurrentSession } from "./utils/api.js";
-import { goToDashboard, goToStart, goToSubmap } from "./utils/navigation.js";
+import { goToDashboard, goToIslandNavigator, goToStart, goToSubmap } from "./utils/navigation.js";
 import { renderSubmap } from "./views/submapView.js";
 import { renderMission } from "./views/missionView.js";
 import { renderResult } from "./views/resultView.js";
@@ -27,6 +27,7 @@ import {
 import { uiIcon } from "./utils/icons.js";
 
 const worlds = grade4Data.worlds;
+const USE_ISLAND_NAVIGATOR_FROM_WORLD_MAP = true;
 let hasGlobalAudioUnlock = false;
 
 const saved = loadProgress();
@@ -58,8 +59,51 @@ if (savedSession) {
   }
 }
 
+const isLocalPreviewHost = ["127.0.0.1", "localhost"].includes(window.location.hostname);
+const previewView = new URLSearchParams(window.location.search).get("view");
+if (isLocalPreviewHost && previewView === "island-navigator") {
+  appState.currentView = "island-navigator";
+  appState.selectedWorldId =
+    new URLSearchParams(window.location.search).get("world") || appState.selectedWorldId;
+}
+
 let animationFrameId = null;
 let detachWorldMapEvents = null;
+let islandNavigatorModule = null;
+
+function destroyIslandNavigatorIfLoaded() {
+  islandNavigatorModule?.destroyIslandNavigator?.();
+}
+
+function goToSelectedWorld(worldId) {
+  if (USE_ISLAND_NAVIGATOR_FROM_WORLD_MAP) {
+    goToIslandNavigator(worldId);
+    return;
+  }
+  goToSubmap(worldId);
+}
+
+function renderIslandNavigatorLazy() {
+  void import("./views/islandNavigatorView.js")
+    .then((module) => {
+      islandNavigatorModule = module;
+      if (appState.currentView === "island-navigator") {
+        module.renderIslandNavigator();
+      }
+    })
+    .catch((error) => {
+      if (appState.currentView !== "island-navigator") return;
+      console.error("Island navigator failed to load", error);
+      document.querySelector(".app-shell").innerHTML = `
+        <section class="island-navigator-screen">
+          <div class="navigator-loading">
+            <strong>No pudimos cargar la escena 3D.</strong>
+            <span>Probá recargar la página o volver al mapa para continuar.</span>
+          </div>
+        </section>
+      `;
+    });
+}
 
 /* =========================
    GLOBAL VISUAL SETTINGS
@@ -2102,7 +2146,7 @@ function bootstrapWorldMap() {
     }
 
     playWorldEnter();
-    goToSubmap(world.id);
+    goToSelectedWorld(world.id);
     window.renderApp();
   }
 
@@ -2115,7 +2159,7 @@ function bootstrapWorldMap() {
 
     playWorldEnter();
     appState.selectedWorldId = selectedWorld.id;
-    goToSubmap(selectedWorld.id);
+    goToSelectedWorld(selectedWorld.id);
     window.renderApp();
   }
 
@@ -2225,8 +2269,11 @@ function renderWorldMap() {
 
 function executeRender() {
   destroyWorldMapRuntime();
+  if (appState.currentView !== "island-navigator") {
+    destroyIslandNavigatorIfLoaded();
+  }
   setupGlobalAudioUnlock();
-  const studentGameViews = new Set(["world-map", "submap", "mission", "result"]);
+  const studentGameViews = new Set(["world-map", "island-navigator", "submap", "mission", "result"]);
   document.body.classList.toggle(
     "student-game-cursor",
     appState.currentUserRole === "student" && studentGameViews.has(appState.currentView)
@@ -2247,6 +2294,12 @@ function executeRender() {
   if (appState.currentView === "submap") {
     setAmbientMode("submap");
     renderSubmap();
+    return;
+  }
+
+  if (appState.currentView === "island-navigator") {
+    setAmbientMode("submap");
+    renderIslandNavigatorLazy();
     return;
   }
 

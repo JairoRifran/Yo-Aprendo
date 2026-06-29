@@ -18,6 +18,11 @@ export function goToSubmap(worldId) {
   appState.selectedWorldId = worldId;
 }
 
+export function goToIslandNavigator(worldId) {
+  appState.currentView = "island-navigator";
+  appState.selectedWorldId = worldId;
+}
+
 export function goToMission(worldId, missionId) {
   appState.currentView = "mission";
   appState.selectedWorldId = worldId;

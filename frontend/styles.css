@@ -18444,6 +18444,176 @@ body.student-game-cursor * {
   cursor: url("./img/student-game-cursor.png") 5 3, auto !important;
 }
 
+/* Island Navigator 3D vertical slice. */
+.island-navigator-screen {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255, 243, 175, 0.34), transparent 22%),
+    linear-gradient(180deg, #9eeaff 0%, #38bde8 46%, #0879b5 100%);
+}
+
+.island-navigator-stage,
+.island-navigator-canvas-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.island-navigator-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.island-navigator-loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  gap: 8px;
+  width: min(360px, calc(100% - 40px));
+  padding: 20px 22px;
+  color: #f7fbff;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 18px;
+  background: rgba(8, 35, 64, 0.78);
+  box-shadow: 0 20px 48px rgba(3, 22, 42, 0.28);
+  backdrop-filter: blur(16px);
+}
+
+.island-navigator-loading strong {
+  font-size: 1.15rem;
+}
+
+.island-navigator-loading span {
+  color: #cdeeff;
+  font-size: 0.95rem;
+}
+
+.island-navigator-hud,
+.island-navigator-mission-card {
+  position: absolute;
+  z-index: 5;
+  color: #f7fbff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, rgba(10, 39, 73, 0.86), rgba(6, 26, 52, 0.78));
+  box-shadow: 0 18px 42px rgba(3, 22, 42, 0.24);
+  backdrop-filter: blur(18px);
+}
+
+.island-navigator-hud {
+  top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  max-width: min(420px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 18px;
+}
+
+.island-navigator-hud-left {
+  left: 22px;
+}
+
+.island-navigator-hud-right {
+  right: 22px;
+}
+
+.island-navigator-hud small,
+.island-navigator-mission-card small {
+  display: block;
+  margin-bottom: 2px;
+  color: #9fe8ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.island-navigator-hud strong,
+.island-navigator-mission-card strong {
+  display: block;
+  color: #ffffff;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  line-height: 1.15;
+}
+
+.island-navigator-hud-icon,
+.island-navigator-icon-btn {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  color: #10365f;
+  background: linear-gradient(180deg, #fff3a5, #ffc94d);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.island-navigator-hud-icon .ui-icon {
+  transition: transform 0.18s ease;
+}
+
+.island-navigator-icon-btn {
+  border: 0;
+  cursor: pointer;
+}
+
+.island-navigator-mission-card {
+  right: 22px;
+  bottom: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  width: min(620px, calc(100vw - 44px));
+  padding: 18px;
+  border-radius: 22px;
+}
+
+.island-navigator-mission-card p {
+  max-width: 46ch;
+  margin: 7px 0 0;
+  color: #d8f2ff;
+  line-height: 1.35;
+}
+
+.island-navigator-mission-card[hidden] {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .island-navigator-hud {
+    top: 12px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .island-navigator-hud-left,
+  .island-navigator-hud-right {
+    left: 12px;
+    right: 12px;
+  }
+
+  .island-navigator-hud-right {
+    top: 90px;
+  }
+
+  .island-navigator-mission-card {
+    left: 12px;
+    right: 12px;
+    bottom: 14px;
+    grid-template-columns: 1fr;
+    width: auto;
+  }
+}
+
 /* Mission 4: visual lemonade routes. */
 .mission-screen-error-hunt::before {
   background:
