@@ -1,4 +1,4 @@
-$root = "C:\Users\jairo.rifran\Desktop\yoaprendo\frontend"
+$root = $PSScriptRoot
 $port = 4173
 
 function Get-ContentType($path) {

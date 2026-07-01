@@ -229,7 +229,7 @@ class AuthCredential(Base):
     entity_id: Mapped[str] = mapped_column(String(80), index=True, nullable=False)
     institution_id: Mapped[str] = mapped_column(String(80), index=True, default="")
     identifier: Mapped[str] = mapped_column(String(160), index=True, default="")
-    credential_lookup: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    credential_lookup: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
     credential_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[str] = mapped_column(String(40), default="active", index=True)
 

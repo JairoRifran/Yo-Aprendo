@@ -6,7 +6,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-/feHzqMopYYdXGj+C+8GVAX+6Z2gPFLQRaEUO5cZHHY=' 'sha256-hDYxmKU49o9KIhGcIT0EK85ObuRX/qfmQo/x0yo23o4=' https://unpkg.com https://cdn.jsdelivr.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' blob: http://127.0.0.1:8000 https://www.google-analytics.com https://region1.google-analytics.com https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' 'sha256-/feHzqMopYYdXGj+C+8GVAX+6Z2gPFLQRaEUO5cZHHY=' 'sha256-hDYxmKU49o9KIhGcIT0EK85ObuRX/qfmQo/x0yo23o4=' https://unpkg.com https://cdn.jsdelivr.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' blob: http://127.0.0.1:8000 http://127.0.0.1:8001 https://www.google-analytics.com https://region1.google-analytics.com https://cdn.jsdelivr.net https://unpkg.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
         },
         {
           "key": "X-Content-Type-Options",
@@ -46,7 +46,7 @@
       "src": "/(.*)",
       "continue": true,
       "headers": {
-        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-/feHzqMopYYdXGj+C+8GVAX+6Z2gPFLQRaEUO5cZHHY=' 'sha256-hDYxmKU49o9KIhGcIT0EK85ObuRX/qfmQo/x0yo23o4=' https://unpkg.com https://cdn.jsdelivr.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' blob: http://127.0.0.1:8000 https://www.google-analytics.com https://region1.google-analytics.com https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' 'sha256-/feHzqMopYYdXGj+C+8GVAX+6Z2gPFLQRaEUO5cZHHY=' 'sha256-hDYxmKU49o9KIhGcIT0EK85ObuRX/qfmQo/x0yo23o4=' https://unpkg.com https://cdn.jsdelivr.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' blob: http://127.0.0.1:8000 http://127.0.0.1:8001 https://www.google-analytics.com https://region1.google-analytics.com https://cdn.jsdelivr.net https://unpkg.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests",
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
         "Referrer-Policy": "strict-origin-when-cross-origin",
