@@ -10,6 +10,7 @@ import { createBoat, updateBoatFloat } from "./boat.js";
 import { createBoatNavigation } from "./navigation.js";
 import { createNavigatorHud } from "./hud.js";
 import { createEffects } from "./effects.js";
+import { createWakeParticles } from "./wakeParticles.js";
 
 const TEXTURE_KEYS = [
   "map",
@@ -77,8 +78,11 @@ export function initIslandNavigatorScene(container, { world, onMissionReady } = 
   let boat = null;
   let navigation = null;
   let islandBundle = null;
+  const wakeParticles = createWakeParticles();
+  scene.add(wakeParticles);
 
   function disposeSceneResources() {
+    wakeParticles.userData.dispose?.();
     disposeObjectResources(scene);
     composer.dispose?.();
     renderer.dispose();
@@ -193,6 +197,7 @@ export function initIslandNavigatorScene(container, { world, onMissionReady } = 
     updateIslands(islands, elapsed);
     navigation?.update(delta);
     updateBoatFloat(boat, elapsed, water, delta);
+    wakeParticles.userData.update(elapsed, boat, navigation?.state, delta);
     updateAdventureCamera(camera, boat, delta, cameraInput.state);
     hud.updateCompass(boat, navigation?.getDestination(), islands, navigation?.state);
 

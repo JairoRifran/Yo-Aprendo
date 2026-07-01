@@ -56,7 +56,18 @@ export const NAVIGATOR_CONFIG = {
     spawnRotationY: Math.PI,
     modelLength: 4.2,
     modelRotationY: Math.PI / 2,
-    wakeStrength: 1.15
+    wakeStrength: 1.15,
+    wakeEffects: {
+      sprayCount: 120,
+      foamTrailCount: 80,
+      sprayHeight: 1.8,
+      spraySpread: 1.2,
+      sprayLifetime: 1.5,
+      foamLifetime: 3.0,
+      kelvinAngle: 0.34,
+      bowWaveIntensity: 1.2,
+      turbulenceStrength: 0.8
+    }
   },
   islandModel: {
     diameter: 11.8,

@@ -82,6 +82,8 @@ function createWaterPlane(textures) {
     210
   );
 
+  const wakeConfig = NAVIGATOR_CONFIG.boat.wakeEffects;
+
   const material = new THREE.ShaderMaterial({
     uniforms: {
       uTime: { value: 0 },
@@ -95,7 +97,10 @@ function createWaterPlane(textures) {
       uBoatPos: { value: new THREE.Vector2(FAR_BOAT_POSITION, FAR_BOAT_POSITION) },
       uBoatForward: { value: new THREE.Vector2(0, 1) },
       uBoatSpeed: { value: 0 },
-      uWakeStrength: { value: NAVIGATOR_CONFIG.boat.wakeStrength }
+      uWakeStrength: { value: NAVIGATOR_CONFIG.boat.wakeStrength },
+      uKelvinAngle: { value: wakeConfig.kelvinAngle },
+      uBowWaveIntensity: { value: wakeConfig.bowWaveIntensity },
+      uTurbulenceStrength: { value: wakeConfig.turbulenceStrength }
     },
     vertexShader: `
       uniform float uTime;
@@ -103,32 +108,92 @@ function createWaterPlane(textures) {
       uniform vec2 uBoatForward;
       uniform float uBoatSpeed;
       uniform float uWakeStrength;
+      uniform float uKelvinAngle;
+      uniform float uBowWaveIntensity;
+      uniform float uTurbulenceStrength;
       varying vec2 vUv;
       varying float vWave;
       varying vec3 vWorld;
+      varying float vWakeIntensity;
+      varying float vBowZone;
+
+      // simple pseudo-noise for turbulence
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+      }
 
       void main() {
         vUv = uv;
         vec3 pos = position;
+
+        // ---- natural ocean waves (unchanged) ----
         float waveA = sin(pos.x * 0.075 + uTime * 1.05) * 0.34;
         float waveB = cos(pos.y * 0.105 - uTime * 1.35) * 0.28;
         float swell = sin((pos.x + pos.y) * 0.038 + uTime * 0.58) * 0.66;
         float ripple = sin((pos.x * 0.26 - pos.y * 0.16) + uTime * 2.15) * 0.08;
 
+        // ---- boat wake system ----
         vec2 toPoint = pos.xy - uBoatPos;
         vec2 forward = normalize(uBoatForward);
+        vec2 right = vec2(forward.y, -forward.x);
         float longitudinal = dot(toPoint, forward);
+        float lateral = dot(toPoint, right);
         float behind = -longitudinal;
-        float side = abs(dot(toPoint, vec2(forward.y, -forward.x)));
+        float side = abs(lateral);
         float speedFactor = clamp(uBoatSpeed / 9.0, 0.0, 1.0) * uWakeStrength;
+
+        // -- bow wave: pushes water up at the front --
+        float bowDist = length(toPoint);
+        float bowMask = exp(-bowDist * bowDist * 0.12) * smoothstep(-1.0, 2.5, longitudinal);
+        float bowWave = bowMask * uBowWaveIntensity * 0.35;
+
+        // -- central depression: water sinks directly behind boat --
+        float centralMask = exp(-side * side * 0.28) * smoothstep(0.5, 3.0, behind) * (1.0 - smoothstep(8.0, 22.0, behind));
+        float depression = -centralMask * 0.18;
+
+        // -- Kelvin V-wake: waves spreading at angle from stern --
         float rearMask = smoothstep(0.8, 5.5, behind);
+        float trailFadeV = 1.0 - smoothstep(18.0, 62.0, behind);
+
+        // primary V-arms
+        float armAngle = uKelvinAngle;
+        float leftArm = abs(lateral - behind * armAngle);
+        float rightArm = abs(lateral + behind * armAngle);
+        float vWakeLeft = exp(-leftArm * leftArm * 0.5) * rearMask * trailFadeV;
+        float vWakeRight = exp(-rightArm * rightArm * 0.5) * rearMask * trailFadeV;
+        float vWake = (vWakeLeft + vWakeRight) * 0.3;
+
+        // transverse waves along V-arms
+        float transverseWave = sin(behind * 1.8 - uTime * 4.5) * 0.18;
+        float vWakeDisplacement = vWake * transverseWave;
+
+        // -- central wake trail with ripples --
         float wakeTrail = exp(-side * side * 0.18) * rearMask * (1.0 - smoothstep(24.0, 46.0, behind));
-        float bowPush = exp(-dot(toPoint, toPoint) * 0.2) * (1.0 - smoothstep(0.5, 2.2, abs(longitudinal)));
         float wakeRipple = sin(behind * 2.3 - uTime * 5.2) * 0.24;
 
-        pos.z += waveA + waveB + swell + ripple + (wakeTrail * wakeRipple + bowPush * 0.08) * speedFactor;
+        // -- turbulence directly behind the boat --
+        float turbZone = exp(-side * side * 0.4) * smoothstep(1.0, 4.0, behind) * (1.0 - smoothstep(6.0, 16.0, behind));
+        float turbNoise = hash(pos.xy * 0.5 + uTime * 2.0) * 2.0 - 1.0;
+        float turbulence = turbZone * turbNoise * uTurbulenceStrength * 0.12;
+
+        // -- divergent side waves --
+        float divWaveLeft = sin((lateral - behind * 0.15) * 1.4 + uTime * 3.0) * 0.08;
+        float divWaveRight = sin((-lateral - behind * 0.15) * 1.4 + uTime * 3.0) * 0.08;
+        float divMask = smoothstep(2.0, 6.0, behind) * (1.0 - smoothstep(30.0, 50.0, behind))
+                       * smoothstep(1.5, 4.0, side) * (1.0 - smoothstep(8.0, 18.0, side));
+        float divergentWaves = (divWaveLeft + divWaveRight) * divMask;
+
+        // combine all wake effects
+        float wakeTotal = (wakeTrail * wakeRipple + bowWave + depression + vWakeDisplacement + turbulence + divergentWaves) * speedFactor;
+
+        pos.z += waveA + waveB + swell + ripple + wakeTotal;
         vWave = pos.z;
         vWorld = (modelMatrix * vec4(pos, 1.0)).xyz;
+
+        // pass wake intensity to fragment for foam
+        vWakeIntensity = (wakeTrail + vWake + turbZone * 0.8) * speedFactor;
+        vBowZone = bowMask * speedFactor;
+
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
       }
     `,
@@ -145,9 +210,29 @@ function createWaterPlane(textures) {
       uniform vec2 uBoatForward;
       uniform float uBoatSpeed;
       uniform float uWakeStrength;
+      uniform float uKelvinAngle;
+      uniform float uTurbulenceStrength;
       varying vec2 vUv;
       varying float vWave;
       varying vec3 vWorld;
+      varying float vWakeIntensity;
+      varying float vBowZone;
+
+      // procedural noise for foam dissolve
+      float hash2D(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+      }
+
+      float noisePattern(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        float a = hash2D(i);
+        float b = hash2D(i + vec2(1.0, 0.0));
+        float c = hash2D(i + vec2(0.0, 1.0));
+        float d = hash2D(i + vec2(1.0, 1.0));
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+      }
 
       void main() {
         vec2 worldUv = vWorld.xz * 0.018;
@@ -163,26 +248,70 @@ function createWaterPlane(textures) {
         float textureFoam = texture2D(uFoamMap, foamUv + vec2(uTime * 0.012, -uTime * 0.01)).r;
         float caustics = texture2D(uCausticsMap, vWorld.xz * 0.015 + vec2(-uTime * 0.018, uTime * 0.014)).r;
 
+        // ---- enhanced boat wake foam ----
         vec2 toPoint = vWorld.xz - uBoatPos;
         vec2 forward = normalize(uBoatForward);
+        vec2 right = vec2(forward.y, -forward.x);
         float longitudinal = dot(toPoint, forward);
+        float lateral = dot(toPoint, right);
         float behind = -longitudinal;
-        float side = abs(dot(toPoint, vec2(forward.y, -forward.x)));
-        float rearMask = smoothstep(1.2, 6.0, behind);
-        float trailFade = 1.0 - smoothstep(20.0, 48.0, behind);
-        float wakeTrail = exp(-side * side * 0.115) * rearMask * trailFade;
-        float bowFoam = exp(-dot(toPoint, toPoint) * 0.2) * (1.0 - smoothstep(0.4, 2.0, abs(longitudinal))) * 0.18;
-        float wakeWave = sin(behind * 2.25 - uTime * 5.0) * 0.5 + 0.5;
-        float boatWake = (wakeTrail * wakeWave + bowFoam) * clamp(uBoatSpeed / 9.0, 0.0, 1.0) * uWakeStrength;
+        float side = abs(lateral);
+        float speedNorm = clamp(uBoatSpeed / 9.0, 0.0, 1.0);
 
+        // bow foam — bright white splash at the front
+        float bowFoam = vBowZone * 0.65;
+
+        // central turbulent foam — churning water directly behind
+        float turbZone = exp(-side * side * 0.35) * smoothstep(1.0, 4.0, behind) * (1.0 - smoothstep(6.0, 18.0, behind));
+        float turbNoise = noisePattern(vWorld.xz * 1.8 + uTime * 1.5);
+        float turbFoam = turbZone * turbNoise * uTurbulenceStrength * speedNorm * uWakeStrength * 0.7;
+
+        // Kelvin V-pattern foam lines
+        float rearMask = smoothstep(1.2, 6.0, behind);
+        float trailFade = 1.0 - smoothstep(20.0, 58.0, behind);
+        float leftArm = abs(lateral - behind * uKelvinAngle);
+        float rightArm = abs(lateral + behind * uKelvinAngle);
+        float vFoamLeft = exp(-leftArm * leftArm * 0.7) * rearMask * trailFade;
+        float vFoamRight = exp(-rightArm * rightArm * 0.7) * rearMask * trailFade;
+        float vFoam = (vFoamLeft + vFoamRight) * speedNorm * uWakeStrength * 0.35;
+
+        // foam dissolve with noise — makes edges look organic
+        float dissolveNoise = noisePattern(vWorld.xz * 3.5 - uTime * 0.3);
+        float wakeWave = sin(behind * 2.25 - uTime * 5.0) * 0.5 + 0.5;
+
+        // central trail foam (original but enhanced)
+        float centralTrail = exp(-side * side * 0.115) * rearMask * trailFade;
+        float centralFoam = centralTrail * wakeWave * speedNorm * uWakeStrength * 0.4;
+
+        // combine all foam sources
+        float totalBoatFoam = bowFoam + turbFoam + vFoam + centralFoam;
+        // apply dissolve — foam breaks into patches at the edges
+        totalBoatFoam *= smoothstep(0.08, 0.35, totalBoatFoam + dissolveNoise * 0.15);
+
+        // natural wave crest foam
         float crestFoam = smoothstep(0.78, 1.22, abs(vWave) + textureFoam * 0.22);
-        float foam = max(crestFoam * 0.22, boatWake);
+        float foam = max(crestFoam * 0.22, totalBoatFoam);
+
+        // ---- color composition ----
         vec3 color = mix(uDeep, uMid, horizon * 0.8 + depth * 0.2);
         color = mix(color, uShallow, depth * 0.24 + caustics * 0.07 + foam * 0.24);
+
+        // aerated water in the wake — lighter turquoise tint
+        float aeratedZone = (turbZone + centralTrail * 0.3) * speedNorm * uWakeStrength;
+        color = mix(color, vec3(0.42, 0.82, 0.88), aeratedZone * 0.18);
+
         float sunPath = pow(max(0.0, 1.0 - abs(vUv.x - 0.56) * 2.2), 3.0) * smoothstep(0.26, 0.92, vUv.y);
         float fresnel = pow(1.0 - clamp(waterNormal.z, 0.0, 1.0), 1.8);
         color += uSun * sunPath * 0.13;
-        color += vec3(0.72, 0.96, 1.0) * foam * 0.34;
+
+        // foam rendering — bright white with slight blue tint
+        vec3 foamColor = mix(vec3(0.88, 0.96, 1.0), vec3(1.0, 1.0, 1.0), foam);
+        color += foamColor * foam * 0.42;
+
+        // extra sparkle in bow foam
+        float sparkle = pow(dissolveNoise, 8.0) * bowFoam * 0.6;
+        color += vec3(1.0, 0.98, 0.92) * sparkle;
+
         color += vec3(0.1, 0.32, 0.34) * caustics * 0.055;
         color += vec3(0.15, 0.3, 0.34) * fresnel * 0.18;
         color *= 0.88 + sin((vWorld.x + vWorld.z) * 0.07) * 0.028;
