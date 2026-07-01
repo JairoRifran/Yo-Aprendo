@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { getMissionState } from "../../utils/progress.js";
 import { NAVIGATOR_CONFIG } from "./config.js";
-import { createAdventureCamera, updateAdventureCamera } from "./camera.js";
+import { createAdventureCamera, createCameraInput, updateAdventureCamera } from "./camera.js";
 import { createRenderer, resizeRenderer } from "./renderer.js";
 import { addLights } from "./lights.js";
 import { createWater } from "./water.js";
@@ -24,14 +24,29 @@ const TEXTURE_KEYS = [
 ];
 
 function disposeMaterial(material) {
+  const disposedTextures = new Set();
   TEXTURE_KEYS.forEach((key) => {
-    material[key]?.dispose?.();
+    const texture = material[key];
+    if (texture?.dispose && !disposedTextures.has(texture)) {
+      texture.dispose();
+      disposedTextures.add(texture);
+    }
   });
+  if (material.uniforms) {
+    Object.values(material.uniforms).forEach((uniform) => {
+      const texture = uniform?.value;
+      if (texture?.isTexture && !disposedTextures.has(texture)) {
+        texture.dispose();
+        disposedTextures.add(texture);
+      }
+    });
+  }
   material.dispose?.();
 }
 
 function disposeObjectResources(root) {
   root.traverse((object) => {
+    object.userData.dispose?.();
     if (object.geometry) object.geometry.dispose();
     if (object.material) {
       const materials = Array.isArray(object.material) ? object.material : [object.material];
@@ -53,14 +68,15 @@ export function initIslandNavigatorScene(container, { world, onMissionReady } = 
   const renderer = createRenderer(container);
   const composer = createEffects(renderer, scene, camera, container);
   const clock = new THREE.Clock();
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
   const hud = createNavigatorHud(document);
+  const cameraInput = createCameraInput(renderer.domElement);
+  const resetButton = document.getElementById("islandNavigatorResetBtn");
   let animationFrameId = 0;
   let isDisposed = false;
   let eventsAttached = false;
   let boat = null;
   let navigation = null;
+  let islandBundle = null;
 
   function disposeSceneResources() {
     disposeObjectResources(scene);
@@ -73,8 +89,11 @@ export function initIslandNavigatorScene(container, { world, onMissionReady } = 
     if (isDisposed) return;
     isDisposed = true;
     cancelAnimationFrame(animationFrameId);
+    islandBundle?.destroy?.();
     if (eventsAttached) {
-      renderer.domElement.removeEventListener("pointerdown", onPointerDown);
+      navigation?.destroy();
+      cameraInput.destroy();
+      resetButton?.removeEventListener("click", onResetBoat);
       window.removeEventListener("resize", onResize);
       eventsAttached = false;
     }
@@ -86,20 +105,49 @@ export function initIslandNavigatorScene(container, { world, onMissionReady } = 
   const water = createWater();
   scene.add(water);
 
-  const { group: islandsGroup, islands } = createIslands(
+  islandBundle = createIslands(
     world,
-    (entry, index) => getMissionState(entry, index, [world])
+    (entry, index) => getMissionState(entry, index, [world]),
+    { renderer }
   );
+  const { group: islandsGroup, islands } = islandBundle;
+  hud.setIslands(islands);
   scene.add(islandsGroup);
 
+  function onResetBoat() {
+    if (!boat || !navigation) return;
+    const destination = navigation.getDestination();
+    const position = new THREE.Vector3(
+      NAVIGATOR_CONFIG.boat.spawnX,
+      boat.position.y,
+      NAVIGATOR_CONFIG.boat.spawnZ
+    );
+    let rotationY = NAVIGATOR_CONFIG.boat.spawnRotationY;
+
+    if (destination) {
+      const offsetX = NAVIGATOR_CONFIG.boat.spawnX - destination.position.x;
+      const offsetZ = NAVIGATOR_CONFIG.boat.spawnZ - destination.position.z;
+      const length = Math.max(1, Math.hypot(offsetX, offsetZ));
+      position.x = destination.position.x + (offsetX / length) * NAVIGATOR_CONFIG.world.resetDistanceFromTarget;
+      position.z = destination.position.z + (offsetZ / length) * NAVIGATOR_CONFIG.world.resetDistanceFromTarget;
+      rotationY = Math.atan2(destination.position.x - position.x, destination.position.z - position.z);
+    }
+
+    navigation.resetTo(position, rotationY);
+    cameraInput.reset();
+    hud.updateNavigation(navigation.state);
+    hud.updateCompass(boat, navigation.getDestination(), islands, navigation.state);
+  }
+
   async function start() {
-    const loadedBoat = await createBoat();
+    const loadedBoat = await createBoat(renderer);
     if (isDisposed) {
       disposeObjectResources(loadedBoat);
       return;
     }
     boat = loadedBoat;
     scene.add(boat);
+    islandBundle.loadModels?.();
 
     navigation = createBoatNavigation(boat, {
       onDestinationChange(mission) {
@@ -108,32 +156,28 @@ export function initIslandNavigatorScene(container, { world, onMissionReady } = 
       onArrive(mission) {
         hud.showArrival(mission);
         onMissionReady?.(mission);
+      },
+      onStateChange(state) {
+        hud.updateNavigation(state);
       }
     });
 
     const firstAvailableIsland =
-      islands.find((island) => island.userData.missionState !== "locked") || islands[0] || null;
+      islands.find((island) => island.userData.missionState !== "locked" && island.userData.mission.status === "current") ||
+      islands.find((island) => island.userData.missionState !== "locked") ||
+      islands[0] ||
+      null;
     if (firstAvailableIsland) {
       navigation.setDestination(firstAvailableIsland);
     }
 
-    renderer.domElement.addEventListener("pointerdown", onPointerDown);
+    navigation.attach();
+    cameraInput.attach();
+    resetButton?.addEventListener("click", onResetBoat);
     window.addEventListener("resize", onResize);
     eventsAttached = true;
     onResize();
     animate();
-  }
-
-  function onPointerDown(event) {
-    const rect = renderer.domElement.getBoundingClientRect();
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(islandsGroup.children, true);
-    const hit = hits.find((item) => item.object.userData.isIslandHit);
-    if (hit?.object.userData.island) {
-      navigation?.setDestination(hit.object.userData.island);
-    }
   }
 
   function onResize() {
@@ -145,12 +189,12 @@ export function initIslandNavigatorScene(container, { world, onMissionReady } = 
     const delta = Math.min(clock.getDelta(), 0.04);
     const elapsed = clock.elapsedTime;
 
-    water.userData.update(elapsed);
+    water.userData.update(elapsed, boat, navigation?.state);
     updateIslands(islands, elapsed);
     navigation?.update(delta);
-    updateBoatFloat(boat, elapsed);
-    updateAdventureCamera(camera, boat, delta);
-    hud.updateCompass(boat, navigation?.getDestination());
+    updateBoatFloat(boat, elapsed, water, delta);
+    updateAdventureCamera(camera, boat, delta, cameraInput.state);
+    hud.updateCompass(boat, navigation?.getDestination(), islands, navigation?.state);
 
     composer.render(delta);
     animationFrameId = requestAnimationFrame(animate);
