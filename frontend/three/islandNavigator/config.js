@@ -1,6 +1,12 @@
 export const THREE_VERSION = "0.168.0";
 export const BOAT_GLB_URL = "./models/barco.glb";
-export const MINI_ISLAND_GLB_URLS = ["./models/micro-isla-1.glb", "./models/micro-isla-2.glb"];
+export const MINI_ISLAND_GLB_URLS = [
+  "./models/micro-isla-1.glb",
+  "./models/micro-isla-2.glb",
+  "./models/micro-isla-3.glb",
+  "./models/micro-isla-4.glb",
+  "./models/micro-isla-5.glb"
+];
 
 export const NAVIGATOR_CONFIG = {
   camera: {
@@ -25,7 +31,7 @@ export const NAVIGATOR_CONFIG = {
     oceanSize: 620,
     playableRadius: 260,
     edgeWarningRadius: 226,
-    activeIslandCount: 2,
+    activeIslandCount: 5,
     resetDistanceFromTarget: 76,
     fogColor: 0x8eddf5,
     fogNear: 155,
