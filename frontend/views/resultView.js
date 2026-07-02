@@ -1,6 +1,6 @@
 import { grade4Data } from "../data/grade4.js";
 import { appState } from "../state/appState.js";
-import { goToDashboard, goToMission, goToStart, goToSubmap } from "../utils/navigation.js";
+import { goToDashboard, goToIslandNavigator, goToMission, goToStart, goToSubmap } from "../utils/navigation.js";
 import { unlockAudio, playUiClick, playSuccess, playError, playCoinCount } from "../utils/audio.js";
 import { uiIcon } from "../utils/icons.js";
 
@@ -213,7 +213,7 @@ export function renderResult() {
 
   const playerName = getResultPlayerName();
   const nextMission = result.success ? getNextMission() : null;
-  const continueLabel = nextMission ? `Seguir con ${nextMission.title}` : "Volver al submapa";
+  const continueLabel = "Seguir navegando";
   preloadResultRobotModel(result.success ? RESULT_ROBOT_MODEL : RESULT_FAIL_ROBOT_MODEL);
 
   unlockAudio();
@@ -258,7 +258,7 @@ export function renderResult() {
 
                   <div class="result-next-note">
                     <strong>Sigue explorando</strong>
-                    <span>${nextMission ? `Tu siguiente reto es ${nextMission.title}. Vamos por la proxima mision.` : "Todavia puedes explorar mas retos en esta isla."}</span>
+                    <span>${nextMission ? `Tu siguiente reto es ${nextMission.title}. Sube al barco y navega hacia la próxima isla.` : "Todavía puedes explorar más retos navegando por el océano."}</span>
                   </div>
                 </div>
                 ${renderVictoryScene(result)}
@@ -286,7 +286,7 @@ export function renderResult() {
           ${
             result.success
               ? `
-                <button id="backToSubmapBtn" class="btn btn-secondary">Volver al submapa</button>
+                <button id="backToSubmapBtn" class="btn btn-secondary">Volver a las islas</button>
                 <button id="continueMissionBtn" class="btn btn-primary">${continueLabel}</button>
               `
               : `<button id="retryMissionBtn" class="btn btn-primary">Intentar otra vez</button>`
@@ -302,23 +302,19 @@ export function renderResult() {
 
     document.getElementById("resultHudBackBtn")?.addEventListener("click", () => {
       playUiClick();
-      goToSubmap(appState.selectedWorldId);
+      goToIslandNavigator(appState.selectedWorldId);
       window.renderApp();
     });
 
     document.getElementById("backToSubmapBtn")?.addEventListener("click", () => {
       playUiClick();
-      goToSubmap(appState.selectedWorldId);
+      goToIslandNavigator(appState.selectedWorldId);
       window.renderApp();
     });
 
     document.getElementById("continueMissionBtn")?.addEventListener("click", () => {
       playUiClick();
-      if (nextMission) {
-        goToMission(appState.selectedWorldId, nextMission.id);
-      } else {
-        goToSubmap(appState.selectedWorldId);
-      }
+      goToIslandNavigator(appState.selectedWorldId);
       window.renderApp();
     });
   } else {
@@ -326,7 +322,7 @@ export function renderResult() {
 
     document.getElementById("resultHudBackBtn")?.addEventListener("click", () => {
       playUiClick();
-      goToSubmap(appState.selectedWorldId);
+      goToIslandNavigator(appState.selectedWorldId);
       window.renderApp();
     });
 

@@ -1,7 +1,7 @@
 import { grade4Data } from "../data/grade4.js";
 import { appState } from "../state/appState.js";
 import { completeMission } from "../utils/progress.js";
-import { goToDashboard, goToResult, goToStart, goToSubmap } from "../utils/navigation.js";
+import { goToDashboard, goToIslandNavigator, goToResult, goToStart, goToSubmap } from "../utils/navigation.js";
 import {
   unlockAudio,
   playUiClick,
@@ -3020,7 +3020,7 @@ export function renderMission() {
       unlockAudio();
       playUiClick();
       stopAnimation();
-      goToSubmap(world.id);
+      goToIslandNavigator(world.id);
       window.renderApp();
     });
 
@@ -3028,7 +3028,7 @@ export function renderMission() {
       unlockAudio();
       playUiClick();
       stopAnimation();
-      goToSubmap(world.id);
+      goToIslandNavigator(world.id);
       window.renderApp();
     });
 
