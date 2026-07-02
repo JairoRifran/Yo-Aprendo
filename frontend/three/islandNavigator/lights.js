@@ -1,10 +1,12 @@
 import * as THREE from "three";
 
 export function addLights(scene) {
-  const hemi = new THREE.HemisphereLight(0xe7fbff, 0x2b7465, 2.35);
+  // Use a clean, realistic hemisphere light (sky: white, ground: soft blue-grey reflected from ocean)
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x8bb9d5, 1.45);
   scene.add(hemi);
 
-  const sun = new THREE.DirectionalLight(0xfff0b8, 4.25);
+  // Strong, warm primary sun light
+  const sun = new THREE.DirectionalLight(0xfff5db, 3.8);
   sun.position.set(-38, 52, 28);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1536, 1536);
@@ -16,16 +18,12 @@ export function addLights(scene) {
   sun.shadow.camera.far = 150;
   scene.add(sun);
 
-  const oceanGlow = new THREE.PointLight(0x7df2ff, 1.05, 110);
-  oceanGlow.position.set(12, 12, 18);
-  scene.add(oceanGlow);
-
   const sunDisk = new THREE.Mesh(
     new THREE.SphereGeometry(4.5, 24, 24),
-    new THREE.MeshBasicMaterial({ color: 0xfff0a5, transparent: true, opacity: 0.72 })
+    new THREE.MeshBasicMaterial({ color: 0xfff4c0, transparent: true, opacity: 0.8 })
   );
   sunDisk.position.set(-75, 62, -112);
   scene.add(sunDisk);
 
-  return { hemi, sun, oceanGlow, sunDisk };
+  return { hemi, sun, sunDisk };
 }

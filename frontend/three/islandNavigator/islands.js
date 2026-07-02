@@ -53,9 +53,7 @@ function prepareIslandModel(model, missionState, accent) {
       if (!material) return;
       material.roughness = Math.max(material.roughness ?? 0.68, NAVIGATOR_CONFIG.islandModel.materialRoughness);
       material.metalness = Math.min(material.metalness ?? 0.02, 0.08);
-      if (missionState === "locked") {
-        material.color?.lerp(new THREE.Color(0x8aa090), 0.28);
-      } else if (material.emissive && material.emissiveIntensity > 0) {
+      if (material.emissive && material.emissiveIntensity > 0) {
         material.emissive.lerp(new THREE.Color(accent), 0.18);
       }
     });
