@@ -5,7 +5,9 @@ export const MINI_ISLAND_GLB_URLS = [
   "./models/micro-isla-2.glb",
   "./models/micro-isla-3.glb",
   "./models/micro-isla-4.glb",
-  "./models/micro-isla-5.glb"
+  "./models/micro-isla-5.glb",
+  "./models/micro-isla-6.glb",
+  "./models/micro-isla-7.glb"
 ];
 
 export const NAVIGATOR_CONFIG = {
