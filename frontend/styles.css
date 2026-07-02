@@ -18518,6 +18518,8 @@ body.student-game-cursor * {
 }
 
 .island-navigator-hud-left {
+  top: auto;
+  bottom: 24px;
   left: 22px;
 }
 
@@ -18970,14 +18972,22 @@ body.student-game-cursor * {
     max-width: calc(100vw - 24px);
   }
 
-  .island-navigator-hud-left,
-  .island-navigator-hud-right {
+  .island-navigator-hud-left {
+    top: auto;
+    bottom: 14px;
     left: 12px;
-    right: 12px;
+    right: auto;
+    max-width: calc(100vw - 24px);
+  }
+
+  .island-navigator-hud-left.is-arrived {
+    display: none;
   }
 
   .island-navigator-hud-right {
-    top: 136px;
+    top: 12px;
+    right: 12px;
+    left: auto;
   }
 
   .island-navigator-mini-map {

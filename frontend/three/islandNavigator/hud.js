@@ -50,6 +50,7 @@ export function createNavigatorHud(root) {
   const why = root.querySelector("#islandNavigatorMissionWhy");
   const reward = root.querySelector("#islandNavigatorMissionReward");
   const enter = root.querySelector("#islandNavigatorEnterBtn");
+  const hudLeft = root.querySelector(".island-navigator-hud-left");
 
   let islandMarkers = [];
   let previousDistance = 0;
@@ -107,6 +108,7 @@ export function createNavigatorHud(root) {
     if (mapHintEl) mapHintEl.textContent = "Seguí derecho";
     if (statusEl) statusEl.textContent = "Navegando";
     if (card) card.hidden = true;
+    if (hudLeft) hudLeft.classList.remove("is-arrived");
   }
 
   function showArrival(mission) {
@@ -118,6 +120,7 @@ export function createNavigatorHud(root) {
     if (reward) reward.textContent = getRewardText(mission);
     if (enter) enter.dataset.missionId = mission?.id || "";
     if (card) card.hidden = false;
+    if (hudLeft) hudLeft.classList.add("is-arrived");
   }
 
   function updateCompass(boat, island, islands = [], state) {
@@ -174,7 +177,10 @@ export function createNavigatorHud(root) {
     if (!state) return;
     const distance = Math.max(0, Math.round(state.distance || 0));
     if (detailEl) detailEl.textContent = distance ? `${distance} m hasta la isla` : "Buscando destino";
-    if (card && state.status !== "ready") card.hidden = true;
+    if (card && state.status !== "ready") {
+      card.hidden = true;
+      if (hudLeft) hudLeft.classList.remove("is-arrived");
+    }
     if (statusEl) {
       if (state.status === "ready") statusEl.textContent = "Listo para ingresar";
       else if (state.edgeWarning) statusEl.textContent = "Volvé hacia las islas";

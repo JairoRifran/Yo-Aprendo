@@ -28,10 +28,10 @@ function createSkyDome() {
     side: THREE.BackSide,
     depthWrite: false,
     uniforms: {
-      uTop: { value: new THREE.Color(0x4cc9f0) },
-      uMid: { value: new THREE.Color(0x9feaff) },
-      uHorizon: { value: new THREE.Color(0xffedbb) },
-      uSun: { value: new THREE.Color(0xfff4b5) },
+      uTop: { value: new THREE.Color(0x187bcd) },
+      uMid: { value: new THREE.Color(0x56cbf9) },
+      uHorizon: { value: new THREE.Color(0xfff2d6) },
+      uSun: { value: new THREE.Color(0xfff5c0) },
       uTime: { value: 0 }
     },
     vertexShader: `
@@ -51,19 +51,52 @@ function createSkyDome() {
       uniform float uTime;
       varying vec3 vWorld;
 
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+      }
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i + vec2(0.0,0.0)), hash(i + vec2(1.0,0.0)), u.x),
+                   mix(hash(i + vec2(0.0,1.0)), hash(i + vec2(1.0,1.0)), u.x), u.y);
+      }
+      float fbm(vec2 p) {
+        float v = 0.0;
+        float a = 0.52;
+        for (int i = 0; i < 4; i++) {
+          v += a * noise(p);
+          p = p * 2.15 + vec2(0.12, 0.28);
+          a *= 0.48;
+        }
+        return v;
+      }
+
       void main() {
-        float height = clamp(vWorld.y * 0.5 + 0.5, 0.0, 1.0);
-        float horizon = smoothstep(0.18, 0.52, height);
+        float height = clamp(vWorld.y * 0.6 + 0.4, 0.0, 1.0);
+        float horizon = smoothstep(0.12, 0.55, height);
         vec3 color = mix(uHorizon, uMid, horizon);
-        color = mix(color, uTop, smoothstep(0.55, 1.0, height) * 0.76);
-        vec3 sunDir = normalize(vec3(-0.38, 0.32, -0.86));
-        float sun = pow(max(dot(vWorld, sunDir), 0.0), 520.0);
-        float glow = pow(max(dot(vWorld, sunDir), 0.0), 12.0);
-        float cloudA = sin(vWorld.x * 26.0 + vWorld.z * 11.0 + uTime * 0.025) * 0.5 + 0.5;
-        float cloudB = sin(vWorld.x * -13.0 + vWorld.z * 18.0 - uTime * 0.02) * 0.5 + 0.5;
-        float clouds = smoothstep(0.72, 0.96, cloudA * cloudB) * smoothstep(0.22, 0.48, height) * (1.0 - smoothstep(0.56, 0.82, height));
-        color = mix(color, vec3(1.0, 0.97, 0.86), clouds * 0.13);
-        color += uSun * (sun * 1.3 + glow * 0.12);
+        color = mix(color, uTop, smoothstep(0.52, 1.0, height) * 0.82);
+        
+        vec3 sunDir = normalize(vec3(-0.38, 0.35, -0.85));
+        float sunDot = max(dot(vWorld, sunDir), 0.0);
+        float sunCore = pow(sunDot, 640.0);
+        float sunGlow = pow(sunDot, 18.0) * 0.4 + pow(sunDot, 4.5) * 0.18;
+        
+        if (vWorld.y > 0.04) {
+          vec2 cloudUv = vWorld.xz / (vWorld.y + 0.14) * 2.2 + vec2(uTime * 0.018, uTime * 0.009);
+          float cloudNoise = fbm(cloudUv);
+          float cloudDensity = smoothstep(0.42, 0.78, cloudNoise) * smoothstep(0.04, 0.32, vWorld.y);
+          vec3 cloudColor = mix(vec3(0.96, 0.98, 1.0), vec3(1.0, 0.92, 0.76), pow(sunDot, 2.5) * 0.85);
+          color = mix(color, cloudColor, cloudDensity * 0.75);
+        }
+
+        float rayAngle = atan(vWorld.y - sunDir.y, vWorld.x - sunDir.x);
+        float godRays = sin(rayAngle * 11.0 + uTime * 0.12) * sin(rayAngle * 17.0 - uTime * 0.08) * 0.5 + 0.5;
+        float rayMask = pow(sunDot, 5.0) * (1.0 - smoothstep(0.4, 0.88, height));
+        color += uSun * godRays * rayMask * 0.22;
+
+        color += uSun * (sunCore * 1.5 + sunGlow);
         gl_FragColor = vec4(color, 1.0);
       }
     `
@@ -72,6 +105,99 @@ function createSkyDome() {
   const sky = new THREE.Mesh(geometry, material);
   sky.renderOrder = -10;
   return sky;
+}
+
+function createVolumetricCloudsGroup() {
+  const cloudsGroup = new THREE.Group();
+  
+  const cloudMaterial = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uSunDir: { value: new THREE.Vector3(-0.38, 0.35, -0.85).normalize() },
+      uSunColor: { value: new THREE.Color(0xfff8e7) },
+      uSkyColor: { value: new THREE.Color(0xdceeff) },
+      uShadowColor: { value: new THREE.Color(0x8bc4e8) }
+    },
+    vertexShader: `
+      varying vec3 vNormalWorld;
+      varying vec3 vPosWorld;
+      void main() {
+        vNormalWorld = normalize(mat3(modelMatrix) * normal);
+        vec4 worldPos = modelMatrix * vec4(position, 1.0);
+        vPosWorld = worldPos.xyz;
+        gl_Position = projectionMatrix * viewMatrix * worldPos;
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 uSunDir;
+      uniform vec3 uSunColor;
+      uniform vec3 uSkyColor;
+      uniform vec3 uShadowColor;
+      varying vec3 vNormalWorld;
+      varying vec3 vPosWorld;
+
+      void main() {
+        vec3 norm = normalize(vNormalWorld);
+        float sunDot = max(dot(norm, uSunDir), 0.0);
+        float upDot = clamp(norm.y * 0.6 + 0.4, 0.0, 1.0);
+        
+        vec3 color = mix(uShadowColor, uSkyColor, upDot);
+        color = mix(color, uSunColor, pow(sunDot, 1.8) * 0.65);
+        
+        vec3 viewDir = normalize(cameraPosition - vPosWorld);
+        float rim = 1.0 - max(dot(norm, viewDir), 0.0);
+        color += uSunColor * pow(clamp(rim, 0.0, 1.0), 3.0) * 0.3;
+
+        gl_FragColor = vec4(color, 0.92);
+      }
+    `
+  });
+
+  const puffGeo = new THREE.SphereGeometry(1, 14, 10);
+  const clusterCount = 18;
+
+  for (let i = 0; i < clusterCount; i++) {
+    const cluster = new THREE.Group();
+    const puffCount = 6 + Math.floor(Math.random() * 5);
+    const baseScale = 14 + Math.random() * 18;
+
+    for (let p = 0; p < puffCount; p++) {
+      const puff = new THREE.Mesh(puffGeo, cloudMaterial);
+      const scaleX = baseScale * (0.6 + Math.random() * 0.7);
+      const scaleY = baseScale * (0.35 + Math.random() * 0.35);
+      const scaleZ = baseScale * (0.5 + Math.random() * 0.6);
+      puff.scale.set(scaleX, scaleY, scaleZ);
+
+      const offsetX = (Math.random() - 0.5) * baseScale * 1.6;
+      const offsetY = (Math.random() - 0.3) * baseScale * 0.4;
+      const offsetZ = (Math.random() - 0.5) * baseScale * 1.4;
+      puff.position.set(offsetX, offsetY, offsetZ);
+
+      cluster.add(puff);
+    }
+
+    const angle = (i / clusterCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+    const distance = 140 + Math.random() * 260;
+    cluster.position.set(
+      Math.cos(angle) * distance,
+      75 + Math.random() * 65,
+      Math.sin(angle) * distance
+    );
+    cluster.rotation.y = Math.random() * Math.PI * 2;
+
+    cluster.userData = {
+      speedX: 1.8 + Math.random() * 2.2,
+      speedZ: (Math.random() - 0.5) * 0.8,
+      baseY: cluster.position.y,
+      bobSpeed: 0.35 + Math.random() * 0.3,
+      phase: Math.random() * Math.PI * 2
+    };
+
+    cloudsGroup.add(cluster);
+  }
+
+  return { cloudsGroup, puffGeo, cloudMaterial };
 }
 
 function createWaterPlane(textures) {
@@ -335,12 +461,23 @@ export function createWaterSkyEnvironment() {
   };
 
   const sky = createSkyDome();
+  const { cloudsGroup, puffGeo, cloudMaterial } = createVolumetricCloudsGroup();
   const water = createWaterPlane(textures);
-  group.add(sky, water);
+  group.add(sky, cloudsGroup, water);
 
   group.userData.update = (elapsed, boat, navigationState) => {
     sky.material.uniforms.uTime.value = elapsed;
     water.material.uniforms.uTime.value = elapsed;
+    cloudsGroup.children.forEach((cluster) => {
+      cluster.position.x += cluster.userData.speedX * 0.016;
+      cluster.position.z += cluster.userData.speedZ * 0.016;
+      cluster.position.y = cluster.userData.baseY + Math.sin(elapsed * cluster.userData.bobSpeed + cluster.userData.phase) * 2.2;
+      if (cluster.position.x > 450) cluster.position.x = -450;
+      if (cluster.position.x < -450) cluster.position.x = 450;
+      if (cluster.position.z > 450) cluster.position.z = -450;
+      if (cluster.position.z < -450) cluster.position.z = 450;
+    });
+
     if (boat) {
       water.material.uniforms.uBoatPos.value.set(boat.position.x, boat.position.z);
       water.material.uniforms.uBoatForward.value.set(Math.sin(boat.rotation.y), Math.cos(boat.rotation.y));
@@ -356,6 +493,8 @@ export function createWaterSkyEnvironment() {
     textures.normal.dispose();
     textures.foam.dispose();
     textures.caustics.dispose();
+    puffGeo.dispose();
+    cloudMaterial.dispose();
   };
 
   return group;
