@@ -167,12 +167,13 @@ export function initIslandNavigatorScene(container, { world, onMissionReady } = 
     });
 
     const firstAvailableIsland =
-      islands.find((island) => island.userData.missionState !== "locked" && island.userData.mission.status === "current") ||
+      islands.find((island) => island.userData.missionState === "available") ||
       islands.find((island) => island.userData.missionState !== "locked") ||
       islands[0] ||
       null;
     if (firstAvailableIsland) {
       navigation.setDestination(firstAvailableIsland);
+      onResetBoat();
     }
 
     navigation.attach();
