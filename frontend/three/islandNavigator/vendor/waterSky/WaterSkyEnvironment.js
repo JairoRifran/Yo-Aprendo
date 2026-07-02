@@ -107,97 +107,86 @@ function createSkyDome() {
   return sky;
 }
 
-function createVolumetricCloudsGroup() {
-  const cloudsGroup = new THREE.Group();
-  
-  const cloudMaterial = new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    uniforms: {
-      uSunDir: { value: new THREE.Vector3(-0.38, 0.35, -0.85).normalize() },
-      uSunColor: { value: new THREE.Color(0xfff8e7) },
-      uSkyColor: { value: new THREE.Color(0xdceeff) },
-      uShadowColor: { value: new THREE.Color(0x8bc4e8) }
-    },
-    vertexShader: `
-      varying vec3 vNormalWorld;
-      varying vec3 vPosWorld;
-      void main() {
-        vNormalWorld = normalize(mat3(modelMatrix) * normal);
-        vec4 worldPos = modelMatrix * vec4(position, 1.0);
-        vPosWorld = worldPos.xyz;
-        gl_Position = projectionMatrix * viewMatrix * worldPos;
-      }
-    `,
-    fragmentShader: `
-      uniform vec3 uSunDir;
-      uniform vec3 uSunColor;
-      uniform vec3 uSkyColor;
-      uniform vec3 uShadowColor;
-      varying vec3 vNormalWorld;
-      varying vec3 vPosWorld;
+function makeCloudTexture(size = 256) {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
 
-      void main() {
-        vec3 norm = normalize(vNormalWorld);
-        float sunDot = max(dot(norm, uSunDir), 0.0);
-        float upDot = clamp(norm.y * 0.6 + 0.4, 0.0, 1.0);
-        
-        vec3 color = mix(uShadowColor, uSkyColor, upDot);
-        color = mix(color, uSunColor, pow(sunDot, 1.8) * 0.65);
-        
-        vec3 viewDir = normalize(cameraPosition - vPosWorld);
-        float rim = 1.0 - max(dot(norm, viewDir), 0.0);
-        color += uSunColor * pow(clamp(rim, 0.0, 1.0), 3.0) * 0.3;
+  // Multiple overlapping soft radial blobs to form a natural cloud shape
+  const blobs = [
+    { x: 0.50, y: 0.54, r: 0.36 },
+    { x: 0.34, y: 0.58, r: 0.28 },
+    { x: 0.66, y: 0.56, r: 0.28 },
+    { x: 0.42, y: 0.46, r: 0.22 },
+    { x: 0.60, y: 0.46, r: 0.20 },
+    { x: 0.50, y: 0.40, r: 0.18 },
+    { x: 0.25, y: 0.62, r: 0.18 },
+    { x: 0.75, y: 0.62, r: 0.18 },
+  ];
 
-        gl_FragColor = vec4(color, 0.92);
-      }
-    `
+  blobs.forEach(({ x, y, r }) => {
+    const cx = x * size;
+    const cy = y * size;
+    const radius = r * size;
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+    grd.addColorStop(0,   "rgba(255,255,255,0.55)");
+    grd.addColorStop(0.4, "rgba(255,255,255,0.35)");
+    grd.addColorStop(0.75,"rgba(255,255,255,0.10)");
+    grd.addColorStop(1,   "rgba(255,255,255,0.00)");
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fill();
   });
 
-  const puffGeo = new THREE.SphereGeometry(1, 14, 10);
-  const clusterCount = 18;
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
 
-  for (let i = 0; i < clusterCount; i++) {
-    const cluster = new THREE.Group();
-    const puffCount = 6 + Math.floor(Math.random() * 5);
-    const baseScale = 14 + Math.random() * 18;
+function createCloudSprites() {
+  const CLOUD_COUNT = 40;
+  const cloudGroup = new THREE.Group();
+  const textures = [makeCloudTexture(256), makeCloudTexture(256), makeCloudTexture(256)];
 
-    for (let p = 0; p < puffCount; p++) {
-      const puff = new THREE.Mesh(puffGeo, cloudMaterial);
-      const scaleX = baseScale * (0.6 + Math.random() * 0.7);
-      const scaleY = baseScale * (0.35 + Math.random() * 0.35);
-      const scaleZ = baseScale * (0.5 + Math.random() * 0.6);
-      puff.scale.set(scaleX, scaleY, scaleZ);
+  const spriteMaterial = (tex) => new THREE.SpriteMaterial({
+    map: tex,
+    transparent: true,
+    depthWrite: false,
+    depthTest: true,
+    opacity: 1.0
+  });
 
-      const offsetX = (Math.random() - 0.5) * baseScale * 1.6;
-      const offsetY = (Math.random() - 0.3) * baseScale * 0.4;
-      const offsetZ = (Math.random() - 0.5) * baseScale * 1.4;
-      puff.position.set(offsetX, offsetY, offsetZ);
+  for (let i = 0; i < CLOUD_COUNT; i++) {
+    const tex = textures[i % textures.length];
+    const mat = spriteMaterial(tex);
+    const sprite = new THREE.Sprite(mat);
 
-      cluster.add(puff);
-    }
-
-    const angle = (i / clusterCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
-    const distance = 140 + Math.random() * 260;
-    cluster.position.set(
+    const angle = (i / CLOUD_COUNT) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+    const distance = 80 + Math.random() * 280;
+    const w = 60 + Math.random() * 100;
+    const h = w * (0.3 + Math.random() * 0.25);
+    sprite.scale.set(w, h, 1);
+    sprite.position.set(
       Math.cos(angle) * distance,
-      75 + Math.random() * 65,
+      55 + Math.random() * 70,
       Math.sin(angle) * distance
     );
-    cluster.rotation.y = Math.random() * Math.PI * 2;
+    sprite.material.opacity = 0.55 + Math.random() * 0.35;
 
-    cluster.userData = {
-      speedX: 1.8 + Math.random() * 2.2,
-      speedZ: (Math.random() - 0.5) * 0.8,
-      baseY: cluster.position.y,
-      bobSpeed: 0.35 + Math.random() * 0.3,
+    sprite.userData = {
+      speedX: (0.8 + Math.random() * 1.4) * (Math.random() < 0.5 ? 1 : -1) * 0.5,
+      speedZ: (Math.random() - 0.5) * 0.4,
+      baseY: sprite.position.y,
+      bobSpeed: 0.08 + Math.random() * 0.1,
       phase: Math.random() * Math.PI * 2
     };
 
-    cloudsGroup.add(cluster);
+    cloudGroup.add(sprite);
   }
 
-  return { cloudsGroup, puffGeo, cloudMaterial };
+  return { cloudGroup, textures };
 }
 
 function createWaterPlane(textures) {
@@ -461,21 +450,22 @@ export function createWaterSkyEnvironment() {
   };
 
   const sky = createSkyDome();
-  const { cloudsGroup, puffGeo, cloudMaterial } = createVolumetricCloudsGroup();
+  const { cloudGroup, textures: cloudTextures } = createCloudSprites();
   const water = createWaterPlane(textures);
-  group.add(sky, cloudsGroup, water);
+  group.add(sky, cloudGroup, water);
 
   group.userData.update = (elapsed, boat, navigationState) => {
     sky.material.uniforms.uTime.value = elapsed;
     water.material.uniforms.uTime.value = elapsed;
-    cloudsGroup.children.forEach((cluster) => {
-      cluster.position.x += cluster.userData.speedX * 0.016;
-      cluster.position.z += cluster.userData.speedZ * 0.016;
-      cluster.position.y = cluster.userData.baseY + Math.sin(elapsed * cluster.userData.bobSpeed + cluster.userData.phase) * 2.2;
-      if (cluster.position.x > 450) cluster.position.x = -450;
-      if (cluster.position.x < -450) cluster.position.x = 450;
-      if (cluster.position.z > 450) cluster.position.z = -450;
-      if (cluster.position.z < -450) cluster.position.z = 450;
+
+    cloudGroup.children.forEach((sprite) => {
+      sprite.position.x += sprite.userData.speedX * 0.016;
+      sprite.position.z += sprite.userData.speedZ * 0.016;
+      sprite.position.y = sprite.userData.baseY + Math.sin(elapsed * sprite.userData.bobSpeed + sprite.userData.phase) * 3.5;
+      if (sprite.position.x > 420) sprite.position.x = -420;
+      if (sprite.position.x < -420) sprite.position.x = 420;
+      if (sprite.position.z > 420) sprite.position.z = -420;
+      if (sprite.position.z < -420) sprite.position.z = 420;
     });
 
     if (boat) {
@@ -493,8 +483,7 @@ export function createWaterSkyEnvironment() {
     textures.normal.dispose();
     textures.foam.dispose();
     textures.caustics.dispose();
-    puffGeo.dispose();
-    cloudMaterial.dispose();
+    cloudTextures.forEach((t) => t.dispose());
   };
 
   return group;
